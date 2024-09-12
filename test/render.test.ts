@@ -37,13 +37,15 @@ describe("render", () => {
 	test("renders head related tags", async () => {
 		const Comp = defineComponent({
 			render() {
-				return h("head", {}, [
-					h("title", {}, ["Hello"]),
-					h("meta", { charset: "utf-8" }),
-					h("link", { rel: "stylesheet", href: "style.css" }),
-					h("style", {}, ["body { color: red; }"]),
-					h("script", { src: "script.js" }),
-					h("script", {}, ["console.log('Hello')"]),
+				return h("html", {}, [
+					h("head", {}, [
+						h("title", {}, ["Hello"]),
+						h("meta", { charset: "utf-8" }),
+						h("link", { rel: "stylesheet", href: "style.css" }),
+						h("style", {}, ["body { color: red; }"]),
+						h("script", { src: "script.js" }),
+						h("script", {}, ["console.log('Hello')"]),
+					]),
 				]);
 			},
 		});
@@ -52,7 +54,7 @@ describe("render", () => {
 
 		assert.equal(
 			result,
-			'<head><title>Hello</title><meta charset="utf-8"><link rel="stylesheet" href="style.css"><style>body { color: red; }</style><script src="script.js"></script><script>console.log(&#39;Hello&#39;)</script></head>',
+			'<html><head><title>Hello</title><meta charset="utf-8"><link rel="stylesheet" href="style.css"><style>body { color: red; }</style><script src="script.js"></script><script>console.log(&#39;Hello&#39;)</script></head></html>',
 		);
 	});
 });
