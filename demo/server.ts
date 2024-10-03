@@ -34,7 +34,7 @@ async function createServer() {
 
 			const { render } = isProd
 				? await import("./server-dist/entry-server.js")
-				: await vite.ssrLoadModule("./entry-server.ts");
+				: await vite.ssrLoadModule("./src/entry-server.ts");
 
 			const appHtml = await render(url);
 			const html = template.replace("<!--ssr-outlet-->", appHtml);

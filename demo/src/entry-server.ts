@@ -1,4 +1,4 @@
-import { render as renderComponent } from "../src/render.js";
+import { render as renderComponent } from "../../src/render.js";
 import Page from "./components/Page.vue";
 
 export async function render(_url: string) {
