@@ -1,3 +1,5 @@
 node_modules/
 dist/
 __generated__/
+server-dist/
+client-dist/

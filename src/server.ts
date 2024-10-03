@@ -1,7 +1,7 @@
 import type { Plugin } from "rollup";
 import fs from "node:fs";
 
-export function rollupPlugin(): Plugin {
+export default function islandPlugin(): Plugin {
 	return {
 		name: "vue-island",
 

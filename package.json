@@ -8,7 +8,8 @@
 		"build": "tsc -p .",
 		"test": "node --test --watch --experimental-strip-types ./test/**/*.test.ts",
 		"lint": "pnpm biome lint ./src",
-		"format": "pnpm biome format --write ./src"
+		"format": "pnpm biome format --write ./src",
+		"demo": "cd demo && node --experimental-strip-types server.ts"
 	},
 	"keywords": [
 		"Vue.js",
@@ -22,10 +23,13 @@
 	"packageManager": "pnpm@9.9.0+sha512.60c18acd138bff695d339be6ad13f7e936eea6745660d4cc4a776d5247c540d0edee1a563695c183a66eb917ef88f2b4feb1fc25f32a7adcadc7aaf3438e99c1",
 	"devDependencies": {
 		"@biomejs/biome": "1.8.3",
+		"@types/express": "^5.0.0",
 		"@types/node": "^22.5.4",
 		"@vitejs/plugin-vue": "^5.1.4",
+		"express": "^4.21.0",
 		"rollup": "^4.21.2",
 		"typescript": "^5.5.4",
+		"vite": "^5.4.8",
 		"vue": "^3.5.9"
 	},
 	"peerDependencies": {

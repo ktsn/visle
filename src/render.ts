@@ -1,9 +1,7 @@
 import { createApp } from "vue";
 import { renderToString } from "vue/server-renderer";
 
-type BaseProps = Record<string, unknown>;
-
-interface VueComponent<Props extends BaseProps> {
+interface VueComponent<Props> {
 	new (): {
 		$props: Props;
 	};
@@ -22,19 +20,17 @@ type RequiredKeys<T> = {
 	[K in keyof T]-?: T[K] extends Required<T>[K] ? K : never;
 }[keyof T];
 
-export async function render<Props extends BaseProps>(
+export async function render<Props>(
 	component: VueComponent<CanEmpty<Props>>,
 ): Promise<string>;
 
-export async function render<Props extends BaseProps>(
+export async function render<Props>(
 	component: VueComponent<Props>,
 	props: Props,
 ): Promise<string>;
 
-export async function render(
-	component: VueComponent<BaseProps>,
-	props: BaseProps = {},
-) {
+// biome-ignore lint/complexity/noBannedTypes: Vue uses {} type
+export async function render(component: VueComponent<{}>, props: {} = {}) {
 	const app = createApp(component, props);
 	const result = await renderToString(app);
 

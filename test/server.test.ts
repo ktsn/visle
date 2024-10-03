@@ -6,7 +6,7 @@ import path from "node:path";
 import { spawn } from "node:child_process";
 import { rollup } from "rollup";
 import vue from "@vitejs/plugin-vue";
-import { rollupPlugin } from "../src/server.ts";
+import island from "../src/server.ts";
 
 function create(files: Record<string, string>) {
 	Object.entries(files).map(([fileName, content]) => {
@@ -17,7 +17,7 @@ function create(files: Record<string, string>) {
 		input: path.join(os.tmpdir(), "./main.vue"),
 		external: ["vue"],
 		plugins: [
-			rollupPlugin(),
+			island(),
 			vue({
 				template: {
 					compilerOptions: {
