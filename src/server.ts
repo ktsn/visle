@@ -1,4 +1,5 @@
 import type { Plugin } from "vite";
+import path from "node:path";
 import fs from "node:fs";
 
 export default function islandPlugin(): Plugin {
@@ -43,11 +44,13 @@ export default function islandPlugin(): Plugin {
 }
 
 function generateIslandCode(fileName: string): string {
+	const baseName = path.basename(fileName, ".client.vue");
+
 	return `<script setup>
 	import OriginalComponent from "${fileName}?original";
 	</script>
 	<template>
-		<vue-island entry="Counter">
+		<vue-island entry="${baseName}">
 			<OriginalComponent />
 		</vue-island>
 	</template>`;
