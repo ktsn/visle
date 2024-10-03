@@ -1,7 +1,7 @@
 {
 	"name": "@ktsn/vue-island",
 	"version": "0.0.0",
-	"description": "Vue as a server side template engine",
+	"description": "Vue as a server side template engine with island support",
 	"main": "index.js",
 	"type": "module",
 	"scripts": {
