@@ -16,7 +16,16 @@ function create(files: Record<string, string>) {
 	return rollup({
 		input: path.join(os.tmpdir(), "./main.vue"),
 		external: ["vue"],
-		plugins: [rollupPlugin(), vue()],
+		plugins: [
+			rollupPlugin(),
+			vue({
+				template: {
+					compilerOptions: {
+						isCustomElement: (tag) => tag === "vue-island",
+					},
+				},
+			}),
+		],
 	});
 }
 
@@ -95,7 +104,7 @@ describe("Server Plugin", () => {
 
 		assert.equal(
 			await renderGeneratedCode(code),
-			'<div><h1>Counter</h1><vue-island component="./counter.js"><button>0</button></vue-island></div>\n',
+			"<div><h1>Counter</h1><vue-island><button>0</button></vue-island></div>\n",
 		);
 	});
 });

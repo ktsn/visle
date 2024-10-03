@@ -34,7 +34,7 @@ function generateIslandCode(fileName: string): string {
 	import OriginalComponent from "${fileName}?original";
 	</script>
 	<template>
-		<vue-island component="${fileName}">
+		<vue-island>
 			<OriginalComponent />
 		</vue-island>
 	</template>`;

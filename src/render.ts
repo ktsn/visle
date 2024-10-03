@@ -36,8 +36,6 @@ export async function render(
 	props: BaseProps = {},
 ) {
 	const app = createApp(component, props);
-	app.config.compilerOptions.isCustomElement = (tag) => tag === "vue-island";
-
 	const result = await renderToString(app);
 
 	return result;
