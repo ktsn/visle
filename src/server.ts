@@ -28,6 +28,11 @@ export default function islandPlugin(): Plugin {
 				return null;
 			}
 
+			// Vue plugin generated code
+			if (query.vue != null) {
+				return null;
+			}
+
 			if (query.original != null) {
 				return fs.readFileSync(fileName, "utf-8");
 			}

@@ -1,16 +1,31 @@
 <script setup lang="ts">
+import { computed } from "vue";
 import Counter from "./Counter.client.vue";
 
-defineProps<{
+// DEMO
+import { marked } from "marked"; // 35.9K (11.2K gzipped)
+import sanitizeHtml from "sanitize-html"; // 206K (63.3K gzipped)
+
+const { title } = defineProps<{
 	title: string;
-	content: string;
 }>();
+
+const content = computed((): string => {
+	return sanitizeHtml(
+		marked(`
+# ${title}
+
+## Subtitle
+
+This is a [link](https://example.com).
+    `) as string,
+	);
+});
 </script>
 
 <template>
   <div class="wrapper">
-    <h1>{{ title }}</h1>
-    <p>{{ content }}</p>
+    <div class="content" v-html="content"></div>
     <Counter />
   </div>
 </template>

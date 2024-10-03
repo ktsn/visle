@@ -9,7 +9,9 @@
 		"test": "node --test --watch --experimental-strip-types ./test/**/*.test.ts",
 		"lint": "pnpm biome lint ./src",
 		"format": "pnpm biome format --write ./src",
-		"demo": "cd demo && node --experimental-strip-types server.ts"
+		"demo": "cd demo && node --experimental-strip-types server.ts",
+		"demo:production": "cd demo && NODE_ENV=production node --experimental-strip-types server.ts",
+		"demo:build": "cd demo && vite build --outDir server-dist --ssr entry-server.ts && vite build --outDir client-dist"
 	},
 	"keywords": [
 		"Vue.js",
@@ -25,9 +27,12 @@
 		"@biomejs/biome": "1.8.3",
 		"@types/express": "^5.0.0",
 		"@types/node": "^22.5.4",
+		"@types/sanitize-html": "^2.13.0",
 		"@vitejs/plugin-vue": "^5.1.4",
 		"express": "^4.21.0",
+		"marked": "^14.1.2",
 		"rollup": "^4.21.2",
+		"sanitize-html": "^2.13.0",
 		"typescript": "^5.5.4",
 		"vite": "^5.4.8",
 		"vue": "^3.5.9"

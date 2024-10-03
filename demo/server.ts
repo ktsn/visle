@@ -4,6 +4,7 @@ import { fileURLToPath } from "node:url";
 import express from "express";
 import { createServer as createViteServer } from "vite";
 
+const isProd = process.env.NODE_ENV === "production";
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
 async function createServer() {
@@ -16,18 +17,24 @@ async function createServer() {
 
 	app.use(vite.middlewares);
 
-	app.use("*", async (req, res, next) => {
+	app.get("/", async (req, res, next) => {
 		const url = req.originalUrl;
 
 		try {
+			const htmlFilePath = isProd ? "client-dist/index.html" : "index.html";
+
 			let template = fs.readFileSync(
-				path.resolve(__dirname, "index.html"),
+				path.resolve(__dirname, htmlFilePath),
 				"utf-8",
 			);
 
-			template = await vite.transformIndexHtml(url, template);
+			if (!isProd) {
+				template = await vite.transformIndexHtml(url, template);
+			}
 
-			const { render } = await vite.ssrLoadModule("./entry-server.ts");
+			const { render } = isProd
+				? await import("./server-dist/entry-server.js")
+				: await vite.ssrLoadModule("./entry-server.ts");
 
 			const appHtml = await render(url);
 			const html = template.replace("<!--ssr-outlet-->", appHtml);
@@ -38,6 +45,10 @@ async function createServer() {
 			next(e);
 		}
 	});
+
+	if (isProd) {
+		app.use(express.static(path.resolve(__dirname, "client-dist")));
+	}
 
 	return new Promise<void>((resolve) => {
 		app.listen(5173, resolve);
