@@ -13,6 +13,7 @@ async function createServer() {
 		server: { middlewareMode: true },
 		appType: "custom",
 	});
+
 	app.use(vite.middlewares);
 
 	app.use("*", async (req, res, next) => {

@@ -1,11 +1,15 @@
-import type { Plugin } from "rollup";
+import type { Plugin } from "vite";
 import fs from "node:fs";
 
 export default function islandPlugin(): Plugin {
 	return {
 		name: "vue-island",
 
-		async resolveId(id) {
+		async resolveId(id, _importer, options) {
+			if (!options?.ssr) {
+				return;
+			}
+
 			const { query } = parseId(id);
 
 			if (query.original != null) {
@@ -13,7 +17,11 @@ export default function islandPlugin(): Plugin {
 			}
 		},
 
-		async load(id) {
+		async load(id, options) {
+			if (!options?.ssr) {
+				return null;
+			}
+
 			const { fileName, query } = parseId(id);
 
 			if (!fileName.endsWith(".client.vue")) {
@@ -34,7 +42,7 @@ function generateIslandCode(fileName: string): string {
 	import OriginalComponent from "${fileName}?original";
 	</script>
 	<template>
-		<vue-island>
+		<vue-island entry="Counter">
 			<OriginalComponent />
 		</vue-island>
 	</template>`;
