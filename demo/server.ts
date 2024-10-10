@@ -12,12 +12,12 @@ async function createServer() {
 	const island = await createIsland({
 		development: !isProd,
 
-		serverEntry: import.meta.resolve(
-			isProd ? "./server-dist/entry-server.js" : "./src/entry-server.ts",
-		),
+		serverEntry: isProd
+			? "./server-dist/entry-server.js"
+			: "./src/entry-server.ts",
 
 		renderTemplate: (body) => {
-			const clientEntry = isProd ? "/entry-client.js" : "./src/entry-client.ts";
+			const clientEntry = isProd ? "/entry-client.js" : "/src/entry-client.ts";
 			return `${body}<script type="module" src="${clientEntry}"></script>`;
 		},
 	});

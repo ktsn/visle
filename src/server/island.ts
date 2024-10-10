@@ -1,4 +1,6 @@
 import { type Connect, createServer as createViteServer } from "vite";
+import path from "node:path";
+import { cwd } from "node:process";
 import { render as baseRender } from "./render.js";
 
 export interface Options {
@@ -65,7 +67,7 @@ async function createServer({
 	return {
 		middlewares: null,
 		transformIndexHtml: async (_url: string, template: string) => template,
-		ssrLoadModule: (module: string) => import(module),
+		ssrLoadModule: (module: string) => import(path.resolve(cwd(), module)),
 		ssrFixStacktrace: () => {},
 	};
 }
