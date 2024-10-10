@@ -1,32 +1,10 @@
-import { createSSRApp, defineCustomElement, h, onMounted, useHost } from "vue";
+/// <reference types="vite/client" />
 
-const IslandElement = defineCustomElement(
-	{
-		props: {
-			entry: {
-				type: String,
-				required: true,
-			},
-		},
+import { registerIslandElement } from "../../src/client/index.js";
 
-		setup(props) {
-			const host = useHost();
+const islands = import.meta.glob("./components/**/*.client.vue");
 
-			onMounted(async () => {
-				const entryComponent = (
-					await import(`./components/${props.entry}.client.vue`)
-				).default;
-
-				const app = createSSRApp(entryComponent);
-				app.mount(host!);
-			});
-
-			return () => h("slot");
-		},
-	},
-	{
-		styles: [":host{display:contents;}"],
-	},
-);
-
-window.customElements.define("vue-island", IslandElement);
+registerIslandElement((componentPath) => {
+	const island = islands[`./components/${componentPath}.client.vue`]!;
+	return island();
+});

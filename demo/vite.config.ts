@@ -4,7 +4,9 @@ import island from "../src/build/index.js";
 
 export default defineConfig({
 	plugins: [
-		island(),
+		island({
+			islandDirectory: "src/components",
+		}),
 		vue({
 			template: {
 				compilerOptions: {

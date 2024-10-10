@@ -1,8 +1,15 @@
 import type { Plugin } from "vite";
 import path from "node:path";
 import fs from "node:fs";
+import { cwd } from "node:process";
 
-export default function islandPlugin(): Plugin {
+export interface IslandPluginOptions {
+	islandDirectory: string;
+}
+
+export default function islandPlugin(options: IslandPluginOptions): Plugin {
+	const islandDirectory = path.resolve(cwd(), options.islandDirectory);
+
 	return {
 		name: "vue-island",
 
@@ -38,13 +45,14 @@ export default function islandPlugin(): Plugin {
 				return fs.readFileSync(fileName, "utf-8");
 			}
 
-			return generateIslandCode(fileName);
+			return generateIslandCode(islandDirectory, fileName);
 		},
 	};
 }
 
-function generateIslandCode(fileName: string): string {
-	const baseName = path.basename(fileName, ".client.vue");
+function generateIslandCode(islandDirectory: string, fileName: string): string {
+	const relative = path.relative(islandDirectory, fileName);
+	const baseName = relative.replace(/\.client\.vue$/i, "");
 
 	return `<script setup>
 	import OriginalComponent from "${fileName}?original";
