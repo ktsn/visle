@@ -1,7 +1,6 @@
 <script setup lang="ts">
 import { computed } from "vue";
 import Counter from "./Counter.client.vue";
-import Child from "./nested/Child.client.vue";
 
 // DEMO
 import { marked } from "marked"; // 35.9K (11.2K gzipped)
@@ -28,6 +27,5 @@ This is a [link](https://example.com).
   <div class="wrapper">
     <div class="content" v-html="content"></div>
     <Counter />
-    <Child :initial-count="10" />
   </div>
 </template>

@@ -17,9 +17,35 @@ export function registerIslandElement(
 			},
 
 			setup(props) {
-				const host = useHost();
+				const host = useHost()!;
 
 				onMounted(async () => {
+					const inAnotherIsland = host.parentElement?.closest("vue-island");
+					if (inAnotherIsland) {
+						// Remove island custom element to let the root island handle the hydration.
+						// Since `hydrate` is async function, hydration occurs after all descendants
+						// executed `removeIslandElement`.
+						removeIslandElement();
+					} else {
+						// Hydrate the component if the island is the root.
+						await hydrate();
+					}
+				});
+
+				function removeIslandElement(): void {
+					const hostParent = host.parentElement;
+					if (!hostParent) {
+						host.remove();
+						return;
+					}
+
+					for (const child of host.childNodes) {
+						hostParent.insertBefore(child, host);
+					}
+					host.remove();
+				}
+
+				async function hydrate(): Promise<void> {
 					const module = await importer(props.entry);
 					const entryComponent = module.default;
 
@@ -28,8 +54,8 @@ export function registerIslandElement(
 						: {};
 
 					const app = createSSRApp(entryComponent, parsedProps);
-					app.mount(host!);
-				});
+					app.mount(host);
+				}
 
 				return () => h("slot");
 			},
