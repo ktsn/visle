@@ -28,6 +28,6 @@ This is a [link](https://example.com).
   <div class="wrapper">
     <div class="content" v-html="content"></div>
     <Counter />
-    <Child />
+    <Child :initial-count="10" />
   </div>
 </template>

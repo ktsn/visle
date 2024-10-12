@@ -1,7 +1,11 @@
 <script setup lang="ts">
 import { ref } from "vue";
 
-const count = ref(0);
+const { initialCount } = defineProps<{
+	initialCount: number;
+}>();
+
+const count = ref(initialCount);
 </script>
 
 <template>

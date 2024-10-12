@@ -10,6 +10,10 @@ export function registerIslandElement(
 					type: String,
 					required: true,
 				},
+
+				serializedProps: {
+					type: String,
+				},
 			},
 
 			setup(props) {
@@ -19,7 +23,11 @@ export function registerIslandElement(
 					const module = await importer(props.entry);
 					const entryComponent = module.default;
 
-					const app = createSSRApp(entryComponent);
+					const parsedProps = props.serializedProps
+						? JSON.parse(props.serializedProps)
+						: {};
+
+					const app = createSSRApp(entryComponent, parsedProps);
 					app.mount(host!);
 				});
 

@@ -56,10 +56,11 @@ function generateIslandCode(islandDirectory: string, fileName: string): string {
 
 	return `<script setup>
 	import OriginalComponent from "${fileName}?original";
+	defineOptions({ inheritAttrs: false });
 	</script>
 	<template>
-		<vue-island entry="${baseName}">
-			<OriginalComponent />
+		<vue-island entry="${baseName}" :serialized-props="JSON.stringify($attrs)">
+			<OriginalComponent v-bind="$attrs" />
 		</vue-island>
 	</template>`;
 }
