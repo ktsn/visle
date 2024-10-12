@@ -1,17 +1,17 @@
 import { type Connect, createServer as createViteServer } from "vite";
 import path from "node:path";
 import { cwd } from "node:process";
-import { render as baseRender } from "./render.js";
+import { baseRender, type Render } from "./render.js";
 
 export interface Options {
 	serverEntry: string;
-	renderTemplate?: (body: string) => string;
+	renderTemplate?: (body: string, clientComponentUsed: boolean) => string;
 	development?: boolean;
 }
 
 export interface Island {
 	entryModule: any;
-	render: typeof baseRender;
+	render: Render;
 	middlewares: Connect.Server | null;
 }
 
@@ -23,18 +23,22 @@ export async function createIsland({
 	const server = await createServer({ development });
 
 	try {
-		const ssrOutlet = "<!--ssr-outlet-->";
-		const template = await server.transformIndexHtml(
-			"/",
-			renderTemplate(ssrOutlet),
-		);
-
 		const entryModule = await server.ssrLoadModule(serverEntry);
 
 		const render = (async (component, props) => {
-			const rendered = await baseRender(component, props);
+			const { rendered, clientComponentUsed } = await baseRender(
+				component,
+				props,
+			);
+
+			const ssrOutlet = "<!--ssr-outlet-->";
+			const template = await server.transformIndexHtml(
+				"/",
+				renderTemplate(ssrOutlet, clientComponentUsed),
+			);
+
 			return template.replace(ssrOutlet, rendered);
-		}) as typeof baseRender;
+		}) as Render;
 
 		return {
 			entryModule,

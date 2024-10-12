@@ -55,9 +55,17 @@ function generateIslandCode(islandDirectory: string, fileName: string): string {
 	const baseName = relative.replace(/\.client\.vue$/i, "");
 
 	return `<script setup>
+	import { useSSRContext } from "vue";
 	import OriginalComponent from "${fileName}?original";
-	defineOptions({ inheritAttrs: false });
+
+	defineOptions({
+		inheritAttrs: false,
+	});
+
+	const context = useSSRContext();
+	context.clientComponentUsed = true;
 	</script>
+
 	<template>
 		<vue-island entry="${baseName}" :serialized-props="JSON.stringify($attrs)">
 			<OriginalComponent v-bind="$attrs" />

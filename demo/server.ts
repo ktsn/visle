@@ -16,9 +16,13 @@ async function createServer() {
 			? "./server-dist/entry-server.js"
 			: "./src/entry-server.ts",
 
-		renderTemplate: (body) => {
+		renderTemplate: (body, clientComponentUsed) => {
 			const clientEntry = isProd ? "/entry-client.js" : "/src/entry-client.ts";
-			return `${body}<script type="module" src="${clientEntry}"></script>`;
+			const entryScript = clientComponentUsed
+				? `<script type="module" src="${clientEntry}" defer async></script>`
+				: "";
+
+			return `${body}${entryScript}`;
 		},
 	});
 

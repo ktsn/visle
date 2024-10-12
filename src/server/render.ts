@@ -25,10 +25,21 @@ export interface Render {
 	<Props>(component: VueComponent<Props>, props: Props): Promise<string>;
 }
 
-// biome-ignore lint/complexity/noBannedTypes: Vue uses {} type
-export const render: Render = async (component, props?: {}) => {
-	const app = createApp(component, props);
-	const result = await renderToString(app);
+interface RenderContext {
+	clientComponentUsed?: boolean;
+}
 
-	return result;
-};
+export async function baseRender(
+	component: VueComponent<unknown>,
+	props: any,
+): Promise<{ rendered: string; clientComponentUsed: boolean }> {
+	const context: RenderContext = {};
+
+	const app = createApp(component, props);
+	const result = await renderToString(app, context);
+
+	return {
+		rendered: result,
+		clientComponentUsed: context.clientComponentUsed ?? false,
+	};
+}
