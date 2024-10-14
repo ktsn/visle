@@ -2,19 +2,47 @@ import type { Plugin } from "vite";
 import path from "node:path";
 import fs from "node:fs";
 import { cwd } from "node:process";
+import { globSync } from "glob";
 
 export interface IslandPluginOptions {
 	islandDirectory: string;
 }
 
+const virtualCustomElementEntryPath = "/@entry-custom-element";
+
+const customElementPath = path.resolve(
+	import.meta.dirname,
+	"../client/custom-element.js",
+);
+
 export default function islandPlugin(options: IslandPluginOptions): Plugin {
 	const islandDirectory = path.resolve(cwd(), options.islandDirectory);
+	const islandPaths = globSync(`${islandDirectory}/**/*.client.vue`);
 
 	return {
 		name: "vue-island",
 
+		config(config) {
+			if (config.build?.ssr) {
+				return;
+			}
+
+			return {
+				build: {
+					manifest: true,
+					rollupOptions: {
+						input: [customElementPath, ...islandPaths],
+						preserveEntrySignatures: "allow-extension",
+					},
+				},
+			};
+		},
+
 		async resolveId(id, _importer, options) {
 			if (!options?.ssr) {
+				if (id === virtualCustomElementEntryPath) {
+					return customElementPath;
+				}
 				return;
 			}
 
@@ -45,15 +73,13 @@ export default function islandPlugin(options: IslandPluginOptions): Plugin {
 				return fs.readFileSync(fileName, "utf-8");
 			}
 
-			return generateIslandCode(islandDirectory, fileName);
+			const clientImportId = `/${path.relative(cwd(), fileName)}`;
+			return generateIslandCode(fileName, clientImportId);
 		},
 	};
 }
 
-function generateIslandCode(islandDirectory: string, fileName: string): string {
-	const relative = path.relative(islandDirectory, fileName);
-	const baseName = relative.replace(/\.client\.vue$/i, "");
-
+function generateIslandCode(fileName: string, clientImportId: string): string {
 	return `<script setup>
 	import { useSSRContext } from "vue";
 	import OriginalComponent from "${fileName}?original";
@@ -67,7 +93,7 @@ function generateIslandCode(islandDirectory: string, fileName: string): string {
 	</script>
 
 	<template>
-		<vue-island entry="${baseName}" :serialized-props="JSON.stringify($attrs)">
+		<vue-island entry="${clientImportId}" :serialized-props="JSON.stringify($attrs)">
 			<OriginalComponent v-bind="$attrs" />
 		</vue-island>
 	</template>`;

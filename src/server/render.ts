@@ -32,14 +32,15 @@ interface RenderContext {
 export async function baseRender(
 	component: VueComponent<unknown>,
 	props: any,
-): Promise<{ rendered: string; clientComponentUsed: boolean }> {
+): Promise<string> {
 	const context: RenderContext = {};
 
 	const app = createApp(component, props);
-	const result = await renderToString(app, context);
+	let result = await renderToString(app, context);
 
-	return {
-		rendered: result,
-		clientComponentUsed: context.clientComponentUsed ?? false,
-	};
+	if (context.clientComponentUsed) {
+		result += `<script type="module" src="/@entry-custom-element"></script>`;
+	}
+
+	return result;
 }

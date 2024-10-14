@@ -15,3 +15,9 @@ const count = ref(initialCount);
     <button @click="count++">Increment</button>
   </div>
 </template>
+
+<style scoped>
+h1 {
+  color: red;
+}
+</style>

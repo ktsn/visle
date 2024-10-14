@@ -1,6 +1,6 @@
 import { defineConfig } from "vite";
 import vue from "@vitejs/plugin-vue";
-import island from "../src/build/index.js";
+import island from "../dist/build/index.js";
 
 export default defineConfig({
 	plugins: [
@@ -15,15 +15,4 @@ export default defineConfig({
 			},
 		}),
 	],
-
-	build: {
-		rollupOptions: {
-			output: {
-				entryFileNames: "[name].js",
-			},
-			input: {
-				"entry-client": "./src/entry-client.ts",
-			},
-		},
-	},
 });

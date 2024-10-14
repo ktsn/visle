@@ -1,6 +1,6 @@
 {
 	"compilerOptions": {
-		"target": "es2016",
+		"target": "ES2023",
 		"module": "Node16",
 		"declaration": true,
 		"declarationMap": true,

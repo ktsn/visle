@@ -5,7 +5,7 @@ import { baseRender, type Render } from "./render.js";
 
 export interface Options {
 	serverEntry: string;
-	renderTemplate?: (body: string, clientComponentUsed: boolean) => string;
+	renderTemplate?: (body: string) => string;
 	development?: boolean;
 }
 
@@ -26,15 +26,12 @@ export async function createIsland({
 		const entryModule = await server.ssrLoadModule(serverEntry);
 
 		const render = (async (component, props) => {
-			const { rendered, clientComponentUsed } = await baseRender(
-				component,
-				props,
-			);
+			const rendered = await baseRender(component, props);
 
 			const ssrOutlet = "<!--ssr-outlet-->";
 			const template = await server.transformIndexHtml(
 				"/",
-				renderTemplate(ssrOutlet, clientComponentUsed),
+				renderTemplate(ssrOutlet),
 			);
 
 			return template.replace(ssrOutlet, rendered);

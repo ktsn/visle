@@ -1,69 +1,65 @@
 import { createSSRApp, defineCustomElement, h, onMounted, useHost } from "vue";
 
-export function registerIslandElement(
-	importer: (componentPath: string) => Promise<any>,
-): void {
-	const IslandElement = defineCustomElement(
-		{
-			props: {
-				entry: {
-					type: String,
-					required: true,
-				},
-
-				serializedProps: {
-					type: String,
-				},
+const IslandElement = defineCustomElement(
+	{
+		props: {
+			entry: {
+				type: String,
+				required: true,
 			},
 
-			setup(props) {
-				const host = useHost()!;
+			serializedProps: {
+				type: String,
+			},
+		},
 
-				onMounted(async () => {
-					const inAnotherIsland = host.parentElement?.closest("vue-island");
-					if (inAnotherIsland) {
-						// Remove island custom element to let the root island handle the hydration.
-						// Since `hydrate` is async function, hydration occurs after all descendants
-						// executed `removeIslandElement`.
-						removeIslandElement();
-					} else {
-						// Hydrate the component if the island is the root.
-						await hydrate();
-					}
-				});
+		setup(props) {
+			const host = useHost()!;
 
-				function removeIslandElement(): void {
-					const hostParent = host.parentElement;
-					if (!hostParent) {
-						host.remove();
-						return;
-					}
+			onMounted(async () => {
+				const inAnotherIsland = host.parentElement?.closest("vue-island");
+				if (inAnotherIsland) {
+					// Remove island custom element to let the root island handle the hydration.
+					// Since `hydrate` is async function, hydration occurs after all descendants
+					// executed `removeIslandElement`.
+					removeIslandElement();
+				} else {
+					// Hydrate the component if the island is the root.
+					await hydrate();
+				}
+			});
 
-					for (const child of host.childNodes) {
-						hostParent.insertBefore(child, host);
-					}
+			function removeIslandElement(): void {
+				const hostParent = host.parentElement;
+				if (!hostParent) {
 					host.remove();
+					return;
 				}
 
-				async function hydrate(): Promise<void> {
-					const module = await importer(props.entry);
-					const entryComponent = module.default;
-
-					const parsedProps = props.serializedProps
-						? JSON.parse(props.serializedProps)
-						: {};
-
-					const app = createSSRApp(entryComponent, parsedProps);
-					app.mount(host);
+				for (const child of host.childNodes) {
+					hostParent.insertBefore(child, host);
 				}
+				host.remove();
+			}
 
-				return () => h("slot");
-			},
-		},
-		{
-			styles: [":host{display:contents;}"],
-		},
-	);
+			async function hydrate(): Promise<void> {
+				const module = await import(/* @vite-ignore */ props.entry);
+				const entryComponent = module.default;
 
-	window.customElements.define("vue-island", IslandElement);
-}
+				const parsedProps = props.serializedProps
+					? JSON.parse(props.serializedProps)
+					: {};
+
+				const app = createSSRApp(entryComponent, parsedProps);
+				app.mount(host);
+			}
+
+			return () => h("slot");
+		},
+	},
+	{
+		styles: [":host{display:contents;}"],
+	},
+);
+
+window.customElements.define("vue-island", IslandElement);

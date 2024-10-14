@@ -15,15 +15,6 @@ async function createServer() {
 		serverEntry: isProd
 			? "./server-dist/entry-server.js"
 			: "./src/entry-server.ts",
-
-		renderTemplate: (body, clientComponentUsed) => {
-			const clientEntry = isProd ? "/entry-client.js" : "/src/entry-client.ts";
-			const entryScript = clientComponentUsed
-				? `<script type="module" src="${clientEntry}" defer async></script>`
-				: "";
-
-			return `${body}${entryScript}`;
-		},
 	});
 
 	if (island.middlewares) {
