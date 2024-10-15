@@ -26,7 +26,8 @@ export interface Render {
 }
 
 interface RenderContext {
-	clientComponentUsed?: boolean;
+	loadCss?: Set<string>;
+	loadJs?: Set<string>;
 }
 
 export async function baseRender(
@@ -38,8 +39,16 @@ export async function baseRender(
 	const app = createApp(component, props);
 	let result = await renderToString(app, context);
 
-	if (context.clientComponentUsed) {
-		result += `<script type="module" src="/@entry-custom-element"></script>`;
+	if (context.loadCss) {
+		for (const href of context.loadCss) {
+			result = `<link rel="stylesheet" href="${href}">\n${result}`;
+		}
+	}
+
+	if (context.loadJs) {
+		for (const src of context.loadJs) {
+			result += `\n<script type="module" src="${src}"></script>`;
+		}
 	}
 
 	return result;
