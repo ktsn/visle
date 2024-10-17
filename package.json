@@ -9,9 +9,9 @@
     "test": "node --test --watch --experimental-strip-types ./test/**/*.test.ts",
     "lint": "pnpm biome lint ./",
     "format": "pnpm biome format --write ./",
-    "demo": "cd demo && node --experimental-strip-types server.ts",
-    "demo:production": "cd demo && NODE_ENV=production node --experimental-strip-types server.ts",
-    "demo:build": "cd demo && vite build --ssr src/entry-server.ts && vite build"
+    "demo": "cd demo && node --experimental-strip-types dev.ts",
+    "demo:production": "cd demo && node --experimental-strip-types prod.ts",
+    "demo:build": "cd demo && vite build && vite build --ssr src/server.ts"
   },
   "keywords": [
     "Vue.js",

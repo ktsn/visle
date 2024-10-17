@@ -1,2 +1,1 @@
-export { createIsland } from './island.js'
-export type { Render } from './render.js'
+export { render, type Render } from './render.js'

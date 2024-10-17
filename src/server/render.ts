@@ -30,10 +30,10 @@ interface RenderContext {
   loadJs?: Set<string>
 }
 
-export async function baseRender(
+export const render: Render = async (
   component: VueComponent<unknown>,
-  props: any,
-): Promise<string> {
+  props?: any,
+): Promise<string> => {
   const context: RenderContext = {}
 
   const app = createApp(component, props)
