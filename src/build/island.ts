@@ -120,11 +120,11 @@ export function island(options: IslandPluginOptions): Plugin {
       }
 
       // Vue plugin generated code
-      if (query.vue != null) {
+      if (query.vue) {
         return null
       }
 
-      if (query.original != null) {
+      if (query.original) {
         return fs.readFileSync(fileName, 'utf-8')
       }
 
@@ -136,13 +136,25 @@ export function island(options: IslandPluginOptions): Plugin {
   }
 }
 
+interface ParsedIdQuery {
+  original?: boolean
+  vue?: boolean
+}
+
 function parseId(id: string): {
   fileName: string
-  query: Record<string, string>
+  query: ParsedIdQuery
 } {
   const [fileName, searchParams] = id.split('?')
   const parsed = new URLSearchParams(searchParams)
-  const query = Object.fromEntries(parsed)
+
+  const query: ParsedIdQuery = {}
+  if (parsed.has('original')) {
+    query.original = true
+  }
+  if (parsed.has('vue')) {
+    query.vue = true
+  }
 
   return {
     fileName: fileName!,
