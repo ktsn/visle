@@ -1,5 +1,5 @@
 import { createServer } from 'vite'
-import type { Express } from 'express'
+import { Express } from 'express'
 
 const vite = await createServer({
   server: {
