@@ -7,18 +7,7 @@ interface VueComponent<Props> {
   }
 }
 
-type CanEmpty<T> = RequiredKeys<T> extends never
-  ? T
-  : string extends RequiredKeys<T>
-    ? T
-    : // biome-ignore lint/complexity/noBannedTypes: Vue type uses {}
-      {} extends T
-      ? T
-      : never
-
-type RequiredKeys<T> = {
-  [K in keyof T]-?: T[K] extends Required<T>[K] ? K : never
-}[keyof T]
+type CanEmpty<T> = Record<never, unknown> extends T ? T : never
 
 export interface Render {
   <Props>(component: VueComponent<CanEmpty<Props>>): Promise<string>
