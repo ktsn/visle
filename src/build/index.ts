@@ -3,6 +3,7 @@ import path from 'node:path'
 import fs from 'node:fs'
 import { cwd } from 'node:process'
 import { globSync } from 'glob'
+import vue from '@vitejs/plugin-vue'
 
 export interface IslandPluginOptions {
   clientDist: string
@@ -17,7 +18,7 @@ const customElementPath = path.resolve(
   '../client/custom-element.js',
 )
 
-export default function islandPlugin(options: IslandPluginOptions): Plugin {
+export default function islandPlugin(options: IslandPluginOptions): Plugin[] {
   let config: ResolvedConfig
 
   const islandDirectory = path.resolve(options.islandDirectory)
@@ -64,75 +65,89 @@ export default function islandPlugin(options: IslandPluginOptions): Plugin {
     return cssIds.map((cssId) => `/${cssId}`)
   }
 
-  return {
-    name: 'vue-island',
+  return [
+    {
+      name: 'vue-island',
 
-    config(config) {
-      if (config.build?.ssr) {
+      config(config) {
+        if (config.build?.ssr) {
+          return {
+            build: {
+              outDir: serverDist,
+            },
+          }
+        }
+
         return {
           build: {
-            outDir: serverDist,
+            manifest: true,
+            outDir: clientDist,
+            rollupOptions: {
+              input: [customElementPath, ...islandPaths],
+              preserveEntrySignatures: 'allow-extension',
+            },
           },
         }
-      }
+      },
 
-      return {
-        build: {
-          manifest: true,
-          outDir: clientDist,
-          rollupOptions: {
-            input: [customElementPath, ...islandPaths],
-            preserveEntrySignatures: 'allow-extension',
-          },
+      configResolved(resolved) {
+        config = resolved
+      },
+
+      async resolveId(id, _importer, options) {
+        if (!options?.ssr) {
+          if (id === virtualCustomElementEntryPath) {
+            return customElementPath
+          }
+          return
+        }
+
+        const { query } = parseId(id)
+
+        if (query.original != null) {
+          return id
+        }
+      },
+
+      async load(id, options) {
+        if (!options?.ssr) {
+          return null
+        }
+
+        const { fileName, query } = parseId(id)
+
+        if (!fileName.endsWith('.client.vue')) {
+          return null
+        }
+
+        // Vue plugin generated code
+        if (query.vue != null) {
+          return null
+        }
+
+        if (query.original != null) {
+          return fs.readFileSync(fileName, 'utf-8')
+        }
+
+        const clientImportId = getClientImportId(fileName)
+        const entryImportId = getClientImportId(customElementPath)
+        const cssIds = getClientCssIds(fileName)
+        return generateIslandCode(
+          fileName,
+          clientImportId,
+          entryImportId,
+          cssIds,
+        )
+      },
+    },
+    vue({
+      template: {
+        compilerOptions: {
+          isCustomElement: (tag) => tag === 'vue-island',
         },
-      }
-    },
-
-    configResolved(resolved) {
-      config = resolved
-    },
-
-    async resolveId(id, _importer, options) {
-      if (!options?.ssr) {
-        if (id === virtualCustomElementEntryPath) {
-          return customElementPath
-        }
-        return
-      }
-
-      const { query } = parseId(id)
-
-      if (query.original != null) {
-        return id
-      }
-    },
-
-    async load(id, options) {
-      if (!options?.ssr) {
-        return null
-      }
-
-      const { fileName, query } = parseId(id)
-
-      if (!fileName.endsWith('.client.vue')) {
-        return null
-      }
-
-      // Vue plugin generated code
-      if (query.vue != null) {
-        return null
-      }
-
-      if (query.original != null) {
-        return fs.readFileSync(fileName, 'utf-8')
-      }
-
-      const clientImportId = getClientImportId(fileName)
-      const entryImportId = getClientImportId(customElementPath)
-      const cssIds = getClientCssIds(fileName)
-      return generateIslandCode(fileName, clientImportId, entryImportId, cssIds)
-    },
-  }
+      },
+    }),
+  ]
 }
 
 function generateIslandCode(
