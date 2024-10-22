@@ -5,7 +5,7 @@ export function generateIslandCode(
   cssIds: string[],
 ): string {
   return `<script setup>
-	import { useSSRContext, provide, inject } from 'vue'
+	import { useSSRContext, useAttrs, provide, inject } from 'vue'
 	import OriginalComponent from '${fileName}?original'
 
 	defineOptions({
@@ -16,16 +16,20 @@ export function generateIslandCode(
   provide('island', true)
 
 	const context = useSSRContext()
+	const attrs = useAttrs()
+
 	context.loadJs ??= new Set()
 	context.loadJs.add('${entryImportId}')
 
 	context.loadCss ??= new Set()
 	${cssIds.map((cssId) => `context.loadCss.add('${cssId}')`).join('\n')}
+
+	const isEmptyProps = Object.keys(attrs).length === 0
 	</script>
 
 	<template>
     <OriginalComponent v-if="inIsland" v-bind="$attrs" />
-		<vue-island v-else entry="${clientImportId}" :serialized-props="JSON.stringify($attrs)">
+		<vue-island v-else entry="${clientImportId}" :serialized-props="isEmptyProps ? undefined : JSON.stringify(attrs)">
 			<OriginalComponent v-bind="$attrs" />
 		</vue-island>
 	</template>`

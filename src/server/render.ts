@@ -1,5 +1,6 @@
 import { createApp } from 'vue'
 import { renderToString } from 'vue/server-renderer'
+import { transformWithRenderContext } from './transform.js'
 
 interface VueComponent<Props> {
   new (): {
@@ -14,7 +15,7 @@ export interface Render {
   <Props>(component: VueComponent<Props>, props: Props): Promise<string>
 }
 
-interface RenderContext {
+export interface RenderContext {
   loadCss?: Set<string>
   loadJs?: Set<string>
 }
@@ -26,19 +27,7 @@ export const render: Render = async (
   const context: RenderContext = {}
 
   const app = createApp(component, props)
-  let result = await renderToString(app, context)
+  const rendered = await renderToString(app, context)
 
-  if (context.loadCss) {
-    for (const href of context.loadCss) {
-      result = `<link rel="stylesheet" href="${href}">\n${result}`
-    }
-  }
-
-  if (context.loadJs) {
-    for (const src of context.loadJs) {
-      result += `\n<script type="module" src="${src}"></script>`
-    }
-  }
-
-  return result
+  return transformWithRenderContext(rendered, context)
 }

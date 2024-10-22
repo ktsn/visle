@@ -1,6 +1,6 @@
 import express from 'express'
-import Page from './components/Page.vue'
 import { render } from '../../src/server/render.js'
+import Page from './components/Page.vue'
 import Static from './components/Static.vue'
 
 const app = express()

@@ -1,7 +1,6 @@
-import test, { describe } from 'node:test'
-import assert from 'node:assert'
+import { describe, test, expect } from 'vitest'
 import { defineComponent, h } from 'vue'
-import { render } from '../src/render.ts'
+import { render } from '../../src/server/render.ts'
 
 describe('render', () => {
   test('renders vue component with props', async () => {
@@ -19,7 +18,7 @@ describe('render', () => {
 
     const result = await render(Comp, { msg: 'Hello' })
 
-    assert.equal(result, '<div>Hello</div>')
+    expect(result).toBe('<div>Hello</div>')
   })
 
   test('renders vue component without props', async () => {
@@ -31,7 +30,7 @@ describe('render', () => {
 
     const result = await render(Comp)
 
-    assert.equal(result, '<div>Hello</div>')
+    expect(result).toBe('<div>Hello</div>')
   })
 
   test('renders head related tags', async () => {
@@ -52,8 +51,7 @@ describe('render', () => {
 
     const result = await render(Comp)
 
-    assert.equal(
-      result,
+    expect(result).toBe(
       '<html><head><title>Hello</title><meta charset="utf-8"><link rel="stylesheet" href="style.css"><style>body { color: red; }</style><script src="script.js"></script><script>console.log(&#39;Hello&#39;)</script></head></html>',
     )
   })

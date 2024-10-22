@@ -1,7 +1,6 @@
 import { Plugin, ResolvedConfig, Manifest } from 'vite'
 import path from 'node:path'
 import fs from 'node:fs'
-import { cwd } from 'node:process'
 import { globSync } from 'glob'
 import { generateIslandCode } from './generate.js'
 
@@ -20,9 +19,7 @@ const customElementPath = path.resolve(
 
 export function island(options: IslandPluginOptions): Plugin {
   let config: ResolvedConfig
-
-  const islandDirectory = path.resolve(options.islandDirectory)
-  const islandPaths = globSync(`${islandDirectory}/**/*.client.vue`)
+  let islandPaths: string[]
 
   const { clientDist, serverDist } = options
 
@@ -40,7 +37,7 @@ export function island(options: IslandPluginOptions): Plugin {
   }
 
   function getClientImportId(id: string): string {
-    const relativePath = path.relative(cwd(), id)
+    const relativePath = path.relative(config.root, id)
 
     if (config.command === 'serve') {
       if (id === customElementPath) {
@@ -58,7 +55,7 @@ export function island(options: IslandPluginOptions): Plugin {
       return []
     }
 
-    const relativePath = path.relative(cwd(), id)
+    const relativePath = path.relative(config.root, id)
     const manifest = ensureClientManifest()
 
     const cssIds = manifest[relativePath]?.css || []
@@ -91,6 +88,9 @@ export function island(options: IslandPluginOptions): Plugin {
 
     configResolved(resolved) {
       config = resolved
+
+      const islandDirectory = path.resolve(config.root, options.islandDirectory)
+      islandPaths = globSync(`${islandDirectory}/**/*.client.vue`)
     },
 
     async resolveId(id, _importer, options) {
