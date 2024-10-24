@@ -29,6 +29,7 @@ export async function serveAndRenderMain(
   const server = await createServer({
     server: {
       middlewareMode: true,
+      ws: false,
     },
     appType: 'custom',
     root: tmpDir,
@@ -43,6 +44,9 @@ export async function serveAndRenderMain(
 
     build: {
       ssr: 'main.js',
+      rollupOptions: {
+        input: 'main.js',
+      },
     },
   })
 
