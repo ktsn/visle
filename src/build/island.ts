@@ -1,6 +1,7 @@
 import { Plugin, ResolvedConfig, Manifest } from 'vite'
 import path from 'node:path'
 import fs from 'node:fs'
+import { cwd } from 'node:process'
 import { globSync } from 'glob'
 import { generateIslandCode } from './generate.js'
 
@@ -19,7 +20,6 @@ const customElementPath = path.resolve(
 
 export function island(options: IslandPluginOptions): Plugin {
   let config: ResolvedConfig
-  let islandPaths: string[]
 
   const { clientDist, serverDist } = options
 
@@ -74,6 +74,12 @@ export function island(options: IslandPluginOptions): Plugin {
         }
       }
 
+      const islandDirectory = path.resolve(
+        config.root ?? cwd(),
+        options.islandDirectory,
+      )
+      const islandPaths = globSync(`${islandDirectory}/**/*.client.vue`)
+
       return {
         build: {
           manifest: true,
@@ -88,9 +94,6 @@ export function island(options: IslandPluginOptions): Plugin {
 
     configResolved(resolved) {
       config = resolved
-
-      const islandDirectory = path.resolve(config.root, options.islandDirectory)
-      islandPaths = globSync(`${islandDirectory}/**/*.client.vue`)
     },
 
     async resolveId(id, _importer, options) {

@@ -4,19 +4,31 @@ export function transformWithRenderContext(
   html: string,
   context: RenderContext,
 ): string {
-  let transformed = html
+  const injecting = createInjectingHtml(context)
+  const point = findInjectionPoint(html)
+
+  return html.slice(0, point) + injecting + html.slice(point)
+}
+
+function createInjectingHtml(context: RenderContext): string {
+  let injecting = ''
 
   if (context.loadCss) {
     for (const href of context.loadCss) {
-      transformed = `<link rel="stylesheet" href="${href}">${transformed}`
+      injecting += `<link rel="stylesheet" href="${href}">`
     }
   }
 
   if (context.loadJs) {
     for (const src of context.loadJs) {
-      transformed += `<script type="module" src="${src}"></script>`
+      injecting += `<script type="module" src="${src}" defer async></script>`
     }
   }
 
-  return transformed
+  return injecting
+}
+
+function findInjectionPoint(html: string): number {
+  const point = html.search(/(?:<\/head>|<body[\s>])/i)
+  return point < 0 ? 0 : point
 }
