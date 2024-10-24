@@ -21,7 +21,7 @@ function createInjectingHtml(context: RenderContext): string {
 
   if (context.loadJs) {
     for (const src of context.loadJs) {
-      injecting += `<script type="module" src="${src}" defer async></script>`
+      injecting += `<script type="module" src="${src}" async></script>`
     }
   }
 
