@@ -10,6 +10,7 @@ const IslandElement = defineCustomElement(
 
       serializedProps: {
         type: String,
+        default: '{}',
       },
     },
 
@@ -24,9 +25,7 @@ const IslandElement = defineCustomElement(
         const module = await import(/* @vite-ignore */ props.entry)
         const entryComponent = module.default
 
-        const parsedProps = props.serializedProps
-          ? JSON.parse(props.serializedProps)
-          : {}
+        const parsedProps = JSON.parse(props.serializedProps)
 
         const app = createSSRApp(entryComponent, parsedProps)
         app.mount(host)
