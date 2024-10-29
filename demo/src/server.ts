@@ -1,5 +1,5 @@
 import express from 'express'
-import { render } from '@ktsn/vue-island/server'
+import { render } from 'vue-islands-renderer/server'
 import Page from './components/Page.vue'
 import Static from './components/Static.vue'
 

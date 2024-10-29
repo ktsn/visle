@@ -2,7 +2,7 @@ import { Manifest } from 'vite'
 import path from 'node:path'
 import baseFs from 'node:fs'
 
-export const virtualCustomElementEntryPath = '/@entry-custom-element'
+export const virtualCustomElementEntryPath = '/@vue-islands-renderer/entry'
 
 export const customElementEntryPath = path.resolve(
   import.meta.dirname,

@@ -27,7 +27,7 @@ describe('Island plugin on server', () => {
     })
 
     expect(code).toBe(
-      '<script type="module" src="/@entry-custom-element" async></script><div><h1>Counter</h1><vue-island entry="/counter.island.vue"><button>0</button></vue-island></div>',
+      '<script type="module" src="/@vue-islands-renderer/entry" async></script><div><h1>Counter</h1><vue-island entry="/counter.island.vue"><button>0</button></vue-island></div>',
     )
   })
 
@@ -56,7 +56,7 @@ describe('Island plugin on server', () => {
     })
 
     expect(code).toBe(
-      '<script type="module" src="/@entry-custom-element" async></script><vue-island entry="/child.island.vue" serialized-props="{&quot;foo&quot;:&quot;bar&quot;,&quot;baz&quot;:123,&quot;qux&quot;:true}"><div>bar 123 true</div></vue-island>',
+      '<script type="module" src="/@vue-islands-renderer/entry" async></script><vue-island entry="/child.island.vue" serialized-props="{&quot;foo&quot;:&quot;bar&quot;,&quot;baz&quot;:123,&quot;qux&quot;:true}"><div>bar 123 true</div></vue-island>',
     )
   })
 })

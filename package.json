@@ -1,7 +1,7 @@
 {
-  "name": "@ktsn/vue-island",
+  "name": "vue-islands-renderer",
   "version": "0.0.0",
-  "description": "Vue as a server side template engine with island support",
+  "description": "Islands Architecture renderer for Vue.js",
   "type": "module",
   "exports": {
     "./build": "./dist/build/index.js",
@@ -19,7 +19,7 @@
   },
   "keywords": [
     "Vue.js",
-    "island architecture",
+    "islands architecture",
     "template engine",
     "server side rendering",
     "multi-page application"

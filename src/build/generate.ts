@@ -1,6 +1,6 @@
-export const islandSymbolImportId = '@vue-island/symbol'
+export const islandSymbolImportId = '@vue-islands-renderer/symbol'
 
-export const islandSymbolCode = "export default Symbol('island')"
+export const islandSymbolCode = "export default Symbol('@vue-islands-renderer')"
 
 export function generateIslandCode(
   fileName: string,
