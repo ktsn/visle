@@ -1,3 +1,7 @@
+export const islandSymbolImportId = '@vue-island/symbol'
+
+export const islandSymbolCode = "export default Symbol('island')"
+
 export function generateIslandCode(
   fileName: string,
   clientImportId: string,
@@ -5,32 +9,33 @@ export function generateIslandCode(
   cssIds: string[],
 ): string {
   return `<script setup>
-	import { useSSRContext, useAttrs, provide, inject } from 'vue'
-	import OriginalComponent from '${fileName}?original'
+  import { useSSRContext, useAttrs, provide, inject } from 'vue'
+  import islandSymbol from '${islandSymbolImportId}'
+  import OriginalComponent from '${fileName}?original'
 
-	defineOptions({
-		inheritAttrs: false,
-	})
+  defineOptions({
+    inheritAttrs: false,
+  })
 
-  const inIsland = inject('island', false)
-  provide('island', true)
+  const inIsland = inject(islandSymbol, false)
+  provide(islandSymbol, true)
 
-	const context = useSSRContext()
-	const attrs = useAttrs()
+  const context = useSSRContext()
+  const attrs = useAttrs()
 
-	context.loadJs ??= new Set()
-	context.loadJs.add('${entryImportId}')
+  context.loadJs ??= new Set()
+  context.loadJs.add('${entryImportId}')
 
-	context.loadCss ??= new Set()
-	${cssIds.map((cssId) => `context.loadCss.add('${cssId}')`).join('\n')}
+  context.loadCss ??= new Set()
+  ${cssIds.map((cssId) => `context.loadCss.add('${cssId}')`).join('\n')}
 
-	const isEmptyProps = Object.keys(attrs).length === 0
-	</script>
+  const isEmptyProps = Object.keys(attrs).length === 0
+  </script>
 
-	<template>
+  <template>
     <OriginalComponent v-if="inIsland" v-bind="$attrs" />
-		<vue-island v-else entry="${clientImportId}" :serialized-props="isEmptyProps ? undefined : JSON.stringify(attrs)">
-			<OriginalComponent v-bind="$attrs" />
-		</vue-island>
-	</template>`
+    <vue-island v-else entry="${clientImportId}" :serialized-props="isEmptyProps ? undefined : JSON.stringify(attrs)">
+      <OriginalComponent v-bind="$attrs" />
+    </vue-island>
+  </template>`
 }

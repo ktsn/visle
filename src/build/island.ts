@@ -3,7 +3,11 @@ import path from 'node:path'
 import fs from 'node:fs'
 import { cwd } from 'node:process'
 import { globSync } from 'glob'
-import { generateIslandCode } from './generate.js'
+import {
+  generateIslandCode,
+  islandSymbolCode,
+  islandSymbolImportId,
+} from './generate.js'
 import {
   clientManifest,
   customElementEntryPath,
@@ -68,6 +72,10 @@ export function island(options: IslandPluginOptions): Plugin {
         return
       }
 
+      if (id === islandSymbolImportId) {
+        return islandSymbolImportId
+      }
+
       const { query } = parseId(id)
 
       if (query.original) {
@@ -78,6 +86,10 @@ export function island(options: IslandPluginOptions): Plugin {
     async load(id, options) {
       if (!options?.ssr) {
         return null
+      }
+
+      if (id === islandSymbolImportId) {
+        return islandSymbolCode
       }
 
       const { fileName, query } = parseId(id)
