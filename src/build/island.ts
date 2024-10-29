@@ -1,9 +1,14 @@
-import { Plugin, ResolvedConfig, Manifest } from 'vite'
+import { Plugin } from 'vite'
 import path from 'node:path'
 import fs from 'node:fs'
 import { cwd } from 'node:process'
 import { globSync } from 'glob'
 import { generateIslandCode } from './generate.js'
+import {
+  clientManifest,
+  customElementEntryPath,
+  virtualCustomElementEntryPath,
+} from './client-manifest.js'
 
 export interface IslandPluginOptions {
   clientDist: string
@@ -11,56 +16,10 @@ export interface IslandPluginOptions {
   islandDirectory: string
 }
 
-const virtualCustomElementEntryPath = '/@entry-custom-element'
-
-const customElementPath = path.resolve(
-  import.meta.dirname,
-  '../client/custom-element.js',
-)
-
 export function island(options: IslandPluginOptions): Plugin {
-  let config: ResolvedConfig
+  let manifest: ReturnType<typeof clientManifest>
 
   const { clientDist, serverDist } = options
-
-  let clientManifest: Manifest
-
-  function ensureClientManifest(): Manifest {
-    if (clientManifest) {
-      return clientManifest
-    }
-
-    clientManifest = JSON.parse(
-      fs.readFileSync(path.resolve(clientDist, '.vite/manifest.json'), 'utf-8'),
-    )
-    return clientManifest
-  }
-
-  function getClientImportId(id: string): string {
-    const relativePath = path.relative(config.root, id)
-
-    if (config.command === 'serve') {
-      if (id === customElementPath) {
-        return virtualCustomElementEntryPath
-      }
-      return `/${relativePath}`
-    }
-
-    const manifest = ensureClientManifest()
-    return `/${manifest[relativePath]!.file}`
-  }
-
-  function getClientCssIds(id: string): string[] {
-    if (config.command !== 'build') {
-      return []
-    }
-
-    const relativePath = path.relative(config.root, id)
-    const manifest = ensureClientManifest()
-
-    const cssIds = manifest[relativePath]?.css || []
-    return cssIds.map((cssId) => `/${cssId}`)
-  }
 
   return {
     name: 'vue-island',
@@ -85,28 +44,33 @@ export function island(options: IslandPluginOptions): Plugin {
           manifest: true,
           outDir: clientDist,
           rollupOptions: {
-            input: [customElementPath, ...islandPaths],
+            input: [customElementEntryPath, ...islandPaths],
             preserveEntrySignatures: 'allow-extension',
           },
         },
       }
     },
 
-    configResolved(resolved) {
-      config = resolved
+    configResolved(config) {
+      manifest = clientManifest({
+        manifest: '.vite/manifest.json',
+        clientDist,
+        command: config.command,
+        root: config.root,
+      })
     },
 
     async resolveId(id, _importer, options) {
       if (!options?.ssr) {
         if (id === virtualCustomElementEntryPath) {
-          return customElementPath
+          return customElementEntryPath
         }
         return
       }
 
       const { query } = parseId(id)
 
-      if (query.original != null) {
+      if (query.original) {
         return id
       }
     },
@@ -131,9 +95,9 @@ export function island(options: IslandPluginOptions): Plugin {
         return fs.readFileSync(fileName, 'utf-8')
       }
 
-      const clientImportId = getClientImportId(fileName)
-      const entryImportId = getClientImportId(customElementPath)
-      const cssIds = getClientCssIds(fileName)
+      const clientImportId = manifest.getClientImportId(fileName)
+      const entryImportId = manifest.getClientImportId(customElementEntryPath)
+      const cssIds = manifest.getDependingClientCssIds(fileName)
       return generateIslandCode(fileName, clientImportId, entryImportId, cssIds)
     },
   }
