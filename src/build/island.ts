@@ -37,7 +37,7 @@ export function island(options: IslandPluginOptions): Plugin {
         config.root ?? cwd(),
         options.islandDirectory,
       )
-      const islandPaths = globSync(`${islandDirectory}/**/*.client.vue`)
+      const islandPaths = globSync(`${islandDirectory}/**/*.island.vue`)
 
       return {
         build: {
@@ -82,7 +82,7 @@ export function island(options: IslandPluginOptions): Plugin {
 
       const { fileName, query } = parseId(id)
 
-      if (!fileName.endsWith('.client.vue')) {
+      if (!fileName.endsWith('.island.vue')) {
         return null
       }
 

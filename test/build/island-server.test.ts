@@ -6,7 +6,7 @@ describe('Island plugin on server', () => {
     const code = await serveAndRenderMain({
       './main.vue': `
         <script setup>
-          import Counter from "./counter.client.vue";
+          import Counter from "./counter.island.vue";
         </script>
         <template>
 					<div>
@@ -15,7 +15,7 @@ describe('Island plugin on server', () => {
 					</div>
         </template>
       `,
-      './counter.client.vue': `
+      './counter.island.vue': `
         <script setup>
           import { ref } from "vue";
           const count = ref(0);
@@ -27,7 +27,7 @@ describe('Island plugin on server', () => {
     })
 
     expect(code).toBe(
-      '<script type="module" src="/@entry-custom-element" async></script><div><h1>Counter</h1><vue-island entry="/counter.client.vue"><button>0</button></vue-island></div>',
+      '<script type="module" src="/@entry-custom-element" async></script><div><h1>Counter</h1><vue-island entry="/counter.island.vue"><button>0</button></vue-island></div>',
     )
   })
 
@@ -35,13 +35,13 @@ describe('Island plugin on server', () => {
     const code = await serveAndRenderMain({
       './main.vue': `
         <script setup>
-        import Child from './child.client.vue'
+        import Child from './child.island.vue'
         </script>
         <template>
           <Child foo="bar" :baz="123" :qux="true" />
         </template>
       `,
-      './child.client.vue': `
+      './child.island.vue': `
         <script setup lang="ts">
         defineProps<{
           foo: string
@@ -56,7 +56,7 @@ describe('Island plugin on server', () => {
     })
 
     expect(code).toBe(
-      '<script type="module" src="/@entry-custom-element" async></script><vue-island entry="/child.client.vue" serialized-props="{&quot;foo&quot;:&quot;bar&quot;,&quot;baz&quot;:123,&quot;qux&quot;:true}"><div>bar 123 true</div></vue-island>',
+      '<script type="module" src="/@entry-custom-element" async></script><vue-island entry="/child.island.vue" serialized-props="{&quot;foo&quot;:&quot;bar&quot;,&quot;baz&quot;:123,&quot;qux&quot;:true}"><div>bar 123 true</div></vue-island>',
     )
   })
 })
