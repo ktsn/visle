@@ -5,7 +5,6 @@ import { island, IslandPluginOptions } from './island.js'
 const defaultOptions: IslandPluginOptions = {
   clientDist: 'dist-client',
   serverDist: 'dist-server',
-  islandDirectory: './',
 }
 
 export default function plugin(

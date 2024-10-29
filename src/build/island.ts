@@ -1,7 +1,6 @@
 import { Plugin } from 'vite'
 import path from 'node:path'
 import fs from 'node:fs'
-import { cwd } from 'node:process'
 import { globSync } from 'glob'
 import {
   generateIslandCode,
@@ -17,7 +16,6 @@ import {
 export interface IslandPluginOptions {
   clientDist: string
   serverDist: string
-  islandDirectory: string
 }
 
 export function island(options: IslandPluginOptions): Plugin {
@@ -37,10 +35,7 @@ export function island(options: IslandPluginOptions): Plugin {
         }
       }
 
-      const islandDirectory = path.resolve(
-        config.root ?? cwd(),
-        options.islandDirectory,
-      )
+      const islandDirectory = path.resolve(config.root ?? './')
       const islandPaths = globSync(`${islandDirectory}/**/*.island.vue`)
 
       return {

@@ -38,7 +38,6 @@ export async function serveAndRenderMain(
       island({
         clientDist: 'client',
         serverDist: 'server',
-        islandDirectory: './',
       }),
     ],
 
