@@ -2,8 +2,12 @@
   "name": "@ktsn/vue-island",
   "version": "0.0.0",
   "description": "Vue as a server side template engine with island support",
-  "main": "index.js",
   "type": "module",
+  "exports": {
+    "./build": "./dist/build/index.js",
+    "./server": "./dist/server/index.js",
+    "./client": "./dist/client/custom-element.js"
+  },
   "scripts": {
     "build": "tsc -p .",
     "test": "vitest",

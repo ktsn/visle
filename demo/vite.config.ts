@@ -1,5 +1,5 @@
 import { defineConfig } from 'vite'
-import island from '../dist/build/index.js'
+import island from '@ktsn/vue-island/build'
 
 export default defineConfig({
   plugins: [
