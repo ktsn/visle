@@ -2,9 +2,20 @@ import { Plugin } from 'vite'
 import vue from '@vitejs/plugin-vue'
 import { island, IslandPluginOptions } from './island.js'
 
-export default function plugin(options: IslandPluginOptions): Plugin[] {
+const defaultOptions: IslandPluginOptions = {
+  clientDist: 'dist-client',
+  serverDist: 'dist-server',
+  islandDirectory: './',
+}
+
+export default function plugin(
+  options: Partial<IslandPluginOptions> = {},
+): Plugin[] {
   return [
-    island(options),
+    island({
+      ...defaultOptions,
+      ...options,
+    }),
     vue({
       template: {
         compilerOptions: {

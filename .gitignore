@@ -1,6 +1,6 @@
 node_modules/
 dist/
 __generated__/
-server-dist/
-client-dist/
+dist-server/
+dist-client/
 coverage/
