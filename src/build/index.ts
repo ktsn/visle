@@ -2,6 +2,7 @@ import { Plugin } from 'vite'
 import vue from '@vitejs/plugin-vue'
 import { island, IslandPluginOptions } from './island.js'
 import { generateComponentId } from './component-id.js'
+import { devStyleSSRPlugin } from './dev-ssr-css.js'
 
 const defaultOptions: IslandPluginOptions = {
   clientDist: 'dist-client',
@@ -28,5 +29,6 @@ export default function plugin(
         },
       },
     }),
+    devStyleSSRPlugin(),
   ]
 }

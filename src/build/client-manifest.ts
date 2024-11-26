@@ -72,7 +72,11 @@ export function clientManifest(config: ClientManifestConfig) {
       }
 
       const descriptor = parse(code).descriptor
-      const componentId = generateComponentId(id, code, config.isProduction)
+      const componentId = generateComponentId(
+        relativePath,
+        code,
+        config.isProduction,
+      )
 
       return descriptor.styles.map((style, i) => {
         if (style.src) {
