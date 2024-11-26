@@ -14,6 +14,7 @@ describe('Client manifest', () => {
         clientDist: 'dist-client',
         command: 'serve',
         root: '/path/to/root',
+        isProduction: false,
       })
 
       const result = manifest.getClientImportId(customElementEntryPath)
@@ -27,6 +28,7 @@ describe('Client manifest', () => {
         clientDist: 'dist-client',
         command: 'serve',
         root: '/path/to/root',
+        isProduction: false,
       })
 
       const result = manifest.getClientImportId('/path/to/root/src/foo.vue')
@@ -34,19 +36,40 @@ describe('Client manifest', () => {
       expect(result).toBe('/src/foo.vue')
     })
 
-    test('return empty id array for css', () => {
+    test('return empty id array for css without <style>', () => {
       const manifest = clientManifest({
         manifest: '.vite/manifest.json',
         clientDist: 'dist-client',
         command: 'serve',
         root: '/path/to/root',
+        isProduction: false,
       })
 
       const result = manifest.getDependingClientCssIds(
         '/path/to/root/src/foo.vue',
+        '<template><div></div></template>',
       )
 
       expect(result).toEqual([])
+    })
+
+    test('return ids for <style> blocks in code', () => {
+      const manifest = clientManifest({
+        manifest: '.vite/manifest.json',
+        clientDist: 'dist-client',
+        command: 'serve',
+        root: '/path/to/root',
+        isProduction: false,
+      })
+
+      const result = manifest.getDependingClientCssIds(
+        '/path/to/root/src/foo.vue',
+        '<template><div></div></template><style scoped>h1 { color: red; }</style>',
+      )
+
+      expect(result).toEqual([
+        '/path/to/root/src/foo.vue?vue&type=style&index=0&scoped=113f6fdb&lang.css',
+      ])
     })
   })
 
@@ -64,6 +87,7 @@ describe('Client manifest', () => {
         clientDist: 'dist-client',
         command: 'build',
         root: '/path/to/root',
+        isProduction: true,
         fs: { readFileSync },
       })
 
@@ -83,6 +107,7 @@ describe('Client manifest', () => {
         clientDist: 'dist-client',
         command: 'build',
         root: '/path/to/root',
+        isProduction: true,
         fs: { readFileSync },
       })
 
@@ -105,11 +130,13 @@ describe('Client manifest', () => {
         clientDist: 'dist-client',
         command: 'build',
         root: '/path/to/root',
+        isProduction: true,
         fs: { readFileSync },
       })
 
       const result = manifestInstance.getDependingClientCssIds(
         '/path/to/root/src/foo.vue',
+        '<template><div></div></template><style>h1 { color: red; }</style>',
       )
 
       expect(result).toEqual(['/foo-1234.css'])
@@ -128,11 +155,13 @@ describe('Client manifest', () => {
         clientDist: 'dist-client',
         command: 'build',
         root: '/path/to/root',
+        isProduction: true,
         fs: { readFileSync },
       })
 
       const result = manifestInstance.getDependingClientCssIds(
         '/path/to/root/src/foo.vue',
+        '<template><div></div></template>',
       )
 
       expect(result).toEqual([])

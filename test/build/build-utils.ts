@@ -4,7 +4,7 @@ import { createServer } from 'vite'
 import island from '../../src/build/index.ts'
 import { fileURLToPath } from 'node:url'
 
-const tmpDir = 'test/__generated__'
+export const tmpDir = path.resolve('test/__generated__')
 const dirname = path.dirname(fileURLToPath(import.meta.url))
 const renderModulePath = path.resolve(dirname, '../../src/server/render.ts')
 

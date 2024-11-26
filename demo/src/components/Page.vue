@@ -27,6 +27,7 @@ This is a [link](https://example.com).
 <template>
   <DefaultLayout :title="title">
     <div class="wrapper">
+      <a href="/static">Static</a>
       <div class="content" v-html="content"></div>
       <Counter />
     </div>

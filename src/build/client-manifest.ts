@@ -1,6 +1,8 @@
 import { Manifest } from 'vite'
+import { parse, SFCBlock } from 'vue/compiler-sfc'
 import path from 'node:path'
 import baseFs from 'node:fs'
+import { generateComponentId } from './component-id.js'
 
 export const virtualCustomElementEntryPath = '/@vue-islands-renderer/entry'
 
@@ -13,6 +15,7 @@ interface ClientManifestConfig {
   manifest: string
   command: 'serve' | 'build'
   root: string
+  isProduction: boolean
   clientDist: string
   fs?: ClientManifestFs
 }
@@ -47,6 +50,7 @@ export function clientManifest(config: ClientManifestConfig) {
       if (id === customElementEntryPath) {
         return virtualCustomElementEntryPath
       }
+
       return `/${relativePath}`
     }
 
@@ -59,9 +63,29 @@ export function clientManifest(config: ClientManifestConfig) {
     return `/${file}`
   }
 
-  function getDependingClientCssIds(id: string): string[] {
+  function getDependingClientCssIds(id: string, code: string): string[] {
     if (config.command === 'serve') {
-      return []
+      if (!id.endsWith('vue')) {
+        return []
+      }
+
+      const descriptor = parse(code).descriptor
+      const componentId = generateComponentId(id, code, config.isProduction)
+
+      return descriptor.styles.map((style, i) => {
+        if (style.src) {
+          throw new Error('<style src> is not supported')
+        }
+
+        if (style.module) {
+          throw new Error('<style module> is not supported')
+        }
+
+        const attrsQuery = attrsToQuery(style.attrs, 'css')
+        const scopedQuery = style.scoped ? `&scoped=${componentId}` : ''
+        const query = `?vue&type=style&index=${i}${scopedQuery}`
+        return id + query + attrsQuery
+      })
     }
 
     const relativePath = path.relative(config.root, id)
@@ -75,4 +99,48 @@ export function clientManifest(config: ClientManifestConfig) {
     getClientImportId,
     getDependingClientCssIds,
   }
+}
+
+// these are built-in query parameters so should be ignored
+// if the user happen to add them as attrs
+const ignoreList = [
+  'id',
+  'index',
+  'src',
+  'type',
+  'lang',
+  'module',
+  'scoped',
+  'generic',
+]
+
+/**
+ * Borrowed from @vitejs/plugin-vue
+ */
+function attrsToQuery(
+  attrs: SFCBlock['attrs'],
+  langFallback?: string,
+  forceLangFallback = false,
+): string {
+  let query = ''
+
+  for (const name in attrs) {
+    const value = attrs[name]
+    if (!ignoreList.includes(name)) {
+      query += `&${encodeURIComponent(name)}${
+        value ? `=${encodeURIComponent(value)}` : ''
+      }`
+    }
+  }
+
+  if (langFallback || attrs.lang) {
+    query +=
+      'lang' in attrs
+        ? forceLangFallback
+          ? `&lang.${langFallback}`
+          : `&lang.${attrs.lang}`
+        : `&lang.${langFallback}`
+  }
+
+  return query
 }

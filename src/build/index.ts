@@ -1,6 +1,7 @@
 import { Plugin } from 'vite'
 import vue from '@vitejs/plugin-vue'
 import { island, IslandPluginOptions } from './island.js'
+import { generateComponentId } from './component-id.js'
 
 const defaultOptions: IslandPluginOptions = {
   clientDist: 'dist-client',
@@ -16,6 +17,11 @@ export default function plugin(
       ...options,
     }),
     vue({
+      features: {
+        componentIdGenerator: (filePath, source, isProduction) => {
+          return generateComponentId(filePath, source, isProduction ?? false)
+        },
+      },
       template: {
         compilerOptions: {
           isCustomElement: (tag) => tag === 'vue-island',

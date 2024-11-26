@@ -1,11 +1,11 @@
 import { Plugin } from 'vite'
 import path from 'node:path'
-import fs from 'node:fs'
 import { globSync } from 'glob'
 import {
   generateIslandCode,
-  islandSymbolCode,
-  islandSymbolImportId,
+  generateServerComponentCode,
+  symbolCode,
+  symbolImportId,
 } from './generate.js'
 import {
   clientManifest,
@@ -56,10 +56,11 @@ export function island(options: IslandPluginOptions): Plugin {
         clientDist,
         command: config.command,
         root: config.root,
+        isProduction: config.isProduction,
       })
     },
 
-    async resolveId(id, _importer, options) {
+    resolveId(id, _importer, options) {
       if (!options?.ssr) {
         if (id === virtualCustomElementEntryPath) {
           return customElementEntryPath
@@ -67,8 +68,8 @@ export function island(options: IslandPluginOptions): Plugin {
         return
       }
 
-      if (id === islandSymbolImportId) {
-        return islandSymbolImportId
+      if (id === symbolImportId) {
+        return symbolImportId
       }
 
       const { query } = parseId(id)
@@ -78,18 +79,24 @@ export function island(options: IslandPluginOptions): Plugin {
       }
     },
 
-    async load(id, options) {
+    load(id, options) {
       if (!options?.ssr) {
         return null
       }
 
-      if (id === islandSymbolImportId) {
-        return islandSymbolCode
+      if (id === symbolImportId) {
+        return symbolCode
+      }
+    },
+
+    transform(code, id, options) {
+      if (!options?.ssr) {
+        return null
       }
 
       const { fileName, query } = parseId(id)
 
-      if (!fileName.endsWith('.island.vue')) {
+      if (!fileName.endsWith('.vue')) {
         return null
       }
 
@@ -99,13 +106,24 @@ export function island(options: IslandPluginOptions): Plugin {
       }
 
       if (query.original) {
-        return fs.readFileSync(fileName, 'utf-8')
+        return code
       }
 
-      const clientImportId = manifest.getClientImportId(fileName)
-      const entryImportId = manifest.getClientImportId(customElementEntryPath)
-      const cssIds = manifest.getDependingClientCssIds(fileName)
-      return generateIslandCode(fileName, clientImportId, entryImportId, cssIds)
+      if (fileName.endsWith('.island.vue')) {
+        const clientImportId = manifest.getClientImportId(fileName)
+        const entryImportId = manifest.getClientImportId(customElementEntryPath)
+        const cssIds = manifest.getDependingClientCssIds(fileName, code)
+        return generateIslandCode(
+          fileName,
+          clientImportId,
+          entryImportId,
+          cssIds,
+        )
+      }
+
+      // .vue file
+      const cssIds = manifest.getDependingClientCssIds(fileName, code)
+      return generateServerComponentCode(fileName, cssIds)
     },
   }
 }

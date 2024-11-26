@@ -1,6 +1,6 @@
-export const islandSymbolImportId = '@vue-islands-renderer/symbol'
+export const symbolImportId = '@vue-islands-renderer/symbols'
 
-export const islandSymbolCode = "export default Symbol('@vue-islands-renderer')"
+export const symbolCode = `export const islandSymbol = Symbol('@vue-islands-renderer/island')`
 
 export function generateIslandCode(
   fileName: string,
@@ -10,7 +10,7 @@ export function generateIslandCode(
 ): string {
   return `<script setup>
   import { useSSRContext, useAttrs, provide, inject } from 'vue'
-  import islandSymbol from '${islandSymbolImportId}'
+  import { islandSymbol } from '${symbolImportId}'
   import OriginalComponent from '${fileName}?original'
 
   defineOptions({
@@ -33,9 +33,30 @@ export function generateIslandCode(
   </script>
 
   <template>
-    <OriginalComponent v-if="inIsland" v-bind="$attrs" />
+    <OriginalComponent v-if="inIsland" v-bind="attrs" />
     <vue-island v-else entry="${clientImportId}" :serialized-props="isEmptyProps ? undefined : JSON.stringify(attrs)">
-      <OriginalComponent v-bind="$attrs" />
+      <OriginalComponent v-bind="attrs" />
     </vue-island>
+  </template>`
+}
+
+export function generateServerComponentCode(
+  fileName: string,
+  cssIds: string[],
+): string {
+  return `<script setup>
+  import { useSSRContext } from 'vue'
+  import OriginalComponent from '${fileName}?original'
+
+  const context = useSSRContext()
+
+  context.loadCss ??= new Set()
+  ${cssIds.map((cssId) => `context.loadCss.add('${cssId}')`).join('\n')}
+  </script>
+
+  <template>
+    <OriginalComponent>
+      <template v-for="(_, slot) of $slots" v-slot:[slot]="scope"><slot :name="slot" v-bind="scope"/></template>
+    </OriginalComponent>
   </template>`
 }
