@@ -64,6 +64,8 @@ export function clientManifest(config: ClientManifestConfig) {
   }
 
   function getDependingClientCssIds(id: string, code: string): string[] {
+    const relativePath = path.relative(config.root, id)
+
     if (config.command === 'serve') {
       if (!id.endsWith('vue')) {
         return []
@@ -84,11 +86,10 @@ export function clientManifest(config: ClientManifestConfig) {
         const attrsQuery = attrsToQuery(style.attrs, 'css')
         const scopedQuery = style.scoped ? `&scoped=${componentId}` : ''
         const query = `?vue&type=style&index=${i}${scopedQuery}`
-        return id + query + attrsQuery
+        return `/${relativePath}${query}${attrsQuery}`
       })
     }
 
-    const relativePath = path.relative(config.root, id)
     const manifest = ensureClientManifest()
 
     const cssIds = manifest[relativePath]?.css || []
