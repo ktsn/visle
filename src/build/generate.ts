@@ -1,6 +1,12 @@
-export const symbolImportId = '@vue-islands-renderer/symbols'
+export const virtualEntryId = '\0@vue-islands-renderer/entry'
+
+export const symbolImportId = '\0@vue-islands-renderer/symbols'
 
 export const symbolCode = `export const islandSymbol = Symbol('@vue-islands-renderer/island')`
+
+export function generateVirtualEntryCode(componentIds: string[]): string {
+  return componentIds.map((id) => `import '${id}'`).join('\n')
+}
 
 export function generateIslandCode(
   fileName: string,

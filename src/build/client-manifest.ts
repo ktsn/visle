@@ -11,9 +11,10 @@ export const customElementEntryPath = path.resolve(
   '../client/custom-element.js',
 )
 
+export const entryMetadataPath = '.vite/entry-metadata.json'
+
 interface ClientManifestConfig {
   manifest: string
-  entry: string
   command: 'serve' | 'build'
   root: string
   isProduction: boolean
@@ -25,10 +26,15 @@ interface ClientManifestFs {
   readFileSync: typeof baseFs.readFileSync
 }
 
+export interface EntryMetadata {
+  css: string[]
+}
+
 export function clientManifest(config: ClientManifestConfig) {
   const fs = config.fs || baseFs
 
   let clientManifest: Manifest
+  let entryMetaData: EntryMetadata
 
   function ensureClientManifest(): Manifest {
     if (clientManifest) {
@@ -42,6 +48,20 @@ export function clientManifest(config: ClientManifestConfig) {
       ),
     )
     return clientManifest
+  }
+
+  function ensureEntryMetadata() {
+    if (entryMetaData) {
+      return entryMetaData
+    }
+
+    entryMetaData = JSON.parse(
+      fs.readFileSync(
+        path.resolve(config.root, config.clientDist, entryMetadataPath),
+        'utf-8',
+      ),
+    )
+    return entryMetaData
   }
 
   function getClientImportId(id: string): string {
@@ -96,11 +116,9 @@ export function clientManifest(config: ClientManifestConfig) {
     }
 
     const manifest = ensureClientManifest()
+    const entry = ensureEntryMetadata()
 
-    const entryRelativePath = path.normalize(config.entry)
-
-    const cssIds =
-      manifest[relativePath]?.css ?? manifest[entryRelativePath]?.css ?? []
+    const cssIds = manifest[relativePath]?.css ?? entry.css
     return cssIds.map((cssId) => `/${cssId}`)
   }
 

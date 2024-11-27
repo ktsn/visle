@@ -2,6 +2,7 @@ import { describe, expect, test, vitest } from 'vitest'
 import {
   clientManifest,
   customElementEntryPath,
+  EntryMetadata,
   virtualCustomElementEntryPath,
 } from '../../src/build/client-manifest.ts'
 import { Manifest } from 'vite'
@@ -11,7 +12,6 @@ describe('Client manifest', () => {
     test('get custom element entry path as virtual path', () => {
       const manifest = clientManifest({
         manifest: '.vite/manifest.json',
-        entry: 'entry.js',
         clientDist: 'dist-client',
         command: 'serve',
         root: '/path/to/root',
@@ -26,7 +26,6 @@ describe('Client manifest', () => {
     test('get a relative path from the root directory', () => {
       const manifest = clientManifest({
         manifest: '.vite/manifest.json',
-        entry: 'entry.js',
         clientDist: 'dist-client',
         command: 'serve',
         root: '/path/to/root',
@@ -41,7 +40,6 @@ describe('Client manifest', () => {
     test('return empty id array for css without <style>', () => {
       const manifest = clientManifest({
         manifest: '.vite/manifest.json',
-        entry: 'entry.js',
         clientDist: 'dist-client',
         command: 'serve',
         root: '/path/to/root',
@@ -59,7 +57,6 @@ describe('Client manifest', () => {
     test('return ids for <style> blocks in code', () => {
       const manifest = clientManifest({
         manifest: '.vite/manifest.json',
-        entry: 'entry.js',
         clientDist: 'dist-client',
         command: 'serve',
         root: '/path/to/root',
@@ -88,7 +85,6 @@ describe('Client manifest', () => {
 
       const manifestInstance = clientManifest({
         manifest: '.vite/manifest.json',
-        entry: 'entry.js',
         clientDist: 'dist-client',
         command: 'build',
         root: '/path/to/root',
@@ -109,7 +105,6 @@ describe('Client manifest', () => {
 
       const manifestInstance = clientManifest({
         manifest: '.vite/manifest.json',
-        entry: 'entry.js',
         clientDist: 'dist-client',
         command: 'build',
         root: '/path/to/root',
@@ -133,7 +128,6 @@ describe('Client manifest', () => {
 
       const manifestInstance = clientManifest({
         manifest: '.vite/manifest.json',
-        entry: 'entry.js',
         clientDist: 'dist-client',
         command: 'build',
         root: '/path/to/root',
@@ -154,16 +148,22 @@ describe('Client manifest', () => {
         'src/foo.vue': {
           file: 'foo-1234.js',
         },
-        'entry.js': {
-          file: 'entry-1234.js',
-          css: ['entry-1234.css'],
-        },
       }
-      const readFileSync = vitest.fn().mockReturnValue(JSON.stringify(manifest))
+      const entry: EntryMetadata = {
+        css: ['entry-1234.css'],
+      }
+      const readFileSync = vitest.fn().mockImplementation((path) => {
+        if (path === '/path/to/root/dist-client/.vite/manifest.json') {
+          return JSON.stringify(manifest)
+        }
+
+        if (path === '/path/to/root/dist-client/.vite/entry-metadata.json') {
+          return JSON.stringify(entry)
+        }
+      })
 
       const manifestInstance = clientManifest({
         manifest: '.vite/manifest.json',
-        entry: 'entry.js',
         clientDist: 'dist-client',
         command: 'build',
         root: '/path/to/root',
