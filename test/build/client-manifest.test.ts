@@ -11,6 +11,7 @@ describe('Client manifest', () => {
     test('get custom element entry path as virtual path', () => {
       const manifest = clientManifest({
         manifest: '.vite/manifest.json',
+        entry: 'entry.js',
         clientDist: 'dist-client',
         command: 'serve',
         root: '/path/to/root',
@@ -25,6 +26,7 @@ describe('Client manifest', () => {
     test('get a relative path from the root directory', () => {
       const manifest = clientManifest({
         manifest: '.vite/manifest.json',
+        entry: 'entry.js',
         clientDist: 'dist-client',
         command: 'serve',
         root: '/path/to/root',
@@ -39,6 +41,7 @@ describe('Client manifest', () => {
     test('return empty id array for css without <style>', () => {
       const manifest = clientManifest({
         manifest: '.vite/manifest.json',
+        entry: 'entry.js',
         clientDist: 'dist-client',
         command: 'serve',
         root: '/path/to/root',
@@ -56,6 +59,7 @@ describe('Client manifest', () => {
     test('return ids for <style> blocks in code', () => {
       const manifest = clientManifest({
         manifest: '.vite/manifest.json',
+        entry: 'entry.js',
         clientDist: 'dist-client',
         command: 'serve',
         root: '/path/to/root',
@@ -68,7 +72,7 @@ describe('Client manifest', () => {
       )
 
       expect(result).toEqual([
-        '/path/to/root/src/foo.vue?vue&type=style&index=0&scoped=113f6fdb&lang.css',
+        '/src/foo.vue?vue&type=style&index=0&scoped=6bf1c258&lang.css',
       ])
     })
   })
@@ -84,6 +88,7 @@ describe('Client manifest', () => {
 
       const manifestInstance = clientManifest({
         manifest: '.vite/manifest.json',
+        entry: 'entry.js',
         clientDist: 'dist-client',
         command: 'build',
         root: '/path/to/root',
@@ -104,6 +109,7 @@ describe('Client manifest', () => {
 
       const manifestInstance = clientManifest({
         manifest: '.vite/manifest.json',
+        entry: 'entry.js',
         clientDist: 'dist-client',
         command: 'build',
         root: '/path/to/root',
@@ -127,6 +133,7 @@ describe('Client manifest', () => {
 
       const manifestInstance = clientManifest({
         manifest: '.vite/manifest.json',
+        entry: 'entry.js',
         clientDist: 'dist-client',
         command: 'build',
         root: '/path/to/root',
@@ -142,16 +149,21 @@ describe('Client manifest', () => {
       expect(result).toEqual(['/foo-1234.css'])
     })
 
-    test('return empty css id array when manifest does not have css paths', () => {
+    test('return entry css id array when manifest does not have css paths', () => {
       const manifest: Manifest = {
         'src/foo.vue': {
           file: 'foo-1234.js',
+        },
+        'entry.js': {
+          file: 'entry-1234.js',
+          css: ['entry-1234.css'],
         },
       }
       const readFileSync = vitest.fn().mockReturnValue(JSON.stringify(manifest))
 
       const manifestInstance = clientManifest({
         manifest: '.vite/manifest.json',
+        entry: 'entry.js',
         clientDist: 'dist-client',
         command: 'build',
         root: '/path/to/root',
@@ -164,7 +176,7 @@ describe('Client manifest', () => {
         '<template><div></div></template>',
       )
 
-      expect(result).toEqual([])
+      expect(result).toEqual(['/entry-1234.css'])
     })
   })
 })

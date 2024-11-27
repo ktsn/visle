@@ -13,6 +13,7 @@ export const customElementEntryPath = path.resolve(
 
 interface ClientManifestConfig {
   manifest: string
+  entry: string
   command: 'serve' | 'build'
   root: string
   isProduction: boolean
@@ -96,7 +97,10 @@ export function clientManifest(config: ClientManifestConfig) {
 
     const manifest = ensureClientManifest()
 
-    const cssIds = manifest[relativePath]?.css || []
+    const entryRelativePath = path.normalize(config.entry)
+
+    const cssIds =
+      manifest[relativePath]?.css ?? manifest[entryRelativePath]?.css ?? []
     return cssIds.map((cssId) => `/${cssId}`)
   }
 

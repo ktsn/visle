@@ -1,5 +1,5 @@
 import { describe, test, expect } from 'vitest'
-import { serveAndRenderMain, tmpDir } from './build-utils.ts'
+import { serveAndRenderMain } from './build-utils.ts'
 
 describe('Island plugin on server', () => {
   test('compiles vue component', async () => {
@@ -89,7 +89,7 @@ describe('Island plugin on server', () => {
     })
 
     expect(code).toBe(
-      `<link rel="stylesheet" href="${tmpDir}/main.vue?vue&type=style&index=0&lang.css"><link rel="stylesheet" href="${tmpDir}/child.island.vue?vue&type=style&index=0&lang.css"><link rel="stylesheet" href="/Users/katashin/dev/ts/vue-islands-renderer/test/__generated__/child.island.vue?vue&type=style&index=1&scoped=1dfedb7d&lang.css"><script type="module" src="/@vue-islands-renderer/entry" async></script><vue-island entry="/child.island.vue"><button data-v-4b3910e4>hello</button></vue-island>`,
+      `<link rel="stylesheet" href="/main.vue?vue&type=style&index=0&lang.css"><link rel="stylesheet" href="/child.island.vue?vue&type=style&index=0&lang.css"><link rel="stylesheet" href="/child.island.vue?vue&type=style&index=1&scoped=4b3910e4&lang.css"><script type="module" src="/@vue-islands-renderer/entry" async></script><vue-island entry="/child.island.vue"><button data-v-4b3910e4>hello</button></vue-island>`,
     )
   })
 })

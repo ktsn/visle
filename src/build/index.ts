@@ -7,6 +7,7 @@ import { devStyleSSRPlugin } from './dev-ssr-css.js'
 const defaultOptions: IslandPluginOptions = {
   clientDist: 'dist-client',
   serverDist: 'dist-server',
+  entry: 'entry.ts',
 }
 
 export default function plugin(

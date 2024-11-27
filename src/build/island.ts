@@ -16,12 +16,13 @@ import {
 export interface IslandPluginOptions {
   clientDist: string
   serverDist: string
+  entry: string
 }
 
 export function island(options: IslandPluginOptions): Plugin {
   let manifest: ReturnType<typeof clientManifest>
 
-  const { clientDist, serverDist } = options
+  const { clientDist, serverDist, entry } = options
 
   return {
     name: 'vue-island',
@@ -35,15 +36,15 @@ export function island(options: IslandPluginOptions): Plugin {
         }
       }
 
-      const islandDirectory = path.resolve(config.root ?? './')
-      const islandPaths = globSync(`${islandDirectory}/**/*.island.vue`)
+      const root = path.resolve(config.root ?? './')
+      const islandPaths = resolvePattern('/**/*.island.vue', root)
 
       return {
         build: {
           manifest: true,
           outDir: clientDist,
           rollupOptions: {
-            input: [customElementEntryPath, ...islandPaths],
+            input: [customElementEntryPath, entry, ...islandPaths],
             preserveEntrySignatures: 'allow-extension',
           },
         },
@@ -53,6 +54,7 @@ export function island(options: IslandPluginOptions): Plugin {
     configResolved(config) {
       manifest = clientManifest({
         manifest: '.vite/manifest.json',
+        entry,
         clientDist,
         command: config.command,
         root: config.root,
@@ -152,4 +154,12 @@ function parseId(id: string): {
     fileName: fileName!,
     query,
   }
+}
+
+function resolvePattern(pattern: string | string[], root: string): string[] {
+  if (typeof pattern === 'string') {
+    return globSync(path.join(root, pattern))
+  }
+
+  return pattern.flatMap((p) => resolvePattern(p, root))
 }
