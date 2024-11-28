@@ -1,6 +1,6 @@
 {
   "name": "vue-islands-renderer",
-  "version": "0.0.0",
+  "version": "0.1.0",
   "description": "Islands Architecture renderer for Vue.js",
   "type": "module",
   "exports": {
