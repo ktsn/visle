@@ -15,7 +15,8 @@
     "format": "pnpm biome format --write ./",
     "demo": "cd demo && node --experimental-strip-types dev.ts",
     "demo:production": "cd demo && node --experimental-strip-types prod.ts",
-    "demo:build": "cd demo && vite build && vite build --ssr src/server.ts"
+    "demo:build": "cd demo && vite build && vite build --ssr src/server.ts",
+    "prepublishOnly": "pnpm lint && pnpm test && rm -rf dist && pnpm build"
   },
   "keywords": [
     "Vue.js",
