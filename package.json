@@ -8,6 +8,7 @@
     "./server": "./dist/server/index.js",
     "./client": "./dist/client/custom-element.js"
   },
+  "files": ["dist"],
   "scripts": {
     "build": "tsc -p .",
     "test": "vitest",
