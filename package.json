@@ -1,6 +1,6 @@
 {
   "name": "vue-islands-renderer",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "Islands Architecture renderer for Vue.js",
   "type": "module",
   "exports": {
@@ -8,7 +8,9 @@
     "./server": "./dist/server/index.js",
     "./client": "./dist/client/custom-element.js"
   },
-  "files": ["dist"],
+  "files": [
+    "dist"
+  ],
   "scripts": {
     "build": "tsc -p .",
     "test": "vitest",
