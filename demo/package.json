@@ -1,0 +1,19 @@
+{
+  "name": "vue-islands-renderer-demo",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "node --experimental-strip-types app/server.ts",
+    "build": "vue-islands build",
+    "start": "NODE_ENV=production node --experimental-strip-types app/server.ts"
+  },
+  "dependencies": {
+    "express": "^4.21.0",
+    "marked": "^14.1.2",
+    "sanitize-html": "^2.13.0",
+    "vue": "^3.5.9"
+  },
+  "devDependencies": {
+    "vue-islands-renderer": "file:../"
+  }
+}
