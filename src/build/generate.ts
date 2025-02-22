@@ -33,10 +33,13 @@ export function generateServerVirtualEntryCode(
 
 export function pathToExportId(targetPath: string): string {
   const stripped = targetPath.replace(/^\//, '').replace(/\.vue$/, '')
-  return stripped
-    .replaceAll('.', '_')
+  const replaced = stripped
+    .replaceAll('$', '$$')
+    .replaceAll('.', '$')
     .replaceAll('_', '__')
     .replaceAll('/', '_')
+
+  return `_${replaced}`
 }
 
 export function generateIslandCode(
