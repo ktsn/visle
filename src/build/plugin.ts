@@ -5,19 +5,9 @@ import { generateComponentId } from './component-id.js'
 import { devStyleSSRPlugin } from './dev-ssr-css.js'
 import { islandElementName } from './generate.js'
 
-const defaultOptions: IslandPluginOptions = {
-  clientDist: 'dist-client',
-  serverDist: 'dist-server',
-}
-
-export default function plugin(
-  options: Partial<IslandPluginOptions> = {},
-): Plugin[] {
+export default function plugin(options: IslandPluginOptions): Plugin[] {
   return [
-    island({
-      ...defaultOptions,
-      ...options,
-    }),
+    island(options),
     vue({
       features: {
         componentIdGenerator: (filePath, source, isProduction) => {

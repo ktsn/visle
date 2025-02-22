@@ -1,5 +1,5 @@
 export interface ResolvedIslandsConfig {
-  rootDir: string
+  root: string
   componentDir: string
   clientOutDir: string
   serverOutDir: string
@@ -8,7 +8,7 @@ export interface ResolvedIslandsConfig {
 export type IslandsConfig = Partial<ResolvedIslandsConfig>
 
 export const defaultConfig: ResolvedIslandsConfig = {
-  rootDir: process.cwd(),
+  root: process.cwd(),
   componentDir: 'components',
   clientOutDir: 'dist/client',
   serverOutDir: 'dist/server',

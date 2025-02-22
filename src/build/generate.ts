@@ -1,4 +1,8 @@
-export const virtualEntryId = '\0@vue-islands-renderer/entry'
+import path from 'node:path'
+
+export const clientVirtualEntryId = '\0@vue-islands-renderer/client-entry'
+
+export const serverVirtualEntryId = '\0@vue-islands-renderer/server-entry'
 
 export const symbolImportId = '\0@vue-islands-renderer/symbols'
 
@@ -6,8 +10,33 @@ export const symbolCode = `export const islandSymbol = Symbol('@vue-islands-rend
 
 export const islandElementName = 'vue-island'
 
-export function generateVirtualEntryCode(componentIds: string[]): string {
+export function generateClientVirtualEntryCode(componentIds: string[]): string {
   return componentIds.map((id) => `import '${id}'`).join('\n')
+}
+
+export function generateServerVirtualEntryCode(
+  config: {
+    root: string
+    componentDir: string
+  },
+  componentIds: string[],
+): string {
+  const basePath = path.join(config.root, config.componentDir)
+
+  return componentIds
+    .map((id) => {
+      const exportId = pathToExportId(path.relative(basePath, id))
+      return `export { default as ${exportId} } from '${id}'`
+    })
+    .join('\n')
+}
+
+export function pathToExportId(targetPath: string): string {
+  const stripped = targetPath.replace(/^\//, '').replace(/\.vue$/, '')
+  return stripped
+    .replaceAll('.', '_')
+    .replaceAll('_', '__')
+    .replaceAll('/', '_')
 }
 
 export function generateIslandCode(

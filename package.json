@@ -4,7 +4,6 @@
   "description": "Islands Architecture renderer for Vue.js",
   "type": "module",
   "exports": {
-    "./build": "./dist/build/index.js",
     "./server": "./dist/server/index.js",
     "./client": "./dist/client/custom-element.js"
   },
@@ -15,8 +14,8 @@
     "lint": "pnpm biome lint ./",
     "format": "pnpm biome format --write ./",
     "demo": "cd demo && node --experimental-strip-types app/server.ts",
-    "demo:production": "cd demo && node --experimental-strip-types prod.ts",
-    "demo:build": "cd demo && vite build && vite build --ssr src/server.ts",
+    "demo:production": "cd demo && NODE_ENV=production node --experimental-strip-types app/server.ts",
+    "demo:build": "cd demo && node ../dist/cli.js build",
     "prepublishOnly": "pnpm lint && pnpm run test --run && rm -rf dist && pnpm build"
   },
   "keywords": [
@@ -51,6 +50,7 @@
   },
   "dependencies": {
     "@vitejs/plugin-vue": "^5.2.0",
+    "cac": "^6.7.14",
     "connect": "^3.7.0",
     "glob": "^11.0.0"
   }

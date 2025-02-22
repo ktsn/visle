@@ -88,7 +88,7 @@ file changes and provide HMR, it is not suitable for production environment.
 
 To make it ready for production, update `app/server.ts` as follows:
 
-```ts+diff
+```diff
 // app/server.ts
 import express from 'express'
 import { createRender } from 'vue-islands-renderer'
@@ -117,7 +117,7 @@ app.get('/', async (req, res) => {
 +  app.use(render.devMiddlewares)
 +} else {
 +  // Serve client asset files from the dist directory.
-+  app.use(express.static(path.resolve(import.meta.dirname, 'dist/client')))
++  app.use(express.static(path.resolve('dist/client')))
 +}
 
 // Start the server.

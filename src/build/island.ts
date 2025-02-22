@@ -4,10 +4,12 @@ import { globSync } from 'glob'
 import {
   generateIslandCode,
   generateServerComponentCode,
-  generateVirtualEntryCode,
+  generateClientVirtualEntryCode,
+  generateServerVirtualEntryCode,
   symbolCode,
   symbolImportId,
-  virtualEntryId,
+  clientVirtualEntryId,
+  serverVirtualEntryId,
 } from './generate.js'
 import {
   clientManifest,
@@ -19,41 +21,17 @@ import {
 
 export interface IslandPluginOptions {
   clientDist: string
-  serverDist: string
+  componentDir: string
 }
 
 export function island(options: IslandPluginOptions): Plugin {
   let manifest: ReturnType<typeof clientManifest>
   let root: string
 
-  const { clientDist, serverDist } = options
+  const { clientDist, componentDir } = options
 
   return {
     name: 'vue-island',
-
-    config(config) {
-      if (config.build?.ssr) {
-        return {
-          build: {
-            outDir: serverDist,
-          },
-        }
-      }
-
-      const root = path.resolve(config.root ?? './')
-      const islandPaths = resolvePattern('/**/*.island.vue', root)
-
-      return {
-        build: {
-          manifest: true,
-          outDir: clientDist,
-          rollupOptions: {
-            input: [customElementEntryPath, virtualEntryId, ...islandPaths],
-            preserveEntrySignatures: 'allow-extension',
-          },
-        },
-      }
-    },
 
     configResolved(config) {
       root = config.root
@@ -72,11 +50,15 @@ export function island(options: IslandPluginOptions): Plugin {
           return customElementEntryPath
         }
 
-        if (id === virtualEntryId) {
-          return virtualEntryId
+        if (id === clientVirtualEntryId) {
+          return clientVirtualEntryId
         }
 
         return
+      }
+
+      if (id === serverVirtualEntryId) {
+        return serverVirtualEntryId
       }
 
       if (id === symbolImportId) {
@@ -92,15 +74,19 @@ export function island(options: IslandPluginOptions): Plugin {
 
     load(id, options) {
       if (!options?.ssr) {
-        if (id === virtualEntryId) {
-          const islandPaths = new Set(resolvePattern('/**/*.island.vue', root))
-          const vuePaths = resolvePattern('/**/*.vue', root)
-
-          const filtered = vuePaths.filter((p) => !islandPaths.has(p))
-
-          return generateVirtualEntryCode(filtered)
+        if (id === clientVirtualEntryId) {
+          return generateClientVirtualEntryCode(
+            resolveServerComponentIds(root, componentDir),
+          )
         }
         return null
+      }
+
+      if (id === serverVirtualEntryId) {
+        return generateServerVirtualEntryCode(
+          { root, componentDir },
+          resolveServerComponentIds(root, componentDir),
+        )
       }
 
       if (id === symbolImportId) {
@@ -147,7 +133,10 @@ export function island(options: IslandPluginOptions): Plugin {
 
     generateBundle(_options, bundle) {
       for (const [key, chunk] of Object.entries(bundle)) {
-        if (chunk.type === 'chunk' && chunk.facadeModuleId === virtualEntryId) {
+        if (
+          chunk.type === 'chunk' &&
+          chunk.facadeModuleId === clientVirtualEntryId
+        ) {
           delete bundle[key]
 
           const entryMetaData: EntryMetadata = {
@@ -189,6 +178,18 @@ function parseId(id: string): {
     fileName: fileName!,
     query,
   }
+}
+
+function resolveServerComponentIds(
+  root: string,
+  componentDir: string,
+): string[] {
+  const basePath = path.join(root, componentDir)
+
+  const islandPaths = new Set(resolvePattern('/**/*.island.vue', basePath))
+  const vuePaths = resolvePattern('/**/*.vue', basePath)
+
+  return vuePaths.filter((p) => !islandPaths.has(p))
 }
 
 function resolvePattern(pattern: string | string[], root: string): string[] {

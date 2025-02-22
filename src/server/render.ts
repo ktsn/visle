@@ -5,6 +5,8 @@ import connect from 'connect'
 import * as path from 'node:path'
 import { transformWithRenderContext } from './transform.js'
 import { defaultConfig } from '../build/config.js'
+import { pathToExportId } from '../build/generate.js'
+import plugin from '../build/plugin.js'
 
 export interface RenderOptions {
   isDev?: boolean
@@ -32,31 +34,41 @@ export function createRender(options: RenderOptions = {}) {
 
   let devServer: ViteDevServer | undefined
 
-  function resolveComponentPath(componentPath: string): string {
-    const { rootDir, componentDir, serverOutDir } = defaultConfig
-    const basePath = isDev ? componentDir : serverOutDir
+  function resolveDevComponentPath(componentPath: string): string {
+    const { root, componentDir } = defaultConfig
+    const basePath = componentDir
 
-    console.log(path.resolve(path.join(rootDir, basePath, componentPath)))
-    return path.resolve(path.join(rootDir, basePath, componentPath))
+    return path.resolve(path.join(root, basePath, `${componentPath}.vue`))
+  }
+
+  function resolveServerDistPath(): string {
+    const { root, serverOutDir } = defaultConfig
+    return path.resolve(path.join(root, serverOutDir, 'server-entry.js'))
   }
 
   async function loadComponent(componentPath: string): Promise<Component> {
-    const resolvedPath = resolveComponentPath(componentPath)
-
     if (!isDev) {
-      return import(`${resolvedPath}.js`).then((m) => m.default)
+      return import(resolveServerDistPath()).then((m) => {
+        return m[pathToExportId(componentPath)]
+      })
     }
 
     if (!devServer) {
       devServer = await createServer({
         appType: 'custom',
         server: { middlewareMode: true },
+        plugins: [
+          plugin({
+            clientDist: defaultConfig.clientOutDir,
+            componentDir: defaultConfig.componentDir,
+          }),
+        ],
       })
     }
 
     try {
       return devServer
-        .ssrLoadModule(`${resolvedPath}.vue`)
+        .ssrLoadModule(resolveDevComponentPath(componentPath))
         .then((m) => m.default)
     } catch (e) {
       if (e instanceof Error) {
