@@ -6,6 +6,33 @@ import { clientVirtualEntryId, serverVirtualEntryId } from './generate.js'
 import plugin from './plugin.js'
 import { defaultConfig } from './config.js'
 
+/**
+ * Build all Vue components matched with the config.
+ * Build consistes of two parts: client and server.
+ *
+ * Client Build:
+ * - Transform each island component into entry files
+ *   that hydrates corresponding islands respectively.
+ * - Generate client side entry file that activates
+ *   `<vue-island>` custom element. It triggers island
+ *   hydration with loading island component entry files
+ *   stated earlier.
+ * - Generate a virtual chunk that loads all server side
+ *   components and generates a CSS file extracted from them.
+ * - Generate a manifest file of the client build that
+ *   will be used by the server build later.
+ *
+ * Server Build:
+ * - Transform all Vue components into single server entry
+ *   file. The server entry file re-exports all Vue components
+ *   with export id derived from each component's path.
+ *   e.g. `user/profile.vue` will be exported as `user_profile`.
+ * - Inject `<vue-island>` custom element into the place that
+ *   island components are used.
+ * - Resolve asset (JavaScript, CSS) paths and inject them
+ *   into each server-rendered HTML as `<script>`, `<link>`
+ *   or an attribute of `<vue-island>`.
+ */
 export async function build(): Promise<void> {
   await buildForClient(defaultConfig)
   await buildForServer(defaultConfig)
