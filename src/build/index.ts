@@ -3,6 +3,7 @@ import vue from '@vitejs/plugin-vue'
 import { island, IslandPluginOptions } from './island.js'
 import { generateComponentId } from './component-id.js'
 import { devStyleSSRPlugin } from './dev-ssr-css.js'
+import { islandElementName } from './generate.js'
 
 const defaultOptions: IslandPluginOptions = {
   clientDist: 'dist-client',
@@ -25,7 +26,7 @@ export default function plugin(
       },
       template: {
         compilerOptions: {
-          isCustomElement: (tag) => tag === 'vue-island',
+          isCustomElement: (tag) => tag === islandElementName,
         },
       },
     }),

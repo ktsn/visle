@@ -4,6 +4,8 @@ export const symbolImportId = '\0@vue-islands-renderer/symbols'
 
 export const symbolCode = `export const islandSymbol = Symbol('@vue-islands-renderer/island')`
 
+export const islandElementName = 'vue-island'
+
 export function generateVirtualEntryCode(componentIds: string[]): string {
   return componentIds.map((id) => `import '${id}'`).join('\n')
 }
@@ -40,9 +42,9 @@ export function generateIslandCode(
 
   <template>
     <OriginalComponent v-if="inIsland" v-bind="attrs" />
-    <vue-island v-else entry="${clientImportId}" :serialized-props="isEmptyProps ? undefined : JSON.stringify(attrs)">
+    <${islandElementName} v-else entry="${clientImportId}" :serialized-props="isEmptyProps ? undefined : JSON.stringify(attrs)">
       <OriginalComponent v-bind="attrs" />
-    </vue-island>
+    </${islandElementName}>
   </template>`
 }
 
