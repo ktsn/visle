@@ -1,7 +1,7 @@
 import path from 'node:path'
 import fs from 'node:fs'
 import { createServer } from 'vite'
-import island from '../../src/build/plugin.ts'
+import { islandPlugin } from '../../src/build/plugins/index.js'
 import { fileURLToPath } from 'node:url'
 
 const tmpDir = path.resolve('test/__generated__/build-utils')
@@ -43,7 +43,7 @@ export async function serveAndRenderMain(
     root: tmpDir,
 
     plugins: [
-      island({
+      islandPlugin({
         clientDist: 'dist/client',
         componentDir: '',
       }),

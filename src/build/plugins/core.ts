@@ -10,28 +10,28 @@ import {
   symbolImportId,
   clientVirtualEntryId,
   serverVirtualEntryId,
-} from './generate.js'
+} from '../generate.js'
 import {
   clientManifest,
   customElementEntryPath,
   EntryMetadata,
   entryMetadataPath,
   virtualCustomElementEntryPath,
-} from './client-manifest.js'
+} from '../client-manifest.js'
 
 export interface IslandPluginOptions {
   clientDist: string
   componentDir: string
 }
 
-export function island(options: IslandPluginOptions): Plugin {
+export function islandCorePlugin(options: IslandPluginOptions): Plugin {
   let manifest: ReturnType<typeof clientManifest>
   let root: string
 
   const { clientDist, componentDir } = options
 
   return {
-    name: 'vue-island',
+    name: 'vue-island-core',
 
     configResolved(config) {
       root = config.root

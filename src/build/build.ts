@@ -3,7 +3,7 @@ import { build as viteBuild } from 'vite'
 import { globSync } from 'glob'
 import { customElementEntryPath } from './client-manifest.js'
 import { clientVirtualEntryId, serverVirtualEntryId } from './generate.js'
-import plugin from './plugin.js'
+import { islandPlugin } from './plugins/index.js'
 import { defaultConfig } from './config.js'
 
 /**
@@ -54,7 +54,7 @@ async function buildForServer(config: {
       },
     },
     plugins: [
-      plugin({
+      islandPlugin({
         componentDir: config.componentDir,
         clientDist: config.clientOutDir,
       }),
@@ -84,7 +84,7 @@ async function buildForClient(config: {
       },
     },
     plugins: [
-      plugin({
+      islandPlugin({
         componentDir: config.componentDir,
         clientDist: config.clientOutDir,
       }),

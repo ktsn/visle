@@ -1,13 +1,13 @@
 import { Plugin } from 'vite'
 import vue from '@vitejs/plugin-vue'
-import { island, IslandPluginOptions } from './island.js'
-import { generateComponentId } from './component-id.js'
+import { islandCorePlugin, IslandPluginOptions } from './core.js'
+import { generateComponentId } from '../component-id.js'
 import { devStyleSSRPlugin } from './dev-ssr-css.js'
-import { islandElementName } from './generate.js'
+import { islandElementName } from '../generate.js'
 
-export default function plugin(options: IslandPluginOptions): Plugin[] {
+export function islandPlugin(options: IslandPluginOptions): Plugin[] {
   return [
-    island(options),
+    islandCorePlugin(options),
     vue({
       features: {
         componentIdGenerator: (filePath, source, isProduction) => {

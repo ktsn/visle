@@ -6,7 +6,7 @@ import * as path from 'node:path'
 import { transformWithRenderContext } from './transform.js'
 import { defaultConfig, IslandsConfig } from '../build/config.js'
 import { pathToExportId } from '../build/generate.js'
-import plugin from '../build/plugin.js'
+import { islandPlugin } from '../build/plugins/index.js'
 
 export interface RenderOptions extends IslandsConfig {
   isDev?: boolean
@@ -63,7 +63,7 @@ export function createRender(options: RenderOptions = {}) {
         root: config.root,
 
         plugins: [
-          plugin({
+          islandPlugin({
             clientDist: config.clientOutDir,
             componentDir: config.componentDir,
           }),
