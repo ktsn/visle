@@ -4,11 +4,11 @@ import { Connect, createServer, ViteDevServer } from 'vite'
 import connect from 'connect'
 import * as path from 'node:path'
 import { transformWithRenderContext } from './transform.js'
-import { defaultConfig } from '../build/config.js'
+import { defaultConfig, IslandsConfig } from '../build/config.js'
 import { pathToExportId } from '../build/generate.js'
 import plugin from '../build/plugin.js'
 
-export interface RenderOptions {
+export interface RenderOptions extends IslandsConfig {
   isDev?: boolean
 }
 
@@ -30,25 +30,26 @@ export interface RenderContext {
  * @returns
  */
 export function createRender(options: RenderOptions = {}) {
-  const { isDev = false } = options
+  const { isDev = false, ...rest } = options
+  const config = { ...defaultConfig, ...rest }
 
   let devServer: ViteDevServer | undefined
 
   function resolveDevComponentPath(componentPath: string): string {
-    const { root, componentDir } = defaultConfig
+    const { root, componentDir } = config
     const basePath = componentDir
 
     return path.resolve(path.join(root, basePath, `${componentPath}.vue`))
   }
 
   function resolveServerDistPath(): string {
-    const { root, serverOutDir } = defaultConfig
+    const { root, serverOutDir } = config
     return path.resolve(path.join(root, serverOutDir, 'server-entry.js'))
   }
 
   async function loadComponent(componentPath: string): Promise<Component> {
     if (!isDev) {
-      return import(resolveServerDistPath()).then((m) => {
+      return import(/* @vite-ignore */ resolveServerDistPath()).then((m) => {
         return m[pathToExportId(componentPath)]
       })
     }
@@ -57,10 +58,14 @@ export function createRender(options: RenderOptions = {}) {
       devServer = await createServer({
         appType: 'custom',
         server: { middlewareMode: true },
+        logLevel: 'silent',
+
+        root: config.root,
+
         plugins: [
           plugin({
-            clientDist: defaultConfig.clientOutDir,
-            componentDir: defaultConfig.componentDir,
+            clientDist: config.clientOutDir,
+            componentDir: config.componentDir,
           }),
         ],
       })
