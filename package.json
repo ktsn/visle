@@ -14,6 +14,7 @@
   "scripts": {
     "build": "tsc -p .",
     "test": "vitest",
+    "test:coverage": "vitest --coverage --coverage.reporter=lcov",
     "lint": "pnpm biome lint ./",
     "format": "pnpm biome format --write ./",
     "prepublishOnly": "pnpm lint && pnpm run test --run && rm -rf dist && pnpm build"

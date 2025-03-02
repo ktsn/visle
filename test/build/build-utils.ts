@@ -1,29 +1,36 @@
 import path from 'node:path'
 import fs from 'node:fs'
 import { createServer } from 'vite'
-import island from '../../src/build/index.ts'
+import island from '../../src/build/plugin.ts'
 import { fileURLToPath } from 'node:url'
 
-const tmpDir = path.resolve('test/__generated__')
+const tmpDir = path.resolve('test/__generated__/build-utils')
 const dirname = path.dirname(fileURLToPath(import.meta.url))
 const renderModulePath = path.resolve(dirname, '../../src/server/render.ts')
 
 export async function serveAndRenderMain(
   files: Record<string, string>,
 ): Promise<string> {
-  const main = `
-  import { render } from '${renderModulePath}'
-  import Component from './Main.vue'
-  export default () => render(Component)
-  `
+  fs.rmSync(tmpDir, { recursive: true, force: true })
 
-  fs.mkdirSync(tmpDir, { recursive: true })
+  const main = `
+  import { createRender } from '${renderModulePath}'
+  const render = createRender({
+    isDev: true,
+    root: ${JSON.stringify(tmpDir)},
+    componentDir: '',
+  })
+  export default () => render('main')
+  `
 
   Object.entries({
     ...files,
     'main.js': main,
   }).map(([fileName, content]) => {
-    fs.writeFileSync(path.join(tmpDir, fileName), content)
+    const filePath = path.join(tmpDir, fileName)
+    const dirPath = path.dirname(filePath)
+    fs.mkdirSync(dirPath, { recursive: true })
+    fs.writeFileSync(filePath, content)
   })
 
   const server = await createServer({
@@ -31,13 +38,14 @@ export async function serveAndRenderMain(
       middlewareMode: true,
       ws: false,
     },
+    logLevel: 'silent',
     appType: 'custom',
     root: tmpDir,
 
     plugins: [
       island({
-        clientDist: 'client',
-        serverDist: 'server',
+        clientDist: 'dist/client',
+        componentDir: '',
       }),
     ],
 

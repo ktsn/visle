@@ -4,7 +4,7 @@ import { serveAndRenderMain } from './build-utils.ts'
 describe('Island plugin on server', () => {
   test('compiles vue component', async () => {
     const code = await serveAndRenderMain({
-      './main.vue': `
+      'main.vue': `
         <script setup>
           import Counter from "./counter.island.vue";
         </script>
@@ -15,7 +15,7 @@ describe('Island plugin on server', () => {
 					</div>
         </template>
       `,
-      './counter.island.vue': `
+      'counter.island.vue': `
         <script setup>
           import { ref } from "vue";
           const count = ref(0);
@@ -33,7 +33,7 @@ describe('Island plugin on server', () => {
 
   test('pass props to island', async () => {
     const code = await serveAndRenderMain({
-      './main.vue': `
+      'main.vue': `
         <script setup>
         import Child from './child.island.vue'
         </script>
@@ -41,7 +41,7 @@ describe('Island plugin on server', () => {
           <Child foo="bar" :baz="123" :qux="true" />
         </template>
       `,
-      './child.island.vue': `
+      'child.island.vue': `
         <script setup lang="ts">
         defineProps<{
           foo: string
@@ -62,7 +62,7 @@ describe('Island plugin on server', () => {
 
   test('inject css of component', async () => {
     const code = await serveAndRenderMain({
-      './main.vue': `
+      'main.vue': `
         <script setup>
         import Child from './child.island.vue'
         </script>
@@ -73,7 +73,7 @@ describe('Island plugin on server', () => {
         h1 { color: red; }
         </style>
       `,
-      './child.island.vue': `
+      'child.island.vue': `
         <style>
         button {
           color: red;
