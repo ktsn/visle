@@ -9,13 +9,12 @@ import {
   resolveClientManifestPath,
   resolveEntryMetadataPath,
 } from './paths.js'
+import { ResolvedIslandsConfig } from './config.js'
 
 interface ClientManifestConfig {
   manifest: string
   command: 'serve' | 'build'
-  root: string
   isProduction: boolean
-  clientOutDir: string
   fs?: ClientManifestFs
 }
 
@@ -27,8 +26,11 @@ export interface EntryMetadata {
   css: string[]
 }
 
-export function clientManifest(config: ClientManifestConfig) {
-  const fs = config.fs || baseFs
+export function clientManifest(
+  islandsConfig: ResolvedIslandsConfig,
+  manifestConfig: ClientManifestConfig,
+) {
+  const fs = manifestConfig.fs || baseFs
 
   let clientManifest: Manifest
   let entryMetaData: EntryMetadata
@@ -39,13 +41,7 @@ export function clientManifest(config: ClientManifestConfig) {
     }
 
     clientManifest = JSON.parse(
-      fs.readFileSync(
-        resolveClientManifestPath({
-          root: config.root,
-          clientOutDir: config.clientOutDir,
-        }),
-        'utf-8',
-      ),
+      fs.readFileSync(resolveClientManifestPath(islandsConfig), 'utf-8'),
     )
     return clientManifest
   }
@@ -56,21 +52,15 @@ export function clientManifest(config: ClientManifestConfig) {
     }
 
     entryMetaData = JSON.parse(
-      fs.readFileSync(
-        resolveEntryMetadataPath({
-          root: config.root,
-          clientOutDir: config.clientOutDir,
-        }),
-        'utf-8',
-      ),
+      fs.readFileSync(resolveEntryMetadataPath(islandsConfig), 'utf-8'),
     )
     return entryMetaData
   }
 
   function getClientImportId(id: string): string {
-    const relativePath = path.relative(config.root, id)
+    const relativePath = path.relative(islandsConfig.root, id)
 
-    if (config.command === 'serve') {
+    if (manifestConfig.command === 'serve') {
       if (id === customElementEntryPath) {
         return virtualCustomElementEntryPath
       }
@@ -88,9 +78,9 @@ export function clientManifest(config: ClientManifestConfig) {
   }
 
   function getDependingClientCssIds(id: string, code: string): string[] {
-    const relativePath = path.relative(config.root, id)
+    const relativePath = path.relative(islandsConfig.root, id)
 
-    if (config.command === 'serve') {
+    if (manifestConfig.command === 'serve') {
       if (!id.endsWith('vue')) {
         return []
       }
@@ -99,7 +89,7 @@ export function clientManifest(config: ClientManifestConfig) {
       const componentId = generateComponentId(
         relativePath,
         code,
-        config.isProduction,
+        manifestConfig.isProduction,
       )
 
       return descriptor.styles.map((style, i) => {

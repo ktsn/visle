@@ -3,7 +3,7 @@ import { build as viteBuild } from 'vite'
 import { customElementEntryPath, resolvePattern } from './paths.js'
 import { clientVirtualEntryId, serverVirtualEntryId } from './generate.js'
 import { islandPlugin } from './plugins/index.js'
-import { defaultConfig } from './config.js'
+import { defaultConfig, ResolvedIslandsConfig } from './config.js'
 
 /**
  * Build all Vue components matched with the config.
@@ -37,12 +37,7 @@ export async function build(): Promise<void> {
   await buildForServer(defaultConfig)
 }
 
-async function buildForServer(config: {
-  root: string
-  componentDir: string
-  clientOutDir: string
-  serverOutDir: string
-}): Promise<void> {
+async function buildForServer(config: ResolvedIslandsConfig): Promise<void> {
   await viteBuild({
     root: config.root,
     build: {
@@ -52,20 +47,11 @@ async function buildForServer(config: {
         input: [serverVirtualEntryId],
       },
     },
-    plugins: [
-      islandPlugin({
-        componentDir: config.componentDir,
-        clientOutDir: config.clientOutDir,
-      }),
-    ],
+    plugins: [islandPlugin(config)],
   })
 }
 
-async function buildForClient(config: {
-  root: string
-  componentDir: string
-  clientOutDir: string
-}): Promise<void> {
+async function buildForClient(config: ResolvedIslandsConfig): Promise<void> {
   const root = path.resolve(config.root)
   const islandPaths = resolvePattern(
     '/**/*.island.vue',
@@ -82,11 +68,6 @@ async function buildForClient(config: {
         preserveEntrySignatures: 'allow-extension',
       },
     },
-    plugins: [
-      islandPlugin({
-        componentDir: config.componentDir,
-        clientOutDir: config.clientOutDir,
-      }),
-    ],
+    plugins: [islandPlugin(config)],
   })
 }

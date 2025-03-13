@@ -1,5 +1,6 @@
 import path from 'node:path'
 import { pathToExportName } from './paths.js'
+import { ResolvedIslandsConfig } from './config.js'
 
 export const clientVirtualEntryId = '\0@vue-islands-renderer/client-entry'
 
@@ -16,10 +17,7 @@ export function generateClientVirtualEntryCode(componentIds: string[]): string {
 }
 
 export function generateServerVirtualEntryCode(
-  config: {
-    root: string
-    componentDir: string
-  },
+  config: ResolvedIslandsConfig,
   componentIds: string[],
 ): string {
   const basePath = path.join(config.root, config.componentDir)

@@ -81,9 +81,9 @@ export function parseId(id: string): {
  * Resolves paths for all server components
  */
 export function resolveServerComponentIds(
-  root: string,
-  componentDir: string,
+  config: ResolvedIslandsConfig,
 ): string[] {
+  const { root, componentDir } = config
   const basePath = path.join(root, componentDir)
 
   const islandPaths = new Set(resolvePattern('/**/*.island.vue', basePath))
@@ -115,19 +115,17 @@ export function resolveServerDistPath(config: ResolvedIslandsConfig): string {
 /**
  * Resolves the client manifest file path
  */
-export function resolveClientManifestPath(config: {
-  root: string
-  clientOutDir: string
-}): string {
+export function resolveClientManifestPath(
+  config: ResolvedIslandsConfig,
+): string {
   return path.resolve(config.root, config.clientOutDir, '.vite/manifest.json')
 }
 
 /**
  * Resolves the entry metadata file path
  */
-export function resolveEntryMetadataPath(config: {
-  root: string
-  clientOutDir: string
-}): string {
+export function resolveEntryMetadataPath(
+  config: ResolvedIslandsConfig,
+): string {
   return path.resolve(config.root, config.clientOutDir, entryMetadataPath)
 }

@@ -17,29 +17,19 @@ import {
   resolveServerComponentIds,
 } from '../paths.js'
 import { clientManifest, EntryMetadata } from '../client-manifest.js'
+import { ResolvedIslandsConfig } from '../config.js'
 
-export interface IslandPluginOptions {
-  clientOutDir: string
-  componentDir: string
-}
-
-export function islandCorePlugin(options: IslandPluginOptions): Plugin {
+export function islandCorePlugin(config: ResolvedIslandsConfig): Plugin {
   let manifest: ReturnType<typeof clientManifest>
-  let root: string
-
-  const { clientOutDir, componentDir } = options
 
   return {
     name: 'vue-island-core',
 
-    configResolved(config) {
-      root = config.root
-      manifest = clientManifest({
+    configResolved(viteConfig) {
+      manifest = clientManifest(config, {
         manifest: '.vite/manifest.json',
-        clientOutDir,
-        command: config.command,
-        root: config.root,
-        isProduction: config.isProduction,
+        command: viteConfig.command,
+        isProduction: viteConfig.isProduction,
       })
     },
 
@@ -75,7 +65,7 @@ export function islandCorePlugin(options: IslandPluginOptions): Plugin {
       if (!options?.ssr) {
         if (id === clientVirtualEntryId) {
           return generateClientVirtualEntryCode(
-            resolveServerComponentIds(root, componentDir),
+            resolveServerComponentIds(config),
           )
         }
         return null
@@ -83,8 +73,8 @@ export function islandCorePlugin(options: IslandPluginOptions): Plugin {
 
       if (id === serverVirtualEntryId) {
         return generateServerVirtualEntryCode(
-          { root, componentDir },
-          resolveServerComponentIds(root, componentDir),
+          config,
+          resolveServerComponentIds(config),
         )
       }
 

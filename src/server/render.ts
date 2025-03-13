@@ -55,12 +55,7 @@ export function createRender(options: RenderOptions = {}) {
 
         root: config.root,
 
-        plugins: [
-          islandPlugin({
-            clientOutDir: config.clientOutDir,
-            componentDir: config.componentDir,
-          }),
-        ],
+        plugins: [islandPlugin(config)],
       })
     }
 
