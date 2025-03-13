@@ -5,7 +5,7 @@ import { ResolvedIslandsConfig } from './config.js'
 // -----------------------------
 // Custom Element Paths
 // -----------------------------
-export const virtualCustomElementEntryPath = '/@vue-islands-renderer/entry'
+export const virtualCustomElementEntryPath = '/@visle/entry'
 export const customElementEntryPath = path.resolve(
   import.meta.dirname,
   '../client/custom-element.js',

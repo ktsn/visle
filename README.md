@@ -1,11 +1,11 @@
-# Vue Islands Renderer
+# Visle
 
 ## Usage
 
 Directory structure with Vue Islands Renderer will be like this:
 
 ```
-├─ islands.config.ts
+├─ visle.config.ts
 ├─ components/
 │   ├─ Page.vue
 │   ├─ Counter.island.vue
@@ -56,7 +56,7 @@ Then use `createRender` function to create a render function of Vue components:
 ```ts
 // app/server.ts
 import express from 'express'
-import { createRender } from 'vue-islands-renderer'
+import { createRender } from 'visle'
 
 const render = createRender({
   isDev: true,
@@ -91,7 +91,7 @@ To make it ready for production, update `app/server.ts` as follows:
 ```diff
 // app/server.ts
 import express from 'express'
-import { createRender } from 'vue-islands-renderer'
+import { createRender } from 'visle'
 +import * as path from 'node:path'
 
 const isDev = process.env.NODE_ENV !== 'production'
@@ -131,5 +131,5 @@ in the `dist/server` directory.
 To build components, run the following command:
 
 ```bash
-vue-islands build
+visle build
 ```

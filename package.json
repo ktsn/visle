@@ -1,5 +1,5 @@
 {
-  "name": "vue-islands-renderer",
+  "name": "visle",
   "version": "0.1.1",
   "description": "Islands Architecture renderer for Vue.js",
   "type": "module",
@@ -9,7 +9,7 @@
   },
   "files": ["dist", "bin"],
   "bin": {
-    "vue-islands": "./bin/vue-islands.js"
+    "visle": "./bin/visle.js"
   },
   "scripts": {
     "build": "tsc -p .",

@@ -1,6 +1,6 @@
 import express from 'express'
 import path from 'node:path'
-import { createRender } from 'vue-islands-renderer'
+import { createRender } from 'visle'
 
 const app = express()
 

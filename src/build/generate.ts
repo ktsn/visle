@@ -2,13 +2,13 @@ import path from 'node:path'
 import { pathToExportName } from './paths.js'
 import { ResolvedIslandsConfig } from './config.js'
 
-export const clientVirtualEntryId = '\0@vue-islands-renderer/client-entry'
+export const clientVirtualEntryId = '\0@visle/client-entry'
 
-export const serverVirtualEntryId = '\0@vue-islands-renderer/server-entry'
+export const serverVirtualEntryId = '\0@visle/server-entry'
 
-export const symbolImportId = '\0@vue-islands-renderer/symbols'
+export const symbolImportId = '\0@visle/symbols'
 
-export const symbolCode = `export const islandSymbol = Symbol('@vue-islands-renderer/island')`
+export const symbolCode = `export const islandSymbol = Symbol('@visle/island')`
 
 export const islandElementName = 'vue-island'
 
