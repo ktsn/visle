@@ -1,18 +1,20 @@
 import { describe, expect, test, vitest } from 'vitest'
 import {
   clientManifest,
-  customElementEntryPath,
   EntryMetadata,
-  virtualCustomElementEntryPath,
 } from '../../src/build/client-manifest.ts'
 import { Manifest } from 'vite'
+import {
+  customElementEntryPath,
+  virtualCustomElementEntryPath,
+} from '../../src/build/paths.ts'
 
 describe('Client manifest', () => {
   describe('command == server', () => {
     test('get custom element entry path as virtual path', () => {
       const manifest = clientManifest({
         manifest: '.vite/manifest.json',
-        clientDist: 'dist-client',
+        clientOutDir: 'dist-client',
         command: 'serve',
         root: '/path/to/root',
         isProduction: false,
@@ -26,7 +28,7 @@ describe('Client manifest', () => {
     test('get a relative path from the root directory', () => {
       const manifest = clientManifest({
         manifest: '.vite/manifest.json',
-        clientDist: 'dist-client',
+        clientOutDir: 'dist-client',
         command: 'serve',
         root: '/path/to/root',
         isProduction: false,
@@ -40,7 +42,7 @@ describe('Client manifest', () => {
     test('return empty id array for css without <style>', () => {
       const manifest = clientManifest({
         manifest: '.vite/manifest.json',
-        clientDist: 'dist-client',
+        clientOutDir: 'dist-client',
         command: 'serve',
         root: '/path/to/root',
         isProduction: false,
@@ -57,7 +59,7 @@ describe('Client manifest', () => {
     test('return ids for <style> blocks in code', () => {
       const manifest = clientManifest({
         manifest: '.vite/manifest.json',
-        clientDist: 'dist-client',
+        clientOutDir: 'dist-client',
         command: 'serve',
         root: '/path/to/root',
         isProduction: false,
@@ -85,7 +87,7 @@ describe('Client manifest', () => {
 
       const manifestInstance = clientManifest({
         manifest: '.vite/manifest.json',
-        clientDist: 'dist-client',
+        clientOutDir: 'dist-client',
         command: 'build',
         root: '/path/to/root',
         isProduction: true,
@@ -105,7 +107,7 @@ describe('Client manifest', () => {
 
       const manifestInstance = clientManifest({
         manifest: '.vite/manifest.json',
-        clientDist: 'dist-client',
+        clientOutDir: 'dist-client',
         command: 'build',
         root: '/path/to/root',
         isProduction: true,
@@ -128,7 +130,7 @@ describe('Client manifest', () => {
 
       const manifestInstance = clientManifest({
         manifest: '.vite/manifest.json',
-        clientDist: 'dist-client',
+        clientOutDir: 'dist-client',
         command: 'build',
         root: '/path/to/root',
         isProduction: true,
@@ -164,7 +166,7 @@ describe('Client manifest', () => {
 
       const manifestInstance = clientManifest({
         manifest: '.vite/manifest.json',
-        clientDist: 'dist-client',
+        clientOutDir: 'dist-client',
         command: 'build',
         root: '/path/to/root',
         isProduction: true,

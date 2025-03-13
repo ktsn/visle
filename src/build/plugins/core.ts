@@ -1,6 +1,4 @@
 import { Plugin } from 'vite'
-import path from 'node:path'
-import { globSync } from 'glob'
 import {
   generateIslandCode,
   generateServerComponentCode,
@@ -12,15 +10,16 @@ import {
   serverVirtualEntryId,
 } from '../generate.js'
 import {
-  clientManifest,
   customElementEntryPath,
-  EntryMetadata,
   entryMetadataPath,
   virtualCustomElementEntryPath,
-} from '../client-manifest.js'
+  parseId,
+  resolveServerComponentIds,
+} from '../paths.js'
+import { clientManifest, EntryMetadata } from '../client-manifest.js'
 
 export interface IslandPluginOptions {
-  clientDist: string
+  clientOutDir: string
   componentDir: string
 }
 
@@ -28,7 +27,7 @@ export function islandCorePlugin(options: IslandPluginOptions): Plugin {
   let manifest: ReturnType<typeof clientManifest>
   let root: string
 
-  const { clientDist, componentDir } = options
+  const { clientOutDir, componentDir } = options
 
   return {
     name: 'vue-island-core',
@@ -37,7 +36,7 @@ export function islandCorePlugin(options: IslandPluginOptions): Plugin {
       root = config.root
       manifest = clientManifest({
         manifest: '.vite/manifest.json',
-        clientDist,
+        clientOutDir,
         command: config.command,
         root: config.root,
         isProduction: config.isProduction,
@@ -152,50 +151,4 @@ export function islandCorePlugin(options: IslandPluginOptions): Plugin {
       }
     },
   }
-}
-
-interface ParsedIdQuery {
-  original?: boolean
-  vue?: boolean
-}
-
-function parseId(id: string): {
-  fileName: string
-  query: ParsedIdQuery
-} {
-  const [fileName, searchParams] = id.split('?')
-  const parsed = new URLSearchParams(searchParams)
-
-  const query: ParsedIdQuery = {}
-  if (parsed.has('original')) {
-    query.original = true
-  }
-  if (parsed.has('vue')) {
-    query.vue = true
-  }
-
-  return {
-    fileName: fileName!,
-    query,
-  }
-}
-
-function resolveServerComponentIds(
-  root: string,
-  componentDir: string,
-): string[] {
-  const basePath = path.join(root, componentDir)
-
-  const islandPaths = new Set(resolvePattern('/**/*.island.vue', basePath))
-  const vuePaths = resolvePattern('/**/*.vue', basePath)
-
-  return vuePaths.filter((p) => !islandPaths.has(p))
-}
-
-function resolvePattern(pattern: string | string[], root: string): string[] {
-  if (typeof pattern === 'string') {
-    return globSync(path.join(root, pattern))
-  }
-
-  return pattern.flatMap((p) => resolvePattern(p, root))
 }

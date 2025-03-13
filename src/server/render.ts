@@ -2,10 +2,13 @@ import { Component, createApp } from 'vue'
 import { renderToString } from 'vue/server-renderer'
 import { Connect, createServer, ViteDevServer } from 'vite'
 import connect from 'connect'
-import * as path from 'node:path'
 import { transformWithRenderContext } from './transform.js'
 import { defaultConfig, IslandsConfig } from '../build/config.js'
-import { pathToExportId } from '../build/generate.js'
+import {
+  pathToExportName,
+  resolveDevComponentPath,
+  resolveServerDistPath,
+} from '../build/paths.js'
 import { islandPlugin } from '../build/plugins/index.js'
 
 export interface RenderOptions extends IslandsConfig {
@@ -35,23 +38,13 @@ export function createRender(options: RenderOptions = {}) {
 
   let devServer: ViteDevServer | undefined
 
-  function resolveDevComponentPath(componentPath: string): string {
-    const { root, componentDir } = config
-    const basePath = componentDir
-
-    return path.resolve(path.join(root, basePath, `${componentPath}.vue`))
-  }
-
-  function resolveServerDistPath(): string {
-    const { root, serverOutDir } = config
-    return path.resolve(path.join(root, serverOutDir, 'server-entry.js'))
-  }
-
   async function loadComponent(componentPath: string): Promise<Component> {
     if (!isDev) {
-      return import(/* @vite-ignore */ resolveServerDistPath()).then((m) => {
-        return m[pathToExportId(componentPath)]
-      })
+      return import(/* @vite-ignore */ resolveServerDistPath(config)).then(
+        (m) => {
+          return m[pathToExportName(componentPath)]
+        },
+      )
     }
 
     if (!devServer) {
@@ -64,7 +57,7 @@ export function createRender(options: RenderOptions = {}) {
 
         plugins: [
           islandPlugin({
-            clientDist: config.clientOutDir,
+            clientOutDir: config.clientOutDir,
             componentDir: config.componentDir,
           }),
         ],
@@ -73,7 +66,7 @@ export function createRender(options: RenderOptions = {}) {
 
     try {
       return devServer
-        .ssrLoadModule(resolveDevComponentPath(componentPath))
+        .ssrLoadModule(resolveDevComponentPath(config, componentPath))
         .then((m) => m.default)
     } catch (e) {
       if (e instanceof Error) {

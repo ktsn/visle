@@ -1,4 +1,5 @@
 import path from 'node:path'
+import { pathToExportName } from './paths.js'
 
 export const clientVirtualEntryId = '\0@vue-islands-renderer/client-entry'
 
@@ -25,21 +26,10 @@ export function generateServerVirtualEntryCode(
 
   return componentIds
     .map((id) => {
-      const exportId = pathToExportId(path.relative(basePath, id))
-      return `export { default as ${exportId} } from '${id}'`
+      const exportName = pathToExportName(path.relative(basePath, id))
+      return `export { default as ${exportName} } from '${id}'`
     })
     .join('\n')
-}
-
-export function pathToExportId(targetPath: string): string {
-  const stripped = targetPath.replace(/^\//, '').replace(/\.vue$/, '')
-  const replaced = stripped
-    .replaceAll('$', '$$')
-    .replaceAll('.', '$')
-    .replaceAll('_', '__')
-    .replaceAll('/', '_')
-
-  return `_${replaced}`
 }
 
 export function generateIslandCode(

@@ -1,7 +1,6 @@
 import path from 'node:path'
 import { build as viteBuild } from 'vite'
-import { globSync } from 'glob'
-import { customElementEntryPath } from './client-manifest.js'
+import { customElementEntryPath, resolvePattern } from './paths.js'
 import { clientVirtualEntryId, serverVirtualEntryId } from './generate.js'
 import { islandPlugin } from './plugins/index.js'
 import { defaultConfig } from './config.js'
@@ -56,7 +55,7 @@ async function buildForServer(config: {
     plugins: [
       islandPlugin({
         componentDir: config.componentDir,
-        clientDist: config.clientOutDir,
+        clientOutDir: config.clientOutDir,
       }),
     ],
   })
@@ -86,16 +85,8 @@ async function buildForClient(config: {
     plugins: [
       islandPlugin({
         componentDir: config.componentDir,
-        clientDist: config.clientOutDir,
+        clientOutDir: config.clientOutDir,
       }),
     ],
   })
-}
-
-function resolvePattern(pattern: string | string[], root: string): string[] {
-  if (typeof pattern === 'string') {
-    return globSync(path.join(root, pattern))
-  }
-
-  return pattern.flatMap((p) => resolvePattern(p, root))
 }

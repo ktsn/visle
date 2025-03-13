@@ -3,22 +3,19 @@ import { parse, SFCBlock } from 'vue/compiler-sfc'
 import path from 'node:path'
 import baseFs from 'node:fs'
 import { generateComponentId } from './component-id.js'
-
-export const virtualCustomElementEntryPath = '/@vue-islands-renderer/entry'
-
-export const customElementEntryPath = path.resolve(
-  import.meta.dirname,
-  '../client/custom-element.js',
-)
-
-export const entryMetadataPath = '.vite/entry-metadata.json'
+import {
+  virtualCustomElementEntryPath,
+  customElementEntryPath,
+  resolveClientManifestPath,
+  resolveEntryMetadataPath,
+} from './paths.js'
 
 interface ClientManifestConfig {
   manifest: string
   command: 'serve' | 'build'
   root: string
   isProduction: boolean
-  clientDist: string
+  clientOutDir: string
   fs?: ClientManifestFs
 }
 
@@ -43,7 +40,10 @@ export function clientManifest(config: ClientManifestConfig) {
 
     clientManifest = JSON.parse(
       fs.readFileSync(
-        path.resolve(config.root, config.clientDist, config.manifest),
+        resolveClientManifestPath({
+          root: config.root,
+          clientOutDir: config.clientOutDir,
+        }),
         'utf-8',
       ),
     )
@@ -57,7 +57,10 @@ export function clientManifest(config: ClientManifestConfig) {
 
     entryMetaData = JSON.parse(
       fs.readFileSync(
-        path.resolve(config.root, config.clientDist, entryMetadataPath),
+        resolveEntryMetadataPath({
+          root: config.root,
+          clientOutDir: config.clientOutDir,
+        }),
         'utf-8',
       ),
     )
