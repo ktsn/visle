@@ -3,7 +3,7 @@ import { build as viteBuild } from 'vite'
 import { customElementEntryPath, resolvePattern } from './paths.js'
 import { clientVirtualEntryId, serverVirtualEntryId } from './generate.js'
 import { islandPlugin } from './plugins/index.js'
-import { defaultConfig, ResolvedIslandsConfig } from './config.js'
+import { resolveConfig, ResolvedIslandsConfig } from './config.js'
 
 /**
  * Build all Vue components matched with the config.
@@ -33,8 +33,9 @@ import { defaultConfig, ResolvedIslandsConfig } from './config.js'
  *   or an attribute of `<vue-island>`.
  */
 export async function build(): Promise<void> {
-  await buildForClient(defaultConfig)
-  await buildForServer(defaultConfig)
+  const config = await resolveConfig()
+  await buildForClient(config)
+  await buildForServer(config)
 }
 
 async function buildForServer(config: ResolvedIslandsConfig): Promise<void> {

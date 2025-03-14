@@ -3,7 +3,11 @@ import { renderToString } from 'vue/server-renderer'
 import { Connect, createServer, ViteDevServer } from 'vite'
 import connect from 'connect'
 import { transformWithRenderContext } from './transform.js'
-import { defaultConfig, IslandsConfig } from '../build/config.js'
+import {
+  IslandsConfig,
+  resolveConfig,
+  ResolvedIslandsConfig,
+} from '../build/config.js'
 import {
   pathToExportName,
   resolveDevComponentPath,
@@ -33,12 +37,20 @@ export interface RenderContext {
  * @returns
  */
 export function createRender(options: RenderOptions = {}) {
-  const { isDev = false, ...rest } = options
-  const config = { ...defaultConfig, ...rest }
+  const { isDev = false, ...inlineConfig } = options
 
   let devServer: ViteDevServer | undefined
+  let config: ResolvedIslandsConfig | undefined
 
   async function loadComponent(componentPath: string): Promise<Component> {
+    // Lazy load and cache the config on first call
+    if (!config) {
+      config = {
+        ...(await resolveConfig()),
+        ...inlineConfig,
+      }
+    }
+
     if (!isDev) {
       return import(/* @vite-ignore */ resolveServerDistPath(config)).then(
         (m) => {
