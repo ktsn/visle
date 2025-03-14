@@ -7,7 +7,10 @@
     ".": "./dist/server/index.js",
     "./client": "./dist/client/custom-element.js"
   },
-  "files": ["dist", "bin"],
+  "files": [
+    "dist",
+    "bin"
+  ],
   "bin": {
     "visle": "./bin/visle.js"
   },
@@ -50,6 +53,7 @@
     "@vitejs/plugin-vue": "^5.2.0",
     "cac": "^6.7.14",
     "connect": "^3.7.0",
+    "esbuild": "^0.25.1",
     "glob": "^11.0.0"
   }
 }
