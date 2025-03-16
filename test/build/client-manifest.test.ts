@@ -91,6 +91,29 @@ describe('Client manifest', () => {
         '/src/foo.vue?vue&type=style&index=0&scoped=6bf1c258&lang.css',
       ])
     })
+
+    test('return ids for <style> block as css module', () => {
+      const testConfig = {
+        ...defaultConfig,
+        root: '/path/to/root',
+        clientOutDir: 'dist-client',
+      }
+
+      const manifest = clientManifest(testConfig, {
+        manifest: '.vite/manifest.json',
+        command: 'serve',
+        isProduction: false,
+      })
+
+      const result = manifest.getDependingClientCssIds(
+        '/path/to/root/src/foo.vue',
+        '<template><div></div></template><style module>h1 { color: red; }</style>',
+      )
+
+      expect(result).toEqual([
+        '/src/foo.vue?vue&type=style&index=0&lang.module.css',
+      ])
+    })
   })
 
   describe('command == build', () => {
