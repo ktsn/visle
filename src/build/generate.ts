@@ -13,7 +13,12 @@ export const symbolCode = `export const islandSymbol = Symbol('@visle/island')`
 export const islandElementName = 'vue-island'
 
 export function generateClientVirtualEntryCode(componentIds: string[]): string {
-  return componentIds.map((id) => `import '${id}'`).join('\n')
+  return (
+    componentIds
+      // Export each component to avoid being tree-shaken
+      .map((id, i) => `export { default as _${i} } from '${id}'`)
+      .join('\n')
+  )
 }
 
 export function generateServerVirtualEntryCode(

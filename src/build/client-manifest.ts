@@ -97,14 +97,18 @@ export function clientManifest(
           throw new Error('<style src> is not supported')
         }
 
-        if (style.module) {
-          throw new Error('<style module> is not supported')
-        }
-
         const attrsQuery = attrsToQuery(style.attrs, 'css')
         const scopedQuery = style.scoped ? `&scoped=${componentId}` : ''
         const query = `?vue&type=style&index=${i}${scopedQuery}`
-        return `/${relativePath}${query}${attrsQuery}`
+
+        let styleId = `/${relativePath}${query}${attrsQuery}`
+
+        if (style.module) {
+          // inject `.module` before extension so vite handles it as css module
+          styleId = styleId.replace(/\.(\w+)$/, '.module.$1')
+        }
+
+        return styleId
       })
     }
 

@@ -4,15 +4,15 @@ import DefaultLayout from './DefaultLayout.vue'
 
 <template>
   <DefaultLayout title="Static">
-    <div class="wrapper">
-      <h1 class="title">Static</h1>
+    <div :class="$style.wrapper">
+      <h1 :class="$style.title">Static</h1>
       <p>This is static page that does not include any client components.</p>
       <a href="/">Root</a>
     </div>
   </DefaultLayout>
 </template>
 
-<style scoped>
+<style module>
 .wrapper {
   padding: 20px;
 }
