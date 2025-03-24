@@ -24,6 +24,8 @@ export interface RenderContext {
   loadJs?: Set<string>
 }
 
+type RenderFunction = (componentPath: string, props?: any) => Promise<string>
+
 /**
  * Return a function that renders a Vue component to a HTML string.
  * The returned render function receives a path to a Vue component.
@@ -36,7 +38,7 @@ export interface RenderContext {
  * @param options
  * @returns
  */
-export function createRender(options: RenderOptions = {}) {
+export function createRender(options: RenderOptions = {}): RenderFunction {
   const { isDev = false, ...inlineConfig } = options
 
   let devServer: ViteDevServer | undefined

@@ -7,7 +7,9 @@ import { ResolvedIslandsConfig } from './config.js'
 // -----------------------------
 export const virtualCustomElementEntryPath = '/@visle/entry'
 export const customElementEntryPath = path.resolve(
-  import.meta.dirname,
+  // In Deno, import.meta.dirname can be undefined (in https module).
+  // Just casting it to string for now.
+  import.meta.dirname as string,
   '../client/custom-element.js',
 )
 
