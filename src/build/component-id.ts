@@ -1,4 +1,4 @@
-import { hash } from 'node:crypto'
+import crypto from 'node:crypto'
 import { normalizePath } from 'vite'
 
 /**
@@ -14,5 +14,5 @@ export function generateComponentId(
 }
 
 function getHash(text: string): string {
-  return hash('sha256', text, 'hex').substring(0, 8)
+  return crypto.hash('sha256', text, 'hex').substring(0, 8)
 }

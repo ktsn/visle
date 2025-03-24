@@ -1,0 +1,6 @@
+{
+  "name": "@ktsn/visle",
+  "version": "0.0.0",
+  "license": "MIT",
+  "exports": "./src/server/index.ts"
+}
