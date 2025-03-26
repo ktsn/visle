@@ -114,6 +114,25 @@ describe('Client manifest', () => {
         '/src/foo.vue?vue&type=style&index=0&lang.module.css',
       ])
     })
+
+    test('return url with specified dev server origin', () => {
+      const testConfig = {
+        ...defaultConfig,
+        root: '/path/to/root',
+        clientOutDir: 'dist-client',
+        devOrigin: 'http://localhost:3000',
+      }
+
+      const manifest = clientManifest(testConfig, {
+        manifest: '.vite/manifest.json',
+        command: 'serve',
+        isProduction: false,
+      })
+
+      const result = manifest.getClientImportId('/path/to/root/src/foo.vue')
+
+      expect(result).toBe('http://localhost:3000/src/foo.vue')
+    })
   })
 
   describe('command == build', () => {

@@ -64,11 +64,12 @@ export function createRender(options: RenderOptions = {}): RenderFunction {
     if (!devServer) {
       devServer = await createServer({
         appType: 'custom',
-        server: { middlewareMode: true },
+        server: {
+          middlewareMode: true,
+          origin: config.devOrigin,
+        },
         logLevel: 'silent',
-
         root: config.root,
-
         plugins: [islandPlugin(config)],
       })
     }

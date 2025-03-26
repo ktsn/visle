@@ -12,6 +12,7 @@ export function defineConfig(config: IslandsConfig): IslandsConfig {
 
 export interface ResolvedIslandsConfig {
   root: string
+  devOrigin: string | undefined
   componentDir: string
   clientOutDir: string
   serverOutDir: string
@@ -21,6 +22,7 @@ export type IslandsConfig = Partial<ResolvedIslandsConfig>
 
 export const defaultConfig: ResolvedIslandsConfig = {
   root: process.cwd(),
+  devOrigin: undefined,
   componentDir: 'components',
   clientOutDir: 'dist/client',
   serverOutDir: 'dist/server',

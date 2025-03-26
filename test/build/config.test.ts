@@ -163,10 +163,8 @@ describe('Config', () => {
       })
 
       expect(result).toEqual({
+        ...defaultConfig,
         root: `${mockCwd}/custom-root`, // Relative path made absolute
-        componentDir: defaultConfig.componentDir,
-        clientOutDir: defaultConfig.clientOutDir,
-        serverOutDir: defaultConfig.serverOutDir,
       })
     })
   })

@@ -10,6 +10,7 @@ import {
   resolveEntryMetadataPath,
 } from './paths.js'
 import { ResolvedIslandsConfig } from './config.js'
+import assert from 'node:assert'
 
 interface ClientManifestConfig {
   manifest: string
@@ -62,10 +63,10 @@ export function clientManifest(
 
     if (manifestConfig.command === 'serve') {
       if (id === customElementEntryPath) {
-        return virtualCustomElementEntryPath
+        return applyDevOrigin(virtualCustomElementEntryPath)
       }
 
-      return `/${relativePath}`
+      return applyDevOrigin(`/${relativePath}`)
     }
 
     const manifest = ensureClientManifest()
@@ -108,7 +109,7 @@ export function clientManifest(
           styleId = styleId.replace(/\.(\w+)$/, '.module.$1')
         }
 
-        return styleId
+        return applyDevOrigin(styleId)
       })
     }
 
@@ -117,6 +118,22 @@ export function clientManifest(
 
     const cssIds = manifest[relativePath]?.css ?? entry.css
     return cssIds.map((cssId) => `/${cssId}`)
+  }
+
+  /**
+   * If specified, prepend dev origin to the filePath.
+   * @param filePath Must be absolute path without an origin.
+   */
+  function applyDevOrigin(filePath: string): string {
+    assert(manifestConfig.command === 'serve')
+
+    if (!islandsConfig.devOrigin) {
+      return filePath
+    }
+
+    // Normalize origin value
+    const origin = islandsConfig.devOrigin.replace(/\/$/, '')
+    return `${origin}${filePath}`
   }
 
   return {
