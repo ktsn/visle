@@ -1,4 +1,5 @@
 import path from 'node:path'
+import fs from 'node:fs'
 import { globSync } from 'glob'
 import { ResolvedIslandsConfig } from './config.js'
 
@@ -114,7 +115,14 @@ export function resolveDevComponentPath(
  */
 export function resolveServerDistPath(config: ResolvedIslandsConfig): string {
   const { root, serverOutDir } = config
-  return path.resolve(path.join(root, serverOutDir, 'server-entry.js'))
+  const dirPath = path.join(root, serverOutDir)
+  const mjsPath = path.resolve(dirPath, 'server-entry.mjs')
+  const jsPath = path.resolve(dirPath, 'server-entry.js')
+
+  if (fs.existsSync(mjsPath)) {
+    return mjsPath
+  }
+  return jsPath
 }
 
 /**

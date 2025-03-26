@@ -86,6 +86,27 @@ describe('createRender', () => {
       expect(result).toBe('<div>Hello</div>')
     })
 
+    test('renders vue component from .mjs file', async () => {
+      const render = createRender({
+        isDev: false,
+        root,
+      })
+
+      await saveCodes(root, {
+        'dist/server/server-entry.mjs': `
+          import { defineComponent, h } from 'vue'
+          export const _Comp = defineComponent({
+            render() {
+              return h('div', {}, ['Hello'])
+            },
+          })`,
+      })
+
+      const result = await render('Comp')
+
+      expect(result).toBe('<div>Hello</div>')
+    })
+
     test('renders head related tags', async () => {
       const render = createRender({
         isDev: false,
