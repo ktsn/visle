@@ -1,4 +1,5 @@
 import { Plugin } from 'vite'
+import { readFile } from 'node:fs/promises'
 import {
   generateIslandCode,
   generateServerComponentCode,
@@ -36,7 +37,7 @@ export function islandCorePlugin(config: ResolvedIslandsConfig): Plugin {
     resolveId(id, _importer, options) {
       if (!options?.ssr) {
         if (id === virtualCustomElementEntryPath) {
-          return customElementEntryPath
+          return virtualCustomElementEntryPath
         }
 
         if (id === clientVirtualEntryId) {
@@ -68,6 +69,11 @@ export function islandCorePlugin(config: ResolvedIslandsConfig): Plugin {
             resolveServerComponentIds(config),
           )
         }
+
+        if (id === virtualCustomElementEntryPath) {
+          return readFile(customElementEntryPath, 'utf-8')
+        }
+
         return null
       }
 

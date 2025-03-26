@@ -1,5 +1,5 @@
 import { describe, test, expect } from 'vitest'
-import { serveAndRenderMain } from './build-utils.ts'
+import { serve, serveAndRenderMain } from './build-utils.ts'
 
 describe('Island plugin on server', () => {
   test('compiles vue component', async () => {
@@ -91,5 +91,12 @@ describe('Island plugin on server', () => {
     expect(code).toBe(
       `<link rel="stylesheet" href="/main.vue?vue&type=style&index=0&lang.css"><link rel="stylesheet" href="/child.island.vue?vue&type=style&index=0&lang.css"><link rel="stylesheet" href="/child.island.vue?vue&type=style&index=1&scoped=4b3910e4&lang.css"><script type="module" src="/@visle/entry" async></script><vue-island entry="/child.island.vue"><button data-v-4b3910e4>hello</button></vue-island>`,
     )
+  })
+
+  test('render client entry file', async () => {
+    const server = await serve()
+    const result = await server.transformRequest('/@visle/entry')
+
+    expect(result).not.toBe(null)
   })
 })

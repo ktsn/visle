@@ -1,6 +1,6 @@
 import path from 'node:path'
 import fs from 'node:fs'
-import { createServer } from 'vite'
+import { createServer, ViteDevServer } from 'vite'
 import { islandPlugin } from '../../src/build/plugins/index.js'
 import { fileURLToPath } from 'node:url'
 import { defaultConfig } from '../../src/build/config.ts'
@@ -9,9 +9,9 @@ const tmpDir = path.resolve('test/__generated__/build-utils')
 const dirname = path.dirname(fileURLToPath(import.meta.url))
 const renderModulePath = path.resolve(dirname, '../../src/server/render.ts')
 
-export async function serveAndRenderMain(
-  files: Record<string, string>,
-): Promise<string> {
+export function serve(
+  files: Record<string, string> = {},
+): Promise<ViteDevServer> {
   fs.rmSync(tmpDir, { recursive: true, force: true })
 
   const main = `
@@ -34,7 +34,7 @@ export async function serveAndRenderMain(
     fs.writeFileSync(filePath, content)
   })
 
-  const server = await createServer({
+  return createServer({
     server: {
       middlewareMode: true,
       ws: false,
@@ -58,7 +58,12 @@ export async function serveAndRenderMain(
       },
     },
   })
+}
 
+export async function serveAndRenderMain(
+  files: Record<string, string>,
+): Promise<string> {
+  const server = await serve(files)
   const render = (await server.ssrLoadModule('/main.js')).default
 
   return render()

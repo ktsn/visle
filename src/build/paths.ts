@@ -10,7 +10,10 @@ export const customElementEntryPath = path.resolve(
   // In Deno, import.meta.dirname can be undefined (in https module).
   // Just casting it to string for now.
   import.meta.dirname as string,
-  '../client/custom-element.js',
+
+  // The extension can be different between environments.
+  // e.g. in testing env, it is `.ts` while in production it is `.js`.
+  `../client/custom-element${path.extname(import.meta.url)}`,
 )
 
 // -----------------------------
