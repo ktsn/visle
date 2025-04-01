@@ -24,7 +24,10 @@ export interface RenderContext {
   loadJs?: Set<string>
 }
 
-type RenderFunction = (componentPath: string, props?: any) => Promise<string>
+interface RenderFunction {
+  (componentPath: string, props?: any): Promise<string>
+  devMiddlewares: Connect.Server
+}
 
 /**
  * Return a function that renders a Vue component to a HTML string.
