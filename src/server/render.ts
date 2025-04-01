@@ -1,6 +1,5 @@
 import { Component, createApp } from 'vue'
 import { renderToString } from 'vue/server-renderer'
-import { Connect, createServer, ViteDevServer } from 'vite'
 import connect from 'connect'
 import { transformWithRenderContext } from './transform.js'
 import {
@@ -24,9 +23,15 @@ export interface RenderContext {
   loadJs?: Set<string>
 }
 
+interface DevServer {
+  middlewares: connect.Server
+  ssrLoadModule: (path: string) => Promise<any>
+  ssrFixStacktrace: (error: Error) => void
+}
+
 interface RenderFunction {
   (componentPath: string, props?: any): Promise<string>
-  devMiddlewares: Connect.Server
+  devMiddlewares: connect.Server
 }
 
 /**
@@ -44,7 +49,7 @@ interface RenderFunction {
 export function createRender(options: RenderOptions = {}): RenderFunction {
   const { isDev = false, ...inlineConfig } = options
 
-  let devServer: ViteDevServer | undefined
+  let devServer: DevServer | undefined
   let config: ResolvedIslandsConfig | undefined
 
   async function loadComponent(componentPath: string): Promise<Component> {
@@ -65,6 +70,9 @@ export function createRender(options: RenderOptions = {}): RenderFunction {
     }
 
     if (!devServer) {
+      // Vite must be loaded lazily because it may not be available in some environments.
+      const { createServer } = await import('vite')
+
       devServer = await createServer({
         appType: 'custom',
         server: {
@@ -100,7 +108,7 @@ export function createRender(options: RenderOptions = {}): RenderFunction {
     return transformWithRenderContext(rendered, context)
   }
 
-  const devMiddlewars: Connect.Server = connect()
+  const devMiddlewars = connect()
 
   devMiddlewars.use((req, res, next) => {
     if (!devServer) {
