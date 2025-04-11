@@ -1,6 +1,6 @@
 {
   "name": "visle",
-  "version": "0.2.4",
+  "version": "0.2.5",
   "description": "Islands Architecture renderer for Vue.js",
   "type": "module",
   "exports": {
@@ -8,7 +8,10 @@
     "./build": "./dist/build/index.js",
     "./dev": "./dist/server/dev.js"
   },
-  "files": ["dist", "bin"],
+  "files": [
+    "dist",
+    "bin"
+  ],
   "bin": {
     "visle": "./bin/visle.js"
   },
