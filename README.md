@@ -59,13 +59,15 @@ import express from 'express'
 import { createRender } from 'visle'
 import { createDevLoader } from 'visle/dev'
 
-const loader = createDevLoader()
-
-const render = createRender({
-  loader,
-})
+const render = createRender()
 
 const app = express()
+
+const loader = createDevLoader()
+render.setLoader(loader)
+
+// Pass the middleware provided by the dev loader to handle assets.
+app.use(loader.middleware)
 
 app.get('/', async (req, res) => {
   // Render components/Page.vue as a HTML string.
@@ -73,9 +75,6 @@ app.get('/', async (req, res) => {
   const html = await render('Page')
   res.send(html)
 })
-
-// Pass the middleware provided by the dev loader to handle assets.
-app.use(loader.middleware)
 
 // Start the server.
 app.listen(3000)
@@ -100,12 +99,25 @@ import { createDevLoader } from 'visle/dev'
 +
 +const isDev = process.env.NODE_ENV !== 'production'
 
-const loader = createDevLoader()
+const render = createRender()
 
-const render = createRender({
--  loader,
-+  loader: isDev ? loader : undefined,
-})
+const app = express()
+
+-const loader = createDevLoader()
+-render.setLoader(loader)
+-
+-// Pass the middleware provided by the dev loader to handle assets.
+-app.use(loader.middleware)
++if (isDev) {
++  const loader = createDevLoader()
++  render.setLoader(loader)
++
++  // Pass the middleware provided by the dev loader to handle assets.
++  app.use(loader.middleware)
++} else {
++  // Serve client asset files from the dist directory.
++  app.use(express.static(path.resolve('dist/client')))
++}
 
 const app = express()
 
@@ -116,21 +128,11 @@ app.get('/', async (req, res) => {
   res.send(html)
 })
 
--// Pass the middleware provided by the dev loader to handle assets.
--app.use(loader.middleware)
-+if (isDev) {
-+  // Pass the middleware provided by the dev loader to handle assets.
-+  app.use(loader.middleware)
-+} else {
-+  // Serve client asset files from the dist directory.
-+  app.use(express.static(path.resolve('dist/client')))
-+}
-
 // Start the server.
 app.listen(3000)
 ```
 
-By not passing `loader` to `createRender`, the `render` function will import Vue components with
+By not passing `loader` to `render.setLoader`, the `render` function will import Vue components with
 the native `import()` function and it automatically imports them from the corresponding built component
 in the `dist/server` directory.
 

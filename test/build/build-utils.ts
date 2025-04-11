@@ -19,10 +19,10 @@ export function serve(
   import { createRender } from '${renderModulePath}'
   import { createDevLoader } from '${devLoaderModulePath}'
   const render = createRender({
-    loader: createDevLoader(),
     root: ${JSON.stringify(tmpDir)},
     componentDir: '',
   })
+  render.setLoader(createDevLoader())
   export default () => render('main')
   `
 

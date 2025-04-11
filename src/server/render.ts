@@ -8,10 +8,6 @@ import {
 } from '../build/config.js'
 import { pathToExportName, resolveServerDistPath } from '../build/paths.js'
 
-export interface RenderOptions extends IslandsConfig {
-  loader?: RenderLoader
-}
-
 export interface RenderLoader {
   loadComponent(
     config: ResolvedIslandsConfig,
@@ -24,7 +20,10 @@ export interface RenderContext {
   loadJs?: Set<string>
 }
 
-type RenderFunction = (componentPath: string, props?: any) => Promise<string>
+interface RenderFunction {
+  (componentPath: string, props?: any): Promise<string>
+  setLoader(loader: RenderLoader): void
+}
 
 const defaultLoader: RenderLoader = {
   loadComponent(config, componentPath) {
@@ -46,9 +45,8 @@ const defaultLoader: RenderLoader = {
  * @param options
  * @returns
  */
-export function createRender(options: RenderOptions = {}): RenderFunction {
-  const { loader = defaultLoader, ...inlineConfig } = options
-
+export function createRender(options: IslandsConfig = {}): RenderFunction {
+  let loader: RenderLoader = defaultLoader
   let config: ResolvedIslandsConfig | undefined
 
   async function loadComponent(componentPath: string): Promise<Component> {
@@ -56,7 +54,7 @@ export function createRender(options: RenderOptions = {}): RenderFunction {
     if (!config) {
       config = {
         ...(await resolveConfig()),
-        ...inlineConfig,
+        ...options,
       }
     }
 
@@ -72,6 +70,10 @@ export function createRender(options: RenderOptions = {}): RenderFunction {
     const rendered = await renderToString(app, context)
 
     return transformWithRenderContext(rendered, context)
+  }
+
+  render.setLoader = (newLoader: RenderLoader) => {
+    loader = newLoader
   }
 
   return render

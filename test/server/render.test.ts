@@ -139,11 +139,11 @@ describe('createRender', () => {
 
   describe('isDev = true', () => {
     test('renders vue component from component directory', async () => {
-      const loader = createDevLoader()
       const render = createRender({
-        loader,
         root,
       })
+
+      render.setLoader(createDevLoader())
 
       await saveCodes(root, {
         'components/Comp.vue': `
