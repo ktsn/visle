@@ -5,12 +5,10 @@
   "type": "module",
   "exports": {
     ".": "./dist/server/index.js",
-    "./build": "./dist/build/index.js"
+    "./build": "./dist/build/index.js",
+    "./dev": "./dist/server/dev.js"
   },
-  "files": [
-    "dist",
-    "bin"
-  ],
+  "files": ["dist", "bin"],
   "bin": {
     "visle": "./bin/visle.js"
   },

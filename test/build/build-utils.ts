@@ -8,6 +8,7 @@ import { defaultConfig } from '../../src/build/config.ts'
 const tmpDir = path.resolve('test/__generated__/build-utils')
 const dirname = path.dirname(fileURLToPath(import.meta.url))
 const renderModulePath = path.resolve(dirname, '../../src/server/render.ts')
+const devLoaderModulePath = path.resolve(dirname, '../../src/server/dev.ts')
 
 export function serve(
   files: Record<string, string> = {},
@@ -16,8 +17,9 @@ export function serve(
 
   const main = `
   import { createRender } from '${renderModulePath}'
+  import { createDevLoader } from '${devLoaderModulePath}'
   const render = createRender({
-    isDev: true,
+    loader: createDevLoader(),
     root: ${JSON.stringify(tmpDir)},
     componentDir: '',
   })

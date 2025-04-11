@@ -2,6 +2,7 @@ import { describe, test, expect, beforeEach } from 'vitest'
 import path from 'node:path'
 import fs from 'node:fs/promises'
 import { createRender } from '../../src/server/render.ts'
+import { createDevLoader } from '../../src/server/dev.ts'
 
 /**
  * Save JavaScript code provided as the argument.
@@ -40,7 +41,6 @@ describe('createRender', () => {
   describe('isDev = false', () => {
     test('renders vue component with props', async () => {
       const render = createRender({
-        isDev: false,
         root,
       })
 
@@ -67,7 +67,6 @@ describe('createRender', () => {
 
     test('renders vue component without props', async () => {
       const render = createRender({
-        isDev: false,
         root,
       })
 
@@ -88,7 +87,6 @@ describe('createRender', () => {
 
     test('renders vue component from .mjs file', async () => {
       const render = createRender({
-        isDev: false,
         root,
       })
 
@@ -109,7 +107,6 @@ describe('createRender', () => {
 
     test('renders head related tags', async () => {
       const render = createRender({
-        isDev: false,
         root,
       })
 
@@ -142,8 +139,9 @@ describe('createRender', () => {
 
   describe('isDev = true', () => {
     test('renders vue component from component directory', async () => {
+      const loader = createDevLoader()
       const render = createRender({
-        isDev: true,
+        loader,
         root,
       })
 

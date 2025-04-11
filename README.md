@@ -57,9 +57,12 @@ Then use `createRender` function to create a render function of Vue components:
 // app/server.ts
 import express from 'express'
 import { createRender } from 'visle'
+import { createDevLoader } from 'visle/dev'
+
+const loader = createDevLoader()
 
 const render = createRender({
-  isDev: true,
+  loader,
 })
 
 const app = express()
@@ -71,8 +74,8 @@ app.get('/', async (req, res) => {
   res.send(html)
 })
 
-// Pass the middlewares provided by render function to handle assets.
-app.use(render.devMiddlewares)
+// Pass the middleware provided by the dev loader to handle assets.
+app.use(loader.middleware)
 
 // Start the server.
 app.listen(3000)
@@ -92,13 +95,16 @@ To make it ready for production, update `app/server.ts` as follows:
 // app/server.ts
 import express from 'express'
 import { createRender } from 'visle'
+import { createDevLoader } from 'visle/dev'
 +import * as path from 'node:path'
++
++const isDev = process.env.NODE_ENV !== 'production'
 
-const isDev = process.env.NODE_ENV !== 'production'
+const loader = createDevLoader()
 
 const render = createRender({
--  isDev: true,
-+  isDev,
+-  loader,
++  loader: isDev ? loader : undefined,
 })
 
 const app = express()
@@ -110,11 +116,11 @@ app.get('/', async (req, res) => {
   res.send(html)
 })
 
--// Pass the middlewares provided by render function to handle assets.
--app.use(render.devMiddlewares)
+-// Pass the middleware provided by the dev loader to handle assets.
+-app.use(loader.middleware)
 +if (isDev) {
-+  // Pass the middlewares provided by render function to handle assets.
-+  app.use(render.devMiddlewares)
++  // Pass the middleware provided by the dev loader to handle assets.
++  app.use(loader.middleware)
 +} else {
 +  // Serve client asset files from the dist directory.
 +  app.use(express.static(path.resolve('dist/client')))
@@ -124,7 +130,7 @@ app.get('/', async (req, res) => {
 app.listen(3000)
 ```
 
-By passing `isDev: true` to `createRender`, the `render` function will import Vue components with
+By not passing `loader` to `createRender`, the `render` function will import Vue components with
 the native `import()` function and it automatically imports them from the corresponding built component
 in the `dist/server` directory.
 

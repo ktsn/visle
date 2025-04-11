@@ -1,21 +1,22 @@
 import { Component, createApp } from 'vue'
 import { renderToString } from 'vue/server-renderer'
-import connect from 'connect'
 import { transformWithRenderContext } from './transform.js'
 import {
   IslandsConfig,
   resolveConfig,
   ResolvedIslandsConfig,
 } from '../build/config.js'
-import {
-  pathToExportName,
-  resolveDevComponentPath,
-  resolveServerDistPath,
-} from '../build/paths.js'
-import { islandPlugin } from '../build/plugins/index.js'
+import { pathToExportName, resolveServerDistPath } from '../build/paths.js'
 
 export interface RenderOptions extends IslandsConfig {
-  isDev?: boolean
+  loader?: RenderLoader
+}
+
+export interface RenderLoader {
+  loadComponent(
+    config: ResolvedIslandsConfig,
+    componentPath: string,
+  ): Promise<Component>
 }
 
 export interface RenderContext {
@@ -23,15 +24,14 @@ export interface RenderContext {
   loadJs?: Set<string>
 }
 
-interface DevServer {
-  middlewares: connect.Server
-  ssrLoadModule: (path: string) => Promise<any>
-  ssrFixStacktrace: (error: Error) => void
-}
+type RenderFunction = (componentPath: string, props?: any) => Promise<string>
 
-interface RenderFunction {
-  (componentPath: string, props?: any): Promise<string>
-  devMiddlewares: connect.Server
+const defaultLoader: RenderLoader = {
+  loadComponent(config, componentPath) {
+    return import(/* @vite-ignore */ resolveServerDistPath(config)).then(
+      (m) => m[pathToExportName(componentPath)],
+    )
+  },
 }
 
 /**
@@ -47,9 +47,8 @@ interface RenderFunction {
  * @returns
  */
 export function createRender(options: RenderOptions = {}): RenderFunction {
-  const { isDev = false, ...inlineConfig } = options
+  const { loader = defaultLoader, ...inlineConfig } = options
 
-  let devServer: DevServer | undefined
   let config: ResolvedIslandsConfig | undefined
 
   async function loadComponent(componentPath: string): Promise<Component> {
@@ -61,40 +60,7 @@ export function createRender(options: RenderOptions = {}): RenderFunction {
       }
     }
 
-    if (!isDev) {
-      return import(/* @vite-ignore */ resolveServerDistPath(config)).then(
-        (m) => {
-          return m[pathToExportName(componentPath)]
-        },
-      )
-    }
-
-    if (!devServer) {
-      // Vite must be loaded lazily because it may not be available in some environments.
-      const { createServer } = await import('vite')
-
-      devServer = await createServer({
-        appType: 'custom',
-        server: {
-          middlewareMode: true,
-          origin: config.devOrigin,
-        },
-        logLevel: 'silent',
-        root: config.root,
-        plugins: [islandPlugin(config)],
-      })
-    }
-
-    try {
-      return devServer
-        .ssrLoadModule(resolveDevComponentPath(config, componentPath))
-        .then((m) => m.default)
-    } catch (e) {
-      if (e instanceof Error) {
-        devServer.ssrFixStacktrace(e)
-      }
-      throw e
-    }
+    return loader.loadComponent(config, componentPath)
   }
 
   async function render(componentPath: string, props?: any): Promise<string> {
@@ -107,18 +73,6 @@ export function createRender(options: RenderOptions = {}): RenderFunction {
 
     return transformWithRenderContext(rendered, context)
   }
-
-  const devMiddlewars = connect()
-
-  devMiddlewars.use((req, res, next) => {
-    if (!devServer) {
-      return next()
-    }
-
-    devServer.middlewares(req, res, next)
-  })
-
-  render.devMiddlewares = devMiddlewars
 
   return render
 }
