@@ -63,10 +63,10 @@ export function clientManifest(
 
     if (manifestConfig.command === 'serve') {
       if (id === customElementEntryPath) {
-        return applyDevOrigin(virtualCustomElementEntryPath)
+        return applyServeBase(virtualCustomElementEntryPath)
       }
 
-      return applyDevOrigin(`/${relativePath}`)
+      return applyServeBase(`/${relativePath}`)
     }
 
     const manifest = ensureClientManifest()
@@ -75,7 +75,7 @@ export function clientManifest(
       throw new Error(`${relativePath} not found in manifest`)
     }
 
-    return `/${file}`
+    return applyBuildBase(`/${file}`)
   }
 
   function getDependingClientCssIds(id: string, code: string): string[] {
@@ -109,7 +109,7 @@ export function clientManifest(
           styleId = styleId.replace(/\.(\w+)$/, '.module.$1')
         }
 
-        return applyDevOrigin(styleId)
+        return applyServeBase(styleId)
       })
     }
 
@@ -117,23 +117,28 @@ export function clientManifest(
     const entry = ensureEntryMetadata()
 
     const cssIds = manifest[relativePath]?.css ?? entry.css
-    return cssIds.map((cssId) => `/${cssId}`)
+    return cssIds.map((cssId) => applyBuildBase(`/${cssId}`))
   }
 
   /**
-   * If specified, prepend dev origin to the filePath.
+   * If specified, prepend dev origin and path part of base to the filePath.
    * @param filePath Must be absolute path without an origin.
    */
-  function applyDevOrigin(filePath: string): string {
+  function applyServeBase(filePath: string): string {
     assert(manifestConfig.command === 'serve')
 
-    if (!islandsConfig.devOrigin) {
-      return filePath
-    }
-
     // Normalize origin value
-    const origin = islandsConfig.devOrigin.replace(/\/$/, '')
-    return `${origin}${filePath}`
+    const origin = islandsConfig.devOrigin?.replace(/\/$/, '') ?? ''
+    const basePath = basePathForDev(islandsConfig.base)
+
+    return `${origin}${basePath}${filePath}`
+  }
+
+  function applyBuildBase(filePath: string): string {
+    assert(manifestConfig.command === 'build')
+
+    const basePath = basePathForBuild(islandsConfig.base)
+    return `${basePath}${filePath}`
   }
 
   return {
@@ -184,4 +189,13 @@ function attrsToQuery(
   }
 
   return query
+}
+
+function basePathForDev(base: string): string {
+  const baseUrl = new URL(base, 'https://example.com')
+  return baseUrl.pathname.replace(/\/$/, '')
+}
+
+function basePathForBuild(base: string): string {
+  return base.replace(/\/$/, '')
 }

@@ -133,6 +133,25 @@ describe('Client manifest', () => {
 
       expect(result).toBe('http://localhost:3000/src/foo.vue')
     })
+
+    test('return url with path part of base', () => {
+      const testConfig = {
+        ...defaultConfig,
+        root: '/path/to/root',
+        clientOutDir: 'dist-client',
+        base: 'https://example.com/prefix',
+      }
+
+      const manifest = clientManifest(testConfig, {
+        manifest: '.vite/manifest.json',
+        command: 'serve',
+        isProduction: false,
+      })
+
+      const result = manifest.getClientImportId('/path/to/root/src/foo.vue')
+
+      expect(result).toBe('/prefix/src/foo.vue')
+    })
   })
 
   describe('command == build', () => {
@@ -254,6 +273,38 @@ describe('Client manifest', () => {
       )
 
       expect(result).toEqual(['/entry-1234.css'])
+    })
+
+    test.for([
+      ['https://example.com/prefix', 'https://example.com/prefix/foo-1234.js'],
+      ['/prefix', '/prefix/foo-1234.js'],
+    ] as const)('prepend base to file path: %s', ([base, expected]) => {
+      const testConfig = {
+        ...defaultConfig,
+        root: '/path/to/root',
+        clientOutDir: 'dist-client',
+        base,
+      }
+
+      const manifest: Manifest = {
+        'src/foo.vue': {
+          file: 'foo-1234.js',
+        },
+      }
+      const readFileSync = vitest.fn().mockReturnValue(JSON.stringify(manifest))
+
+      const manifestInstance = clientManifest(testConfig, {
+        manifest: '.vite/manifest.json',
+        command: 'build',
+        isProduction: true,
+        fs: { readFileSync },
+      })
+
+      const result = manifestInstance.getClientImportId(
+        '/path/to/root/src/foo.vue',
+      )
+
+      expect(result).toBe(expected)
     })
   })
 })

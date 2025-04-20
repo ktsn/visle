@@ -31,6 +31,7 @@ export function createDevLoader(): DevRenderLoader {
         },
         logLevel: 'silent',
         root: config.root,
+        base: config.base,
         plugins: [islandPlugin(config)],
       })
 

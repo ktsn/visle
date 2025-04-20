@@ -41,6 +41,7 @@ export async function build(): Promise<void> {
 async function buildForServer(config: ResolvedIslandsConfig): Promise<void> {
   await viteBuild({
     root: config.root,
+    base: config.base,
     build: {
       ssr: true,
       outDir: config.serverOutDir,
@@ -61,6 +62,7 @@ async function buildForClient(config: ResolvedIslandsConfig): Promise<void> {
 
   await viteBuild({
     root: config.root,
+    base: config.base,
     build: {
       manifest: true,
       outDir: config.clientOutDir,
