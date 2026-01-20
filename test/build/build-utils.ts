@@ -29,7 +29,7 @@ export function serve(
   Object.entries({
     ...files,
     'main.js': main,
-  }).map(([fileName, content]) => {
+  }).forEach(([fileName, content]) => {
     const filePath = path.join(tmpDir, fileName)
     const dirPath = path.dirname(filePath)
     fs.mkdirSync(dirPath, { recursive: true })
