@@ -1,14 +1,25 @@
 import express from 'express'
 import path from 'node:path'
 import { createRender } from 'visle'
+import { createDevLoader } from 'visle/dev'
 
 const app = express()
 
 const isDev = process.env.NODE_ENV !== 'production'
 
-const render = createRender({
-  isDev,
-})
+const renderOptions = {
+  componentDir: 'components',
+}
+
+const render = createRender(renderOptions)
+
+if (isDev) {
+  const loader = createDevLoader()
+  render.setLoader(loader)
+  app.use(loader.middleware)
+} else {
+  app.use(express.static(path.resolve('dist/client')))
+}
 
 app.get('/', async (_req, res) => {
   const body = await render('Page', {
@@ -26,11 +37,5 @@ app.get('/static', async (_req, res) => {
 app.listen(5173, () => {
   console.log('Server is running on http://localhost:5173')
 })
-
-if (isDev) {
-  app.use(render.devMiddlewares)
-} else {
-  app.use(express.static(path.resolve('dist/client')))
-}
 
 export default app

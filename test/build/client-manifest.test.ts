@@ -8,21 +8,17 @@ import {
   customElementEntryPath,
   virtualCustomElementEntryPath,
 } from '../../src/build/paths.ts'
-import { defaultConfig } from '../../src/build/config.ts'
 
 describe('Client manifest', () => {
   describe('command == server', () => {
     test('get custom element entry path as virtual path', () => {
-      const testConfig = {
-        ...defaultConfig,
-        root: '/path/to/root',
-        clientOutDir: 'dist-client',
-      }
-
-      const manifest = clientManifest(testConfig, {
+      const manifest = clientManifest({
         manifest: '.vite/manifest.json',
         command: 'serve',
         isProduction: false,
+        root: '/path/to/root',
+        base: '/',
+        clientOutDir: 'dist-client',
       })
 
       const result = manifest.getClientImportId(customElementEntryPath)
@@ -31,16 +27,13 @@ describe('Client manifest', () => {
     })
 
     test('get a relative path from the root directory', () => {
-      const testConfig = {
-        ...defaultConfig,
-        root: '/path/to/root',
-        clientOutDir: 'dist-client',
-      }
-
-      const manifest = clientManifest(testConfig, {
+      const manifest = clientManifest({
         manifest: '.vite/manifest.json',
         command: 'serve',
         isProduction: false,
+        root: '/path/to/root',
+        base: '/',
+        clientOutDir: 'dist-client',
       })
 
       const result = manifest.getClientImportId('/path/to/root/src/foo.vue')
@@ -49,16 +42,13 @@ describe('Client manifest', () => {
     })
 
     test('return empty id array for css without <style>', () => {
-      const testConfig = {
-        ...defaultConfig,
-        root: '/path/to/root',
-        clientOutDir: 'dist-client',
-      }
-
-      const manifest = clientManifest(testConfig, {
+      const manifest = clientManifest({
         manifest: '.vite/manifest.json',
         command: 'serve',
         isProduction: false,
+        root: '/path/to/root',
+        base: '/',
+        clientOutDir: 'dist-client',
       })
 
       const result = manifest.getDependingClientCssIds(
@@ -70,16 +60,13 @@ describe('Client manifest', () => {
     })
 
     test('return ids for <style> blocks in code', () => {
-      const testConfig = {
-        ...defaultConfig,
-        root: '/path/to/root',
-        clientOutDir: 'dist-client',
-      }
-
-      const manifest = clientManifest(testConfig, {
+      const manifest = clientManifest({
         manifest: '.vite/manifest.json',
         command: 'serve',
         isProduction: false,
+        root: '/path/to/root',
+        base: '/',
+        clientOutDir: 'dist-client',
       })
 
       const result = manifest.getDependingClientCssIds(
@@ -93,16 +80,13 @@ describe('Client manifest', () => {
     })
 
     test('return ids for <style> block as css module', () => {
-      const testConfig = {
-        ...defaultConfig,
-        root: '/path/to/root',
-        clientOutDir: 'dist-client',
-      }
-
-      const manifest = clientManifest(testConfig, {
+      const manifest = clientManifest({
         manifest: '.vite/manifest.json',
         command: 'serve',
         isProduction: false,
+        root: '/path/to/root',
+        base: '/',
+        clientOutDir: 'dist-client',
       })
 
       const result = manifest.getDependingClientCssIds(
@@ -115,37 +99,14 @@ describe('Client manifest', () => {
       ])
     })
 
-    test('return url with specified dev server origin', () => {
-      const testConfig = {
-        ...defaultConfig,
-        root: '/path/to/root',
-        clientOutDir: 'dist-client',
-        devOrigin: 'http://localhost:3000',
-      }
-
-      const manifest = clientManifest(testConfig, {
-        manifest: '.vite/manifest.json',
-        command: 'serve',
-        isProduction: false,
-      })
-
-      const result = manifest.getClientImportId('/path/to/root/src/foo.vue')
-
-      expect(result).toBe('http://localhost:3000/src/foo.vue')
-    })
-
     test('return url with path part of base', () => {
-      const testConfig = {
-        ...defaultConfig,
-        root: '/path/to/root',
-        clientOutDir: 'dist-client',
-        base: 'https://example.com/prefix',
-      }
-
-      const manifest = clientManifest(testConfig, {
+      const manifest = clientManifest({
         manifest: '.vite/manifest.json',
         command: 'serve',
         isProduction: false,
+        root: '/path/to/root',
+        base: 'https://example.com/prefix',
+        clientOutDir: 'dist-client',
       })
 
       const result = manifest.getClientImportId('/path/to/root/src/foo.vue')
@@ -156,23 +117,20 @@ describe('Client manifest', () => {
 
   describe('command == build', () => {
     test('get file path derived from manifest', () => {
-      const testConfig = {
-        ...defaultConfig,
-        root: '/path/to/root',
-        clientOutDir: 'dist-client',
-      }
-
-      const manifest: Manifest = {
+      const viteManifest: Manifest = {
         'src/foo.vue': {
           file: 'foo-1234.js',
         },
       }
-      const readFileSync = vitest.fn().mockReturnValue(JSON.stringify(manifest))
+      const readFileSync = vitest.fn().mockReturnValue(JSON.stringify(viteManifest))
 
-      const manifestInstance = clientManifest(testConfig, {
+      const manifestInstance = clientManifest({
         manifest: '.vite/manifest.json',
         command: 'build',
         isProduction: true,
+        root: '/path/to/root',
+        base: '/',
+        clientOutDir: 'dist-client',
         fs: { readFileSync },
       })
 
@@ -184,19 +142,16 @@ describe('Client manifest', () => {
     })
 
     test('throw error if manifest does not include passed file path', () => {
-      const testConfig = {
-        ...defaultConfig,
-        root: '/path/to/root',
-        clientOutDir: 'dist-client',
-      }
+      const viteManifest: Manifest = {}
+      const readFileSync = vitest.fn().mockReturnValue(JSON.stringify(viteManifest))
 
-      const manifest: Manifest = {}
-      const readFileSync = vitest.fn().mockReturnValue(JSON.stringify(manifest))
-
-      const manifestInstance = clientManifest(testConfig, {
+      const manifestInstance = clientManifest({
         manifest: '.vite/manifest.json',
         command: 'build',
         isProduction: true,
+        root: '/path/to/root',
+        base: '/',
+        clientOutDir: 'dist-client',
         fs: { readFileSync },
       })
 
@@ -206,24 +161,21 @@ describe('Client manifest', () => {
     })
 
     test('get depending css ids from manifest', () => {
-      const testConfig = {
-        ...defaultConfig,
-        root: '/path/to/root',
-        clientOutDir: 'dist-client',
-      }
-
-      const manifest: Manifest = {
+      const viteManifest: Manifest = {
         'src/foo.vue': {
           file: 'foo-1234.js',
           css: ['foo-1234.css'],
         },
       }
-      const readFileSync = vitest.fn().mockReturnValue(JSON.stringify(manifest))
+      const readFileSync = vitest.fn().mockReturnValue(JSON.stringify(viteManifest))
 
-      const manifestInstance = clientManifest(testConfig, {
+      const manifestInstance = clientManifest({
         manifest: '.vite/manifest.json',
         command: 'build',
         isProduction: true,
+        root: '/path/to/root',
+        base: '/',
+        clientOutDir: 'dist-client',
         fs: { readFileSync },
       })
 
@@ -236,13 +188,7 @@ describe('Client manifest', () => {
     })
 
     test('return entry css id array when manifest does not have css paths', () => {
-      const testConfig = {
-        ...defaultConfig,
-        root: '/path/to/root',
-        clientOutDir: 'dist-client',
-      }
-
-      const manifest: Manifest = {
+      const viteManifest: Manifest = {
         'src/foo.vue': {
           file: 'foo-1234.js',
         },
@@ -252,7 +198,7 @@ describe('Client manifest', () => {
       }
       const readFileSync = vitest.fn().mockImplementation((path) => {
         if (path === '/path/to/root/dist-client/.vite/manifest.json') {
-          return JSON.stringify(manifest)
+          return JSON.stringify(viteManifest)
         }
 
         if (path === '/path/to/root/dist-client/.vite/entry-metadata.json') {
@@ -260,10 +206,13 @@ describe('Client manifest', () => {
         }
       })
 
-      const manifestInstance = clientManifest(testConfig, {
+      const manifestInstance = clientManifest({
         manifest: '.vite/manifest.json',
         command: 'build',
         isProduction: true,
+        root: '/path/to/root',
+        base: '/',
+        clientOutDir: 'dist-client',
         fs: { readFileSync },
       })
 
@@ -279,24 +228,20 @@ describe('Client manifest', () => {
       ['https://example.com/prefix', 'https://example.com/prefix/foo-1234.js'],
       ['/prefix', '/prefix/foo-1234.js'],
     ] as const)('prepend base to file path: %s', ([base, expected]) => {
-      const testConfig = {
-        ...defaultConfig,
-        root: '/path/to/root',
-        clientOutDir: 'dist-client',
-        base,
-      }
-
-      const manifest: Manifest = {
+      const viteManifest: Manifest = {
         'src/foo.vue': {
           file: 'foo-1234.js',
         },
       }
-      const readFileSync = vitest.fn().mockReturnValue(JSON.stringify(manifest))
+      const readFileSync = vitest.fn().mockReturnValue(JSON.stringify(viteManifest))
 
-      const manifestInstance = clientManifest(testConfig, {
+      const manifestInstance = clientManifest({
         manifest: '.vite/manifest.json',
         command: 'build',
         isProduction: true,
+        root: '/path/to/root',
+        base,
+        clientOutDir: 'dist-client',
         fs: { readFileSync },
       })
 

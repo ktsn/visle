@@ -2,15 +2,33 @@ import { Component, createApp } from 'vue'
 import { renderToString } from 'vue/server-renderer'
 import { transformWithRenderContext } from './transform.js'
 import {
-  IslandsConfig,
-  resolveConfig,
-  ResolvedIslandsConfig,
+  VisleConfig,
+  ResolvedVisleConfig,
+  resolveVisleConfig,
 } from '../build/config.js'
 import { pathToExportName, resolveServerDistPath } from '../build/paths.js'
 
+/**
+ * Render options extending VisleConfig
+ */
+export interface RenderOptions extends VisleConfig {
+  /**
+   * Root directory for resolving paths.
+   * Defaults to process.cwd()
+   */
+  root?: string
+}
+
+/**
+ * Resolved render options with all values guaranteed
+ */
+export interface ResolvedRenderOptions extends ResolvedVisleConfig {
+  root: string
+}
+
 export interface RenderLoader {
   loadComponent(
-    config: ResolvedIslandsConfig,
+    config: ResolvedRenderOptions,
     componentPath: string,
   ): Promise<Component>
 }
@@ -27,37 +45,28 @@ interface RenderFunction {
 
 const defaultLoader: RenderLoader = {
   loadComponent(config, componentPath) {
-    return import(/* @vite-ignore */ resolveServerDistPath(config)).then(
-      (m) => m[pathToExportName(componentPath)],
-    )
+    return import(
+      /* @vite-ignore */ resolveServerDistPath(config.root, config.serverOutDir)
+    ).then((m) => m[pathToExportName(componentPath)])
   },
 }
 
 /**
  * Return a function that renders a Vue component to a HTML string.
  * The returned render function receives a path to a Vue component.
- * The base directory of the path is determined by the `templateDir` option
- * of islands.config.ts.
- *
- * If `isDev` option is false, component paths are automatically converted
- * to the ones in the `templateOutDir`.
+ * The base directory of the path is determined by the `componentDir` option.
  *
  * @param options
  * @returns
  */
-export function createRender(options: IslandsConfig = {}): RenderFunction {
+export function createRender(options: RenderOptions = {}): RenderFunction {
   let loader: RenderLoader = defaultLoader
-  let config: ResolvedIslandsConfig | undefined
+  const config: ResolvedRenderOptions = {
+    ...resolveVisleConfig(options),
+    root: options.root ?? process.cwd(),
+  }
 
   async function loadComponent(componentPath: string): Promise<Component> {
-    // Lazy load and cache the config on first call
-    if (!config) {
-      config = {
-        ...(await resolveConfig()),
-        ...options,
-      }
-    }
-
     return loader.loadComponent(config, componentPath)
   }
 

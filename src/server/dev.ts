@@ -1,7 +1,12 @@
-import { Connect, createServer, ViteDevServer } from 'vite'
+import {
+  Connect,
+  createServer,
+  RunnableDevEnvironment,
+  ViteDevServer,
+} from 'vite'
 import connect from 'connect'
 import { RenderLoader } from './render.js'
-import { islandPlugin } from '../build/plugins/index.js'
+import { visle } from '../build/index.js'
 import { resolveDevComponentPath } from '../build/paths.js'
 
 interface DevRenderLoader extends RenderLoader {
@@ -9,7 +14,7 @@ interface DevRenderLoader extends RenderLoader {
 }
 
 export function createDevLoader(): DevRenderLoader {
-  let devServer: ViteDevServer | undefined
+  let devServer: ViteDevServer
 
   const middleware = connect()
 
@@ -23,22 +28,34 @@ export function createDevLoader(): DevRenderLoader {
 
   return {
     async loadComponent(config, componentPath) {
-      devServer = await createServer({
-        appType: 'custom',
-        server: {
-          middlewareMode: true,
-          origin: config.devOrigin,
-        },
-        logLevel: 'silent',
-        root: config.root,
-        base: config.base,
-        plugins: [islandPlugin(config)],
-      })
+      if (!devServer) {
+        devServer = await createServer({
+          appType: 'custom',
+          server: {
+            middlewareMode: true,
+          },
+          logLevel: 'silent',
+          root: config.root,
+          plugins: [
+            visle({
+              componentDir: config.componentDir,
+              clientOutDir: config.clientOutDir,
+              serverOutDir: config.serverOutDir,
+            }),
+          ],
+        })
+      }
+
+      const modulePath = resolveDevComponentPath(
+        config.root,
+        config.componentDir,
+        componentPath,
+      )
 
       try {
-        return devServer
-          .ssrLoadModule(resolveDevComponentPath(config, componentPath))
-          .then((m) => m.default)
+        const ssrEnv = devServer.environments.ssr as RunnableDevEnvironment
+        const module = await ssrEnv.runner.import(modulePath)
+        return module.default
       } catch (e) {
         if (e instanceof Error) {
           devServer.ssrFixStacktrace(e)

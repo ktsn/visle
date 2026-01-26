@@ -4,7 +4,7 @@
   "type": "module",
   "scripts": {
     "dev": "node --experimental-strip-types app/server.ts",
-    "build": "visle build",
+    "build": "vite build",
     "start": "NODE_ENV=production node --experimental-strip-types app/server.ts"
   },
   "dependencies": {
@@ -14,6 +14,7 @@
     "vue": "^3.5.9"
   },
   "devDependencies": {
-    "visle": "file:../"
+    "visle": "file:../",
+    "vite": "^7.3.1"
   }
 }

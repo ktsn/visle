@@ -1,6 +1,5 @@
 import path from 'node:path'
 import { pathToExportName } from './paths.js'
-import { ResolvedIslandsConfig } from './config.js'
 
 export const clientVirtualEntryId = '\0@visle/client-entry'
 
@@ -22,10 +21,11 @@ export function generateClientVirtualEntryCode(componentIds: string[]): string {
 }
 
 export function generateServerVirtualEntryCode(
-  config: ResolvedIslandsConfig,
+  root: string,
+  componentDir: string,
   componentIds: string[],
 ): string {
-  const basePath = path.join(config.root, config.componentDir)
+  const basePath = path.join(root, componentDir)
 
   return componentIds
     .map((id) => {
