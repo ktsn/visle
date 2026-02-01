@@ -1,4 +1,5 @@
 import { describe, expect, test } from 'vitest'
+
 import { RenderContext } from '../../src/server/render.ts'
 import { transformWithRenderContext } from '../../src/server/transform.ts'
 
@@ -11,9 +12,7 @@ describe('transform rendered html', () => {
 
     const result = transformWithRenderContext(html, context)
 
-    expect(result).toBe(
-      '<link rel="stylesheet" href="style.css"><div>Hello</div>',
-    )
+    expect(result).toBe('<link rel="stylesheet" href="style.css"><div>Hello</div>')
   })
 
   test('append into the end of a head element', () => {

@@ -1,9 +1,6 @@
 import { RenderContext } from './render.js'
 
-export function transformWithRenderContext(
-  html: string,
-  context: RenderContext,
-): string {
+export function transformWithRenderContext(html: string, context: RenderContext): string {
   const injecting = createInjectingHtml(context)
   const point = findInjectionPoint(html)
 

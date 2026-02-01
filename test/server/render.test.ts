@@ -1,9 +1,10 @@
-import { describe, test, expect, beforeEach } from 'vitest'
-import path from 'node:path'
 import fs from 'node:fs/promises'
-import { createRender } from '../../src/server/render.ts'
-import { createDevLoader } from '../../src/server/dev.ts'
+import path from 'node:path'
+import { describe, test, expect, beforeEach } from 'vitest'
+
 import { visle } from '../../src/build/index.ts'
+import { createDevLoader } from '../../src/server/dev.ts'
+import { createRender } from '../../src/server/render.ts'
 
 /**
  * Save JavaScript code provided as the argument.
@@ -14,10 +15,7 @@ import { visle } from '../../src/build/index.ts'
  *   JavaScript codes that will be saved.
  *   Keys are relative paths to be saved. Values are code strings.
  */
-async function saveCodes(
-  root: string,
-  codes: Record<string, string>,
-): Promise<void> {
+async function saveCodes(root: string, codes: Record<string, string>): Promise<void> {
   // Save each component code to a file
   const promises = Object.entries(codes).map(async ([filePath, code]) => {
     const fullPath = path.join(root, filePath)

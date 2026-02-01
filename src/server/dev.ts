@@ -1,23 +1,16 @@
-import path from 'node:path'
-import {
-  Connect,
-  createServer,
-  InlineConfig,
-  RunnableDevEnvironment,
-  ViteDevServer,
-} from 'vite'
 import connect from 'connect'
-import { RenderLoader } from './render.js'
+import path from 'node:path'
+import { Connect, createServer, InlineConfig, RunnableDevEnvironment, ViteDevServer } from 'vite'
+
 import { getVisleConfig } from '../build/config.js'
 import { resolveDevComponentPath } from '../build/paths.js'
+import { RenderLoader } from './render.js'
 
 interface DevRenderLoader extends RenderLoader {
   middleware: Connect.Server
 }
 
-export function createDevLoader(
-  viteConfig: InlineConfig = {},
-): DevRenderLoader {
+export function createDevLoader(viteConfig: InlineConfig = {}): DevRenderLoader {
   let devServer: ViteDevServer
 
   const middleware = connect()

@@ -1,4 +1,5 @@
 import { defineConfig } from 'vite'
+
 import { visle } from '../../src/build/index.ts'
 
 export default defineConfig({

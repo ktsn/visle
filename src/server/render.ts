@@ -1,8 +1,9 @@
 import { Component, createApp } from 'vue'
 import { renderToString } from 'vue/server-renderer'
-import { transformWithRenderContext } from './transform.js'
+
 import { defaultConfig } from '../build/config.js'
 import { pathToExportName, resolveServerDistPath } from '../build/paths.js'
+import { transformWithRenderContext } from './transform.js'
 
 export interface RenderOptions {
   serverOutDir?: string
@@ -33,9 +34,9 @@ export function createRender(options: RenderOptions = {}): RenderFunction {
     loadComponent(componentPath) {
       const serverOutDir = options.serverOutDir ?? defaultConfig.serverOutDir
 
-      return import(
-        /* @vite-ignore */ resolveServerDistPath(serverOutDir)
-      ).then((m) => m[pathToExportName(componentPath)])
+      return import(/* @vite-ignore */ resolveServerDistPath(serverOutDir)).then(
+        (m) => m[pathToExportName(componentPath)],
+      )
     },
   }
 

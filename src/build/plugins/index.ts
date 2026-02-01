@@ -1,10 +1,11 @@
-import { Plugin } from 'vite'
 import vue from '@vitejs/plugin-vue'
-import { islandCorePlugin } from './core.js'
+import { Plugin } from 'vite'
+
 import { generateComponentId } from '../component-id.js'
-import { devStyleSSRPlugin } from './dev-ssr-css.js'
-import { islandElementName } from '../generate.js'
 import { ResolvedVisleConfig } from '../config.js'
+import { islandElementName } from '../generate.js'
+import { islandCorePlugin } from './core.js'
+import { devStyleSSRPlugin } from './dev-ssr-css.js'
 
 export function islandPlugin(config: ResolvedVisleConfig): Plugin[] {
   return [

@@ -1,7 +1,7 @@
-import path from 'node:path'
 import fs from 'node:fs'
-import { createServer, ViteDevServer } from 'vite'
+import path from 'node:path'
 import { fileURLToPath } from 'node:url'
+import { createServer, ViteDevServer } from 'vite'
 
 const tmpDir = path.resolve('test/__generated__/build-utils')
 const dirname = path.dirname(fileURLToPath(import.meta.url))
@@ -9,9 +9,7 @@ const viteConfigPath = path.resolve(dirname, './vite.config.ts')
 const renderModulePath = path.resolve(dirname, '../../src/server/render.ts')
 const devLoaderModulePath = path.resolve(dirname, '../../src/server/dev.ts')
 
-export function serve(
-  files: Record<string, string> = {},
-): Promise<ViteDevServer> {
+export function serve(files: Record<string, string> = {}): Promise<ViteDevServer> {
   fs.rmSync(tmpDir, { recursive: true, force: true })
 
   const main = `
@@ -45,9 +43,7 @@ export function serve(
   })
 }
 
-export async function serveAndRenderMain(
-  files: Record<string, string>,
-): Promise<string> {
+export async function serveAndRenderMain(files: Record<string, string>): Promise<string> {
   const server = await serve(files)
   const render = (await server.ssrLoadModule('/main.js')).default
 

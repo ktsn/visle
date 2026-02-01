@@ -1,6 +1,9 @@
+import { readFile } from 'node:fs/promises'
 import path from 'node:path'
 import { Manifest, Plugin, ResolvedConfig } from 'vite'
-import { readFile } from 'node:fs/promises'
+
+import { clientManifest, EntryMetadata } from '../client-manifest.js'
+import { ResolvedVisleConfig } from '../config.js'
 import {
   generateIslandCode,
   generateServerComponentCode,
@@ -17,8 +20,6 @@ import {
   parseId,
   resolveServerComponentIds,
 } from '../paths.js'
-import { clientManifest, EntryMetadata } from '../client-manifest.js'
-import { ResolvedVisleConfig } from '../config.js'
 
 export function islandCorePlugin(config: ResolvedVisleConfig): Plugin {
   let manifest: ReturnType<typeof clientManifest>
@@ -72,9 +73,7 @@ export function islandCorePlugin(config: ResolvedVisleConfig): Plugin {
       if (!isServer) {
         if (id === clientVirtualEntryId) {
           return generateClientVirtualEntryCode(
-            resolveServerComponentIds(
-              path.join(viteConfig.root, config.componentDir),
-            ),
+            resolveServerComponentIds(path.join(viteConfig.root, config.componentDir)),
           )
         }
 
@@ -88,9 +87,7 @@ export function islandCorePlugin(config: ResolvedVisleConfig): Plugin {
       if (id === serverVirtualEntryId) {
         return generateServerVirtualEntryCode(
           path.join(viteConfig.root, config.componentDir),
-          resolveServerComponentIds(
-            path.join(viteConfig.root, config.componentDir),
-          ),
+          resolveServerComponentIds(path.join(viteConfig.root, config.componentDir)),
         )
       }
 
@@ -126,12 +123,7 @@ export function islandCorePlugin(config: ResolvedVisleConfig): Plugin {
         const clientImportId = manifest.getClientImportId(fileName)
         const entryImportId = manifest.getClientImportId(customElementEntryPath)
         const cssIds = manifest.getDependingClientCssIds(fileName, code)
-        return generateIslandCode(
-          fileName,
-          clientImportId,
-          entryImportId,
-          cssIds,
-        )
+        return generateIslandCode(fileName, clientImportId, entryImportId, cssIds)
       }
 
       // .vue file
