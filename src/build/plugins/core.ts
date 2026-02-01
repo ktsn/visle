@@ -31,12 +31,8 @@ export function islandCorePlugin(config: ResolvedVisleConfig): Plugin {
     configResolved(resolvedConfig) {
       viteConfig = resolvedConfig
       manifest = clientManifest({
+        ...resolvedConfig,
         manifest: '.vite/manifest.json',
-        command: resolvedConfig.command,
-        isProduction: resolvedConfig.isProduction,
-        root: resolvedConfig.root,
-        base: resolvedConfig.base,
-        devOrigin: resolvedConfig.server.origin,
         clientOutDir: config.clientOutDir,
       })
     },

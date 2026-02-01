@@ -1,4 +1,8 @@
-import { Manifest, ResolvedConfig as ResolvedViteConfig } from 'vite'
+import {
+  Manifest,
+  ResolvedServerOptions,
+  ResolvedConfig as ResolvedViteConfig,
+} from 'vite'
 import { parse, SFCBlock } from 'vue/compiler-sfc'
 import path from 'node:path'
 import baseFs from 'node:fs'
@@ -11,14 +15,18 @@ import {
 } from './paths.js'
 import assert from 'node:assert'
 
-interface ClientManifestConfig
-  extends Pick<
-    ResolvedViteConfig,
-    'command' | 'isProduction' | 'root' | 'base'
-  > {
+type ClientManifestViteConfig = Pick<
+  ResolvedViteConfig,
+  'command' | 'isProduction' | 'root' | 'base'
+> & {
+  server: ClientManifestViteServerOptions
+}
+
+type ClientManifestViteServerOptions = Pick<ResolvedServerOptions, 'origin'>
+
+interface ClientManifestConfig extends ClientManifestViteConfig {
   manifest: string
   clientOutDir: string
-  devOrigin?: string
   fs?: ClientManifestFs
 }
 
@@ -135,7 +143,7 @@ export function clientManifest(manifestConfig: ClientManifestConfig) {
     assert(manifestConfig.command === 'serve')
 
     const basePath = basePathForDev(base)
-    const origin = manifestConfig.devOrigin ?? ''
+    const origin = manifestConfig.server.origin ?? ''
     return `${origin}${basePath}${filePath}`
   }
 

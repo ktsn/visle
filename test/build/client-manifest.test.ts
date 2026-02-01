@@ -19,6 +19,7 @@ describe('Client manifest', () => {
         root: '/path/to/root',
         base: '/',
         clientOutDir: 'dist-client',
+        server: {},
       })
 
       const result = manifest.getClientImportId(customElementEntryPath)
@@ -33,6 +34,7 @@ describe('Client manifest', () => {
         isProduction: false,
         root: '/path/to/root',
         base: '/',
+        server: {},
         clientOutDir: 'dist-client',
       })
 
@@ -48,6 +50,7 @@ describe('Client manifest', () => {
         isProduction: false,
         root: '/path/to/root',
         base: '/',
+        server: {},
         clientOutDir: 'dist-client',
       })
 
@@ -66,6 +69,7 @@ describe('Client manifest', () => {
         isProduction: false,
         root: '/path/to/root',
         base: '/',
+        server: {},
         clientOutDir: 'dist-client',
       })
 
@@ -86,6 +90,7 @@ describe('Client manifest', () => {
         isProduction: false,
         root: '/path/to/root',
         base: '/',
+        server: {},
         clientOutDir: 'dist-client',
       })
 
@@ -106,6 +111,7 @@ describe('Client manifest', () => {
         isProduction: false,
         root: '/path/to/root',
         base: 'https://example.com/prefix',
+        server: {},
         clientOutDir: 'dist-client',
       })
 
@@ -122,7 +128,9 @@ describe('Client manifest', () => {
         root: '/path/to/root',
         base: '/',
         clientOutDir: 'dist-client',
-        devOrigin: 'http://localhost:3000',
+        server: {
+          origin: 'http://localhost:3000',
+        },
       })
 
       const result = manifest.getClientImportId('/path/to/root/src/foo.vue')
@@ -148,6 +156,7 @@ describe('Client manifest', () => {
         isProduction: true,
         root: '/path/to/root',
         base: '/',
+        server: {},
         clientOutDir: 'dist-client',
         fs: { readFileSync },
       })
@@ -171,6 +180,7 @@ describe('Client manifest', () => {
         isProduction: true,
         root: '/path/to/root',
         base: '/',
+        server: {},
         clientOutDir: 'dist-client',
         fs: { readFileSync },
       })
@@ -197,6 +207,7 @@ describe('Client manifest', () => {
         isProduction: true,
         root: '/path/to/root',
         base: '/',
+        server: {},
         clientOutDir: 'dist-client',
         fs: { readFileSync },
       })
@@ -234,6 +245,7 @@ describe('Client manifest', () => {
         isProduction: true,
         root: '/path/to/root',
         base: '/',
+        server: {},
         clientOutDir: 'dist-client',
         fs: { readFileSync },
       })
@@ -265,6 +277,7 @@ describe('Client manifest', () => {
         isProduction: true,
         root: '/path/to/root',
         base,
+        server: {},
         clientOutDir: 'dist-client',
         fs: { readFileSync },
       })
