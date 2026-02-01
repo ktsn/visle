@@ -1,9 +1,11 @@
-import path from 'node:path'
 import type { Plugin } from 'vite'
+
+import path from 'node:path'
+
 import { VisleConfig, resolveVisleConfig, setVisleConfig } from './config.js'
-import { islandPlugin } from './plugins/index.js'
-import { customElementEntryPath, resolvePattern } from './paths.js'
 import { clientVirtualEntryId, serverVirtualEntryId } from './generate.js'
+import { customElementEntryPath, resolvePattern } from './paths.js'
+import { islandPlugin } from './plugins/index.js'
 
 export type { VisleConfig }
 
@@ -33,11 +35,7 @@ export function visle(config: VisleConfig = {}): Plugin[] {
             build: {
               outDir: resolvedConfig.clientOutDir,
               rollupOptions: {
-                input: [
-                  customElementEntryPath,
-                  clientVirtualEntryId,
-                  ...islandPaths,
-                ],
+                input: [customElementEntryPath, clientVirtualEntryId, ...islandPaths],
                 preserveEntrySignatures: 'allow-extension',
               },
             },

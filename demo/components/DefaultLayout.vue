@@ -9,7 +9,7 @@ defineProps<Props>()
 <template>
   <html lang="en">
     <head>
-    <title>{{ title }}</title>
+      <title>{{ title }}</title>
     </head>
     <body>
       <slot></slot>

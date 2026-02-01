@@ -1,6 +1,6 @@
-import path from 'node:path'
-import fs from 'node:fs'
 import { globSync } from 'glob'
+import fs from 'node:fs'
+import path from 'node:path'
 
 // -----------------------------
 // Custom Element Paths
@@ -37,10 +37,7 @@ export function pathToExportName(targetPath: string): string {
 /**
  * Resolves glob patterns to find files
  */
-export function resolvePattern(
-  pattern: string | string[],
-  root: string,
-): string[] {
+export function resolvePattern(pattern: string | string[], root: string): string[] {
   if (typeof pattern === 'string') {
     return globSync(path.join(root, pattern))
   }
@@ -90,10 +87,7 @@ export function resolveServerComponentIds(componentDir: string): string[] {
 /**
  * Resolves the path for a component in development mode
  */
-export function resolveDevComponentPath(
-  componentDir: string,
-  componentPath: string,
-): string {
+export function resolveDevComponentPath(componentDir: string, componentPath: string): string {
   return path.resolve(componentDir, `${componentPath}.vue`)
 }
 
@@ -109,4 +103,3 @@ export function resolveServerDistPath(serverOutDir: string): string {
   }
   return jsPath
 }
-

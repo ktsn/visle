@@ -25,9 +25,7 @@ export const defaultConfig: ResolvedVisleConfig = {
 /**
  * Resolves user config with defaults
  */
-export function resolveVisleConfig(
-  config: VisleConfig = {},
-): ResolvedVisleConfig {
+export function resolveVisleConfig(config: VisleConfig = {}): ResolvedVisleConfig {
   return {
     componentDir: config.componentDir ?? defaultConfig.componentDir,
     clientOutDir: config.clientOutDir ?? defaultConfig.clientOutDir,
@@ -40,24 +38,17 @@ const visleConfigKey = '__visle'
 /**
  * Stores resolved visle config on Vite's resolved config object.
  */
-export function setVisleConfig(
-  viteConfig: Record<string, any>,
-  config: ResolvedVisleConfig,
-): void {
+export function setVisleConfig(viteConfig: Record<string, any>, config: ResolvedVisleConfig): void {
   viteConfig[visleConfigKey] = config
 }
 
 /**
  * Retrieves resolved visle config from Vite's resolved config object.
  */
-export function getVisleConfig(
-  viteConfig: Record<string, any>,
-): ResolvedVisleConfig {
+export function getVisleConfig(viteConfig: Record<string, any>): ResolvedVisleConfig {
   const config = viteConfig[visleConfigKey]
   if (!config) {
-    throw new Error(
-      'Visle config is not set. Make sure visle plugin is added to the Vite config.',
-    )
+    throw new Error('Visle config is not set. Make sure visle plugin is added to the Vite config.')
   }
   return config
 }

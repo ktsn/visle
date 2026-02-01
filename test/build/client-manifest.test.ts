@@ -1,13 +1,8 @@
-import { describe, expect, test } from 'vitest'
-import {
-  clientManifest,
-  EntryMetadata,
-} from '../../src/build/client-manifest.ts'
 import { Manifest } from 'vite'
-import {
-  customElementEntryPath,
-  virtualCustomElementEntryPath,
-} from '../../src/build/paths.ts'
+import { describe, expect, test } from 'vitest'
+
+import { clientManifest, EntryMetadata } from '../../src/build/client-manifest.ts'
+import { customElementEntryPath, virtualCustomElementEntryPath } from '../../src/build/paths.ts'
 
 describe('Client manifest', () => {
   describe('command == server', () => {
@@ -70,9 +65,7 @@ describe('Client manifest', () => {
         '<template><div></div></template><style scoped>h1 { color: red; }</style>',
       )
 
-      expect(result).toEqual([
-        '/src/foo.vue?vue&type=style&index=0&scoped=6bf1c258&lang.css',
-      ])
+      expect(result).toEqual(['/src/foo.vue?vue&type=style&index=0&scoped=6bf1c258&lang.css'])
     })
 
     test('return ids for <style> block as css module', () => {
@@ -89,9 +82,7 @@ describe('Client manifest', () => {
         '<template><div></div></template><style module>h1 { color: red; }</style>',
       )
 
-      expect(result).toEqual([
-        '/src/foo.vue?vue&type=style&index=0&lang.module.css',
-      ])
+      expect(result).toEqual(['/src/foo.vue?vue&type=style&index=0&lang.module.css'])
     })
 
     test('return url with path part of base', () => {
@@ -146,9 +137,7 @@ describe('Client manifest', () => {
         entryMetadata: { css: [] },
       })
 
-      const result = manifestInstance.getClientImportId(
-        '/path/to/root/src/foo.vue',
-      )
+      const result = manifestInstance.getClientImportId('/path/to/root/src/foo.vue')
 
       expect(result).toBe('/foo-1234.js')
     })
@@ -257,9 +246,7 @@ describe('Client manifest', () => {
         entryMetadata: { css: [] },
       })
 
-      const result = manifestInstance.getClientImportId(
-        '/path/to/root/src/foo.vue',
-      )
+      const result = manifestInstance.getClientImportId('/path/to/root/src/foo.vue')
 
       expect(result).toBe(expected)
     })

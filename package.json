@@ -2,40 +2,46 @@
   "name": "visle",
   "version": "0.2.7",
   "description": "Islands Architecture renderer for Vue.js",
+  "keywords": [
+    "Vue.js",
+    "islands architecture",
+    "multi-page application",
+    "server side rendering",
+    "template engine"
+  ],
+  "license": "MIT",
+  "author": "Katashin",
+  "files": [
+    "dist"
+  ],
   "type": "module",
   "exports": {
     ".": "./dist/server/index.js",
     "./build": "./dist/build/index.js",
     "./dev": "./dist/server/dev.js"
   },
-  "files": [
-    "dist"
-  ],
   "scripts": {
     "build": "tsc -p .",
     "test": "vitest",
     "test:coverage": "vitest --coverage --coverage.reporter=lcov",
-    "lint": "pnpm biome lint ./",
-    "format": "pnpm biome format --write ./",
+    "lint": "pnpm oxlint ./",
+    "format": "pnpm oxfmt --write ./",
     "prepublishOnly": "pnpm lint && pnpm run test --run && rm -rf dist && pnpm build"
   },
-  "keywords": [
-    "Vue.js",
-    "islands architecture",
-    "template engine",
-    "server side rendering",
-    "multi-page application"
-  ],
-  "author": "Katashin",
-  "license": "MIT",
-  "packageManager": "pnpm@9.9.0+sha512.60c18acd138bff695d339be6ad13f7e936eea6745660d4cc4a776d5247c540d0edee1a563695c183a66eb917ef88f2b4feb1fc25f32a7adcadc7aaf3438e99c1",
+  "dependencies": {
+    "@vitejs/plugin-vue": "^6.0.3",
+    "connect": "^3.7.0",
+    "glob": "^13.0.0",
+    "vite": "^7.3.1"
+  },
   "devDependencies": {
-    "@biomejs/biome": "2.3.11",
     "@types/connect": "^3.4.38",
     "@types/express": "^5.0.6",
     "@types/node": "^25.0.9",
     "@types/sanitize-html": "^2.16.0",
     "@vitest/coverage-v8": "4.0.17",
+    "oxfmt": "^0.27.0",
+    "oxlint": "^1.42.0",
     "rollup": "^4.55.2",
     "typescript": "^5.9.3",
     "vitest": "^4.0.17",
@@ -44,10 +50,5 @@
   "peerDependencies": {
     "vue": ">=3.0.0"
   },
-  "dependencies": {
-    "@vitejs/plugin-vue": "^6.0.3",
-    "connect": "^3.7.0",
-    "glob": "^13.0.0",
-    "vite": "^7.3.1"
-  }
+  "packageManager": "pnpm@9.9.0+sha512.60c18acd138bff695d339be6ad13f7e936eea6745660d4cc4a776d5247c540d0edee1a563695c183a66eb917ef88f2b4feb1fc25f32a7adcadc7aaf3438e99c1"
 }

@@ -1,12 +1,10 @@
+import assert from 'node:assert'
+import path from 'node:path'
 import { Manifest, ResolvedServerOptions, ResolvedConfig as ResolvedViteConfig } from 'vite'
 import { parse, SFCBlock } from 'vue/compiler-sfc'
-import path from 'node:path'
+
 import { generateComponentId } from './component-id.js'
-import {
-  virtualCustomElementEntryPath,
-  customElementEntryPath,
-} from './paths.js'
-import assert from 'node:assert'
+import { virtualCustomElementEntryPath, customElementEntryPath } from './paths.js'
 
 type ClientManifestViteConfig = Pick<
   ResolvedViteConfig,
@@ -86,11 +84,7 @@ export function clientManifest(manifestConfig: ClientManifestViteConfig) {
       }
 
       const descriptor = parse(code).descriptor
-      const componentId = generateComponentId(
-        relativePath,
-        code,
-        manifestConfig.isProduction,
-      )
+      const componentId = generateComponentId(relativePath, code, manifestConfig.isProduction)
 
       return descriptor.styles.map((style, i) => {
         if (style.src) {
@@ -149,16 +143,7 @@ export function clientManifest(manifestConfig: ClientManifestViteConfig) {
 
 // these are built-in query parameters so should be ignored
 // if the user happen to add them as attrs
-const ignoreList = [
-  'id',
-  'index',
-  'src',
-  'type',
-  'lang',
-  'module',
-  'scoped',
-  'generic',
-]
+const ignoreList = ['id', 'index', 'src', 'type', 'lang', 'module', 'scoped', 'generic']
 
 /**
  * Borrowed from @vitejs/plugin-vue
@@ -173,9 +158,7 @@ function attrsToQuery(
   for (const name in attrs) {
     const value = attrs[name]
     if (!ignoreList.includes(name)) {
-      query += `&${encodeURIComponent(name)}${
-        value ? `=${encodeURIComponent(value)}` : ''
-      }`
+      query += `&${encodeURIComponent(name)}${value ? `=${encodeURIComponent(value)}` : ''}`
     }
   }
 

@@ -1,5 +1,6 @@
-import * as path from 'node:path'
 import express from 'express'
+import * as path from 'node:path'
+
 import { app } from './server.ts'
 
 app.use(express.static(path.resolve('dist/client')))

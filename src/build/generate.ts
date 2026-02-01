@@ -1,4 +1,5 @@
 import path from 'node:path'
+
 import { pathToExportName } from './paths.js'
 
 export const clientVirtualEntryId = '\0@visle/client-entry'
@@ -70,10 +71,7 @@ export function generateIslandCode(
   </template>`
 }
 
-export function generateServerComponentCode(
-  fileName: string,
-  cssIds: string[],
-): string {
+export function generateServerComponentCode(fileName: string, cssIds: string[]): string {
   return `<script setup>
   import { useSSRContext } from 'vue'
   import OriginalComponent from '${fileName}?original'

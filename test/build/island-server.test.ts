@@ -1,4 +1,5 @@
 import { describe, test, expect } from 'vitest'
+
 import { serve, serveAndRenderMain } from './build-utils.ts'
 
 describe('Island plugin on server', () => {
