@@ -17,11 +17,6 @@ export const customElementEntryPath = path.resolve(
 )
 
 // -----------------------------
-// Metadata Paths
-// -----------------------------
-export const entryMetadataPath = '.vite/entry-metadata.json'
-
-// -----------------------------
 // Path Resolution Functions
 // -----------------------------
 
@@ -115,16 +110,3 @@ export function resolveServerDistPath(serverOutDir: string): string {
   return jsPath
 }
 
-/**
- * Resolves the client manifest file path
- */
-export function resolveClientManifestPath(clientOutDir: string): string {
-  return path.resolve(clientOutDir, '.vite/manifest.json')
-}
-
-/**
- * Resolves the entry metadata file path
- */
-export function resolveEntryMetadataPath(clientOutDir: string): string {
-  return path.resolve(clientOutDir, entryMetadataPath)
-}
