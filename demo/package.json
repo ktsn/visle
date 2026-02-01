@@ -3,9 +3,9 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "dev": "node --experimental-strip-types app/server.ts",
+    "dev": "node app/dev.ts",
     "build": "vite build",
-    "start": "NODE_ENV=production node --experimental-strip-types app/server.ts"
+    "start": "node app/prod.ts"
   },
   "dependencies": {
     "express": "^4.21.0",
