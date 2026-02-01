@@ -1,17 +1,10 @@
-import {
-  Manifest,
-  ResolvedServerOptions,
-  ResolvedConfig as ResolvedViteConfig,
-} from 'vite'
+import { Manifest, ResolvedServerOptions, ResolvedConfig as ResolvedViteConfig } from 'vite'
 import { parse, SFCBlock } from 'vue/compiler-sfc'
 import path from 'node:path'
-import baseFs from 'node:fs'
 import { generateComponentId } from './component-id.js'
 import {
   virtualCustomElementEntryPath,
   customElementEntryPath,
-  resolveClientManifestPath,
-  resolveEntryMetadataPath,
 } from './paths.js'
 import assert from 'node:assert'
 
@@ -24,53 +17,44 @@ type ClientManifestViteConfig = Pick<
 
 type ClientManifestViteServerOptions = Pick<ResolvedServerOptions, 'origin'>
 
-interface ClientManifestConfig extends ClientManifestViteConfig {
-  manifest: string
-  clientOutDir: string
-  fs?: ClientManifestFs
-}
-
-interface ClientManifestFs {
-  readFileSync: typeof baseFs.readFileSync
-}
-
 export interface EntryMetadata {
   css: string[]
 }
 
-export function clientManifest(manifestConfig: ClientManifestConfig) {
-  const fs = manifestConfig.fs || baseFs
-  const { root, base, clientOutDir } = manifestConfig
+export interface ClientBuildData {
+  manifest: Manifest
+  entryMetadata: EntryMetadata
+}
+
+export function clientManifest(manifestConfig: ClientManifestViteConfig) {
+  const { root, base } = manifestConfig
 
   let clientManifest: Manifest
   let entryMetaData: EntryMetadata
+
+  function setBuildData(data: ClientBuildData): void {
+    clientManifest = data.manifest
+    entryMetaData = data.entryMetadata
+  }
 
   function ensureClientManifest(): Manifest {
     if (clientManifest) {
       return clientManifest
     }
 
-    clientManifest = JSON.parse(
-      fs.readFileSync(
-        resolveClientManifestPath(path.join(root, clientOutDir)),
-        'utf-8',
-      ),
+    throw new Error(
+      'Client manifest is not available. setBuildData() must be called before accessing manifest in build mode.',
     )
-    return clientManifest
   }
 
-  function ensureEntryMetadata() {
+  function ensureEntryMetadata(): EntryMetadata {
     if (entryMetaData) {
       return entryMetaData
     }
 
-    entryMetaData = JSON.parse(
-      fs.readFileSync(
-        resolveEntryMetadataPath(path.join(root, clientOutDir)),
-        'utf-8',
-      ),
+    throw new Error(
+      'Entry metadata is not available. setBuildData() must be called before accessing entry metadata in build mode.',
     )
-    return entryMetaData
   }
 
   function getClientImportId(id: string): string {
@@ -159,6 +143,7 @@ export function clientManifest(manifestConfig: ClientManifestConfig) {
   return {
     getClientImportId,
     getDependingClientCssIds,
+    setBuildData,
   }
 }
 
