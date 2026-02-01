@@ -1,5 +1,5 @@
 import path from 'node:path'
-import { Plugin, ResolvedConfig } from 'vite'
+import { Manifest, Plugin, ResolvedConfig } from 'vite'
 import { readFile } from 'node:fs/promises'
 import {
   generateIslandCode,
@@ -13,7 +13,6 @@ import {
 } from '../generate.js'
 import {
   customElementEntryPath,
-  entryMetadataPath,
   virtualCustomElementEntryPath,
   parseId,
   resolveServerComponentIds,
@@ -28,13 +27,11 @@ export function islandCorePlugin(config: ResolvedVisleConfig): Plugin {
   return {
     name: 'vue-island-core',
 
+    sharedDuringBuild: true,
+
     configResolved(resolvedConfig) {
       viteConfig = resolvedConfig
-      manifest = clientManifest({
-        ...resolvedConfig,
-        manifest: '.vite/manifest.json',
-        clientOutDir: config.clientOutDir,
-      })
+      manifest = clientManifest(resolvedConfig)
     },
 
     resolveId(id) {
@@ -143,24 +140,40 @@ export function islandCorePlugin(config: ResolvedVisleConfig): Plugin {
     },
 
     generateBundle(_options, bundle) {
-      for (const [key, chunk] of Object.entries(bundle)) {
-        if (
-          chunk.type === 'chunk' &&
-          chunk.facadeModuleId === clientVirtualEntryId
-        ) {
-          delete bundle[key]
+      if (this.environment?.name !== 'client') {
+        return
+      }
 
-          const entryMetaData: EntryMetadata = {
+      const root = viteConfig.root
+      const viteManifest: Manifest = {}
+      let entryMetadata: EntryMetadata = { css: [] }
+
+      for (const [key, chunk] of Object.entries(bundle)) {
+        if (chunk.type !== 'chunk') {
+          continue
+        }
+
+        if (chunk.facadeModuleId === clientVirtualEntryId) {
+          entryMetadata = {
             css: Array.from(chunk.viteMetadata?.importedCss ?? []),
           }
+          delete bundle[key]
+          continue
+        }
 
-          this.emitFile({
-            type: 'asset',
-            fileName: entryMetadataPath,
-            source: JSON.stringify(entryMetaData),
-          })
+        if (chunk.facadeModuleId) {
+          const relativePath = path.relative(root, chunk.facadeModuleId)
+          viteManifest[relativePath] = {
+            file: chunk.fileName,
+            css: Array.from(chunk.viteMetadata?.importedCss ?? []),
+          }
         }
       }
+
+      manifest.setBuildData({
+        manifest: viteManifest,
+        entryMetadata,
+      })
     },
   }
 }
