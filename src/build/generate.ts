@@ -21,15 +21,12 @@ export function generateClientVirtualEntryCode(componentIds: string[]): string {
 }
 
 export function generateServerVirtualEntryCode(
-  root: string,
   componentDir: string,
   componentIds: string[],
 ): string {
-  const basePath = path.join(root, componentDir)
-
   return componentIds
     .map((id) => {
-      const exportName = pathToExportName(path.relative(basePath, id))
+      const exportName = pathToExportName(path.relative(componentDir, id))
       return `export { default as ${exportName} } from '${id}'`
     })
     .join('\n')

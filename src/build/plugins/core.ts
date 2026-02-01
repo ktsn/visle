@@ -90,8 +90,7 @@ export function islandCorePlugin(config: ResolvedVisleConfig): Plugin {
 
       if (id === serverVirtualEntryId) {
         return generateServerVirtualEntryCode(
-          viteConfig.root,
-          config.componentDir,
+          path.join(viteConfig.root, config.componentDir),
           resolveServerComponentIds(
             path.join(viteConfig.root, config.componentDir),
           ),
