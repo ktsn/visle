@@ -142,8 +142,10 @@ export function clientManifest(manifestConfig: ClientManifestConfig) {
   function applyServeBase(filePath: string): string {
     assert(manifestConfig.command === 'serve')
 
+    // Normalize origin value
+    const origin = manifestConfig.server.origin?.replace(/\/$/, '') ?? ''
     const basePath = basePathForDev(base)
-    const origin = manifestConfig.server.origin ?? ''
+
     return `${origin}${basePath}${filePath}`
   }
 
