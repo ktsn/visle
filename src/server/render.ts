@@ -25,10 +25,8 @@ interface RenderFunction {
 /**
  * Return a function that renders a Vue component to a HTML string.
  * The returned render function receives a path to a Vue component.
- * The base directory of the path is determined by the `componentDir` option.
- *
- * @param options
- * @returns
+ * You need to specify Vite output directory of server build as same value as
+ * defined in Vite config.
  */
 export function createRender(options: RenderOptions = {}): RenderFunction {
   let loader: RenderLoader = {
