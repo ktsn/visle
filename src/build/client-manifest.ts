@@ -42,7 +42,10 @@ export function clientManifest(manifestConfig: ClientManifestConfig) {
     }
 
     clientManifest = JSON.parse(
-      fs.readFileSync(resolveClientManifestPath(root, clientOutDir), 'utf-8'),
+      fs.readFileSync(
+        resolveClientManifestPath(path.join(root, clientOutDir)),
+        'utf-8',
+      ),
     )
     return clientManifest
   }
@@ -53,7 +56,10 @@ export function clientManifest(manifestConfig: ClientManifestConfig) {
     }
 
     entryMetaData = JSON.parse(
-      fs.readFileSync(resolveEntryMetadataPath(root, clientOutDir), 'utf-8'),
+      fs.readFileSync(
+        resolveEntryMetadataPath(path.join(root, clientOutDir)),
+        'utf-8',
+      ),
     )
     return entryMetaData
   }

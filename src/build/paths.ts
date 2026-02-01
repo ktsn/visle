@@ -85,14 +85,9 @@ export function parseId(id: string): {
 /**
  * Resolves paths for all server components
  */
-export function resolveServerComponentIds(
-  root: string,
-  componentDir: string,
-): string[] {
-  const basePath = path.join(root, componentDir)
-
-  const islandPaths = new Set(resolvePattern('/**/*.island.vue', basePath))
-  const vuePaths = resolvePattern('/**/*.vue', basePath)
+export function resolveServerComponentIds(componentDir: string): string[] {
+  const islandPaths = new Set(resolvePattern('/**/*.island.vue', componentDir))
+  const vuePaths = resolvePattern('/**/*.vue', componentDir)
 
   return vuePaths.filter((p) => !islandPaths.has(p))
 }
@@ -101,23 +96,18 @@ export function resolveServerComponentIds(
  * Resolves the path for a component in development mode
  */
 export function resolveDevComponentPath(
-  root: string,
   componentDir: string,
   componentPath: string,
 ): string {
-  return path.resolve(path.join(root, componentDir, `${componentPath}.vue`))
+  return path.resolve(componentDir, `${componentPath}.vue`)
 }
 
 /**
  * Resolves the path to the server dist directory
  */
-export function resolveServerDistPath(
-  root: string,
-  serverOutDir: string,
-): string {
-  const dirPath = path.join(root, serverOutDir)
-  const mjsPath = path.resolve(dirPath, 'server-entry.mjs')
-  const jsPath = path.resolve(dirPath, 'server-entry.js')
+export function resolveServerDistPath(serverOutDir: string): string {
+  const mjsPath = path.resolve(serverOutDir, 'server-entry.mjs')
+  const jsPath = path.resolve(serverOutDir, 'server-entry.js')
 
   if (fs.existsSync(mjsPath)) {
     return mjsPath
@@ -128,19 +118,13 @@ export function resolveServerDistPath(
 /**
  * Resolves the client manifest file path
  */
-export function resolveClientManifestPath(
-  root: string,
-  clientOutDir: string,
-): string {
-  return path.resolve(root, clientOutDir, '.vite/manifest.json')
+export function resolveClientManifestPath(clientOutDir: string): string {
+  return path.resolve(clientOutDir, '.vite/manifest.json')
 }
 
 /**
  * Resolves the entry metadata file path
  */
-export function resolveEntryMetadataPath(
-  root: string,
-  clientOutDir: string,
-): string {
-  return path.resolve(root, clientOutDir, entryMetadataPath)
+export function resolveEntryMetadataPath(clientOutDir: string): string {
+  return path.resolve(clientOutDir, entryMetadataPath)
 }

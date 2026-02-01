@@ -47,8 +47,7 @@ export function createDevLoader(): DevRenderLoader {
       }
 
       const modulePath = resolveDevComponentPath(
-        config.root,
-        config.componentDir,
+        path.join(devServer.config.root, visleConfig.componentDir),
         componentPath,
       )
 

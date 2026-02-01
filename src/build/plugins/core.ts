@@ -77,7 +77,9 @@ export function islandCorePlugin(config: ResolvedVisleConfig): Plugin {
       if (!isSSR) {
         if (id === clientVirtualEntryId) {
           return generateClientVirtualEntryCode(
-            resolveServerComponentIds(viteConfig.root, config.componentDir),
+            resolveServerComponentIds(
+              path.join(viteConfig.root, config.componentDir),
+            ),
           )
         }
 
@@ -92,7 +94,9 @@ export function islandCorePlugin(config: ResolvedVisleConfig): Plugin {
         return generateServerVirtualEntryCode(
           viteConfig.root,
           config.componentDir,
-          resolveServerComponentIds(viteConfig.root, config.componentDir),
+          resolveServerComponentIds(
+            path.join(viteConfig.root, config.componentDir),
+          ),
         )
       }
 
