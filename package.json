@@ -40,7 +40,7 @@
     "@types/express": "^5.0.6",
     "@types/node": "^25.0.9",
     "@types/sanitize-html": "^2.16.0",
-    "@vitest/coverage-v8": "4.0.17",
+    "@vitest/coverage-v8": "4.0.18",
     "oxfmt": "^0.27.0",
     "oxlint": "^1.42.0",
     "rollup": "^4.55.2",
