@@ -1,4 +1,4 @@
-import { Manifest } from 'vite'
+import { Manifest, ResolvedConfig as ResolvedViteConfig } from 'vite'
 import { parse, SFCBlock } from 'vue/compiler-sfc'
 import path from 'node:path'
 import baseFs from 'node:fs'
@@ -11,14 +11,15 @@ import {
 } from './paths.js'
 import assert from 'node:assert'
 
-interface ClientManifestConfig {
+interface ClientManifestConfig
+  extends Pick<
+    ResolvedViteConfig,
+    'command' | 'isProduction' | 'root' | 'base'
+  > {
   manifest: string
-  command: 'serve' | 'build'
-  isProduction: boolean
-  fs?: ClientManifestFs
-  root: string
-  base: string
   clientOutDir: string
+  devOrigin?: string
+  fs?: ClientManifestFs
 }
 
 interface ClientManifestFs {
@@ -134,7 +135,8 @@ export function clientManifest(manifestConfig: ClientManifestConfig) {
     assert(manifestConfig.command === 'serve')
 
     const basePath = basePathForDev(base)
-    return `${basePath}${filePath}`
+    const origin = manifestConfig.devOrigin ?? ''
+    return `${origin}${basePath}${filePath}`
   }
 
   function applyBuildBase(filePath: string): string {

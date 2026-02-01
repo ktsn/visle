@@ -36,6 +36,7 @@ export function islandCorePlugin(config: ResolvedVisleConfig): Plugin {
         isProduction: resolvedConfig.isProduction,
         root: resolvedConfig.root,
         base: resolvedConfig.base,
+        devOrigin: resolvedConfig.server.origin,
         clientOutDir: config.clientOutDir,
       })
     },

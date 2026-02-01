@@ -113,6 +113,22 @@ describe('Client manifest', () => {
 
       expect(result).toBe('/prefix/src/foo.vue')
     })
+
+    test('return url with specified dev server origin', () => {
+      const manifest = clientManifest({
+        manifest: '.vite/manifest.json',
+        command: 'serve',
+        isProduction: false,
+        root: '/path/to/root',
+        base: '/',
+        clientOutDir: 'dist-client',
+        devOrigin: 'http://localhost:3000',
+      })
+
+      const result = manifest.getClientImportId('/path/to/root/src/foo.vue')
+
+      expect(result).toBe('http://localhost:3000/src/foo.vue')
+    })
   })
 
   describe('command == build', () => {
