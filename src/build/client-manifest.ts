@@ -143,7 +143,7 @@ export function clientManifest(manifestConfig: ClientManifestViteConfig) {
 
 // these are built-in query parameters so should be ignored
 // if the user happen to add them as attrs
-const ignoreList = ['id', 'index', 'src', 'type', 'lang', 'module', 'scoped', 'generic']
+const ignoreList = new Set(['id', 'index', 'src', 'type', 'lang', 'module', 'scoped', 'generic'])
 
 /**
  * Borrowed from @vitejs/plugin-vue
@@ -157,7 +157,7 @@ function attrsToQuery(
 
   for (const name in attrs) {
     const value = attrs[name]
-    if (!ignoreList.includes(name)) {
+    if (!ignoreList.has(name)) {
       query += `&${encodeURIComponent(name)}${value ? `=${encodeURIComponent(value)}` : ''}`
     }
   }

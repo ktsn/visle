@@ -24,8 +24,9 @@
     "build": "tsc -p .",
     "test": "vitest",
     "test:coverage": "vitest --coverage --coverage.reporter=lcov",
-    "lint": "pnpm oxlint ./",
-    "format": "pnpm oxfmt --write ./",
+    "lint": "oxlint",
+    "format": "oxfmt --write",
+    "format:check": "oxfmt --check",
     "prepublishOnly": "pnpm lint && pnpm run test --run && rm -rf dist && pnpm build"
   },
   "dependencies": {
