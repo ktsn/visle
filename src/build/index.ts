@@ -31,7 +31,6 @@ export function visle(config: VisleConfig = {}): Plugin[] {
         environments: {
           client: {
             build: {
-              manifest: true,
               outDir: resolvedConfig.clientOutDir,
               rollupOptions: {
                 input: [
