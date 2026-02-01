@@ -51,8 +51,8 @@ export function createDevLoader(
       )
 
       try {
-        const ssrEnv = devServer.environments.ssr as RunnableDevEnvironment
-        const module = await ssrEnv.runner.import(modulePath)
+        const serverEnv = devServer.environments.server as RunnableDevEnvironment
+        const module = await serverEnv.runner.import(modulePath)
         return module.default
       } catch (e) {
         if (e instanceof Error) {

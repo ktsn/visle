@@ -42,9 +42,9 @@ export function islandCorePlugin(config: ResolvedVisleConfig): Plugin {
 
     resolveId(id) {
       // Access environment name via this.environment
-      const isSSR = this.environment?.name === 'ssr'
+      const isServer = this.environment?.name === 'server'
 
-      if (!isSSR) {
+      if (!isServer) {
         if (id === virtualCustomElementEntryPath) {
           return virtualCustomElementEntryPath
         }
@@ -73,9 +73,9 @@ export function islandCorePlugin(config: ResolvedVisleConfig): Plugin {
 
     load(id) {
       // Access environment name via this.environment
-      const isSSR = this.environment?.name === 'ssr'
+      const isServer = this.environment?.name === 'server'
 
-      if (!isSSR) {
+      if (!isServer) {
         if (id === clientVirtualEntryId) {
           return generateClientVirtualEntryCode(
             resolveServerComponentIds(
@@ -108,9 +108,9 @@ export function islandCorePlugin(config: ResolvedVisleConfig): Plugin {
 
     transform(code, id) {
       // Access environment name via this.environment
-      const isSSR = this.environment?.name === 'ssr'
+      const isServer = this.environment?.name === 'server'
 
-      if (!isSSR) {
+      if (!isServer) {
         return null
       }
 

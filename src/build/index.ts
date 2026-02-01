@@ -9,7 +9,7 @@ export type { VisleConfig }
 
 /**
  * Visle plugin for Vite.
- * Configures client and ssr environments for islands architecture.
+ * Configures client and server environments for islands architecture.
  */
 export function visle(config: VisleConfig = {}): Plugin[] {
   const resolvedConfig = resolveVisleConfig(config)
@@ -46,7 +46,7 @@ export function visle(config: VisleConfig = {}): Plugin[] {
               },
             },
           },
-          ssr: {
+          server: {
             build: {
               outDir: resolvedConfig.serverOutDir,
               rollupOptions: {
@@ -61,7 +61,7 @@ export function visle(config: VisleConfig = {}): Plugin[] {
             // Build client first to generate manifest
             await builder.build(builder.environments.client!)
             // Then build server with manifest info
-            await builder.build(builder.environments.ssr!)
+            await builder.build(builder.environments.server!)
           },
         },
       }
