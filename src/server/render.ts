@@ -1,36 +1,15 @@
 import { Component, createApp } from 'vue'
 import { renderToString } from 'vue/server-renderer'
 import { transformWithRenderContext } from './transform.js'
-import {
-  VisleConfig,
-  ResolvedVisleConfig,
-  resolveVisleConfig,
-} from '../build/config.js'
+import { defaultConfig } from '../build/config.js'
 import { pathToExportName, resolveServerDistPath } from '../build/paths.js'
 
-/**
- * Render options extending VisleConfig
- */
-export interface RenderOptions extends VisleConfig {
-  /**
-   * Root directory for resolving paths.
-   * Defaults to process.cwd()
-   */
-  root?: string
-}
-
-/**
- * Resolved render options with all values guaranteed
- */
-export interface ResolvedRenderOptions extends ResolvedVisleConfig {
-  root: string
+export interface RenderOptions {
+  serverOutDir?: string
 }
 
 export interface RenderLoader {
-  loadComponent(
-    config: ResolvedRenderOptions,
-    componentPath: string,
-  ): Promise<Component>
+  loadComponent(componentPath: string): Promise<Component>
 }
 
 export interface RenderContext {
@@ -43,14 +22,6 @@ interface RenderFunction {
   setLoader(loader: RenderLoader): void
 }
 
-const defaultLoader: RenderLoader = {
-  loadComponent(config, componentPath) {
-    return import(
-      /* @vite-ignore */ resolveServerDistPath(config.root, config.serverOutDir)
-    ).then((m) => m[pathToExportName(componentPath)])
-  },
-}
-
 /**
  * Return a function that renders a Vue component to a HTML string.
  * The returned render function receives a path to a Vue component.
@@ -60,14 +31,18 @@ const defaultLoader: RenderLoader = {
  * @returns
  */
 export function createRender(options: RenderOptions = {}): RenderFunction {
-  let loader: RenderLoader = defaultLoader
-  const config: ResolvedRenderOptions = {
-    ...resolveVisleConfig(options),
-    root: options.root ?? process.cwd(),
+  let loader: RenderLoader = {
+    loadComponent(componentPath) {
+      const serverOutDir = options.serverOutDir ?? defaultConfig.serverOutDir
+
+      return import(
+        /* @vite-ignore */ resolveServerDistPath(serverOutDir)
+      ).then((m) => m[pathToExportName(componentPath)])
+    },
   }
 
   async function loadComponent(componentPath: string): Promise<Component> {
-    return loader.loadComponent(config, componentPath)
+    return loader.loadComponent(componentPath)
   }
 
   async function render(componentPath: string, props?: any): Promise<string> {

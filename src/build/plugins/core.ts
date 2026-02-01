@@ -1,3 +1,4 @@
+import path from 'node:path'
 import { Plugin, ResolvedConfig } from 'vite'
 import { readFile } from 'node:fs/promises'
 import {

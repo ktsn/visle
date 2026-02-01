@@ -1,6 +1,6 @@
 import path from 'node:path'
 import type { Plugin } from 'vite'
-import { VisleConfig, resolveVisleConfig } from './config.js'
+import { VisleConfig, resolveVisleConfig, setVisleConfig } from './config.js'
 import { islandPlugin } from './plugins/index.js'
 import { customElementEntryPath, resolvePattern } from './paths.js'
 import { clientVirtualEntryId, serverVirtualEntryId } from './generate.js'
@@ -65,6 +65,10 @@ export function visle(config: VisleConfig = {}): Plugin[] {
           },
         },
       }
+    },
+
+    configResolved(viteConfig) {
+      setVisleConfig(viteConfig, resolvedConfig)
     },
   }
 

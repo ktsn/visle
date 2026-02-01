@@ -1,19 +1,23 @@
+import path from 'node:path'
 import {
   Connect,
   createServer,
+  InlineConfig,
   RunnableDevEnvironment,
   ViteDevServer,
 } from 'vite'
 import connect from 'connect'
 import { RenderLoader } from './render.js'
-import { visle } from '../build/index.js'
+import { getVisleConfig } from '../build/config.js'
 import { resolveDevComponentPath } from '../build/paths.js'
 
 interface DevRenderLoader extends RenderLoader {
   middleware: Connect.Server
 }
 
-export function createDevLoader(): DevRenderLoader {
+export function createDevLoader(
+  viteConfig: InlineConfig = {},
+): DevRenderLoader {
   let devServer: ViteDevServer
 
   const middleware = connect()
@@ -27,24 +31,19 @@ export function createDevLoader(): DevRenderLoader {
   })
 
   return {
-    async loadComponent(config, componentPath) {
+    async loadComponent(componentPath) {
       if (!devServer) {
         devServer = await createServer({
+          ...viteConfig,
           appType: 'custom',
           server: {
             middlewareMode: true,
           },
           logLevel: 'silent',
-          root: config.root,
-          plugins: [
-            visle({
-              componentDir: config.componentDir,
-              clientOutDir: config.clientOutDir,
-              serverOutDir: config.serverOutDir,
-            }),
-          ],
         })
       }
+
+      const visleConfig = getVisleConfig(devServer.config)
 
       const modulePath = resolveDevComponentPath(
         path.join(devServer.config.root, visleConfig.componentDir),

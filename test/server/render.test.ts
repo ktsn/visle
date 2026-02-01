@@ -3,6 +3,7 @@ import path from 'node:path'
 import fs from 'node:fs/promises'
 import { createRender } from '../../src/server/render.ts'
 import { createDevLoader } from '../../src/server/dev.ts'
+import { visle } from '../../src/build/index.ts'
 
 /**
  * Save JavaScript code provided as the argument.
@@ -41,7 +42,7 @@ describe('createRender', () => {
   describe('isDev = false', () => {
     test('renders vue component with props', async () => {
       const render = createRender({
-        root,
+        serverOutDir: path.join(root, 'dist/server'),
       })
 
       await saveCodes(root, {
@@ -67,7 +68,7 @@ describe('createRender', () => {
 
     test('renders vue component without props', async () => {
       const render = createRender({
-        root,
+        serverOutDir: path.join(root, 'dist/server'),
       })
 
       await saveCodes(root, {
@@ -87,7 +88,7 @@ describe('createRender', () => {
 
     test('renders vue component from .mjs file', async () => {
       const render = createRender({
-        root,
+        serverOutDir: path.join(root, 'dist/server'),
       })
 
       await saveCodes(root, {
@@ -107,7 +108,7 @@ describe('createRender', () => {
 
     test('renders head related tags', async () => {
       const render = createRender({
-        root,
+        serverOutDir: path.join(root, 'dist/server'),
       })
 
       await saveCodes(root, {
@@ -140,10 +141,15 @@ describe('createRender', () => {
   describe('isDev = true', () => {
     test('renders vue component from component directory', async () => {
       const render = createRender({
-        root,
+        serverOutDir: path.join(root, 'dist/server'),
       })
 
-      render.setLoader(createDevLoader())
+      render.setLoader(
+        createDevLoader({
+          root,
+          plugins: [visle()],
+        }),
+      )
 
       await saveCodes(root, {
         'components/Comp.vue': `
