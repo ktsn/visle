@@ -19,15 +19,12 @@ export function visle(config: VisleConfig = {}): Plugin[] {
 
     config(userConfig) {
       // Get root from user config or default to cwd
-      const root = userConfig.root ?? process.cwd()
-      const absoluteRoot = path.isAbsolute(root)
-        ? root
-        : path.resolve(process.cwd(), root)
+      const root = path.resolve(userConfig.root ?? process.cwd())
 
       // Find island components for client entry points
       const islandPaths = resolvePattern(
         '/**/*.island.vue',
-        path.join(absoluteRoot, resolvedConfig.componentDir),
+        path.join(root, resolvedConfig.componentDir),
       )
 
       return {
