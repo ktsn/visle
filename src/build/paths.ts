@@ -1,7 +1,6 @@
 import path from 'node:path'
 import fs from 'node:fs'
 import { globSync } from 'glob'
-import { ResolvedIslandsConfig } from './config.js'
 
 // -----------------------------
 // Custom Element Paths
@@ -86,14 +85,9 @@ export function parseId(id: string): {
 /**
  * Resolves paths for all server components
  */
-export function resolveServerComponentIds(
-  config: ResolvedIslandsConfig,
-): string[] {
-  const { root, componentDir } = config
-  const basePath = path.join(root, componentDir)
-
-  const islandPaths = new Set(resolvePattern('/**/*.island.vue', basePath))
-  const vuePaths = resolvePattern('/**/*.vue', basePath)
+export function resolveServerComponentIds(componentDir: string): string[] {
+  const islandPaths = new Set(resolvePattern('/**/*.island.vue', componentDir))
+  const vuePaths = resolvePattern('/**/*.vue', componentDir)
 
   return vuePaths.filter((p) => !islandPaths.has(p))
 }
@@ -102,22 +96,18 @@ export function resolveServerComponentIds(
  * Resolves the path for a component in development mode
  */
 export function resolveDevComponentPath(
-  config: ResolvedIslandsConfig,
+  componentDir: string,
   componentPath: string,
 ): string {
-  const { root, componentDir } = config
-
-  return path.resolve(path.join(root, componentDir, `${componentPath}.vue`))
+  return path.resolve(componentDir, `${componentPath}.vue`)
 }
 
 /**
  * Resolves the path to the server dist directory
  */
-export function resolveServerDistPath(config: ResolvedIslandsConfig): string {
-  const { root, serverOutDir } = config
-  const dirPath = path.join(root, serverOutDir)
-  const mjsPath = path.resolve(dirPath, 'server-entry.mjs')
-  const jsPath = path.resolve(dirPath, 'server-entry.js')
+export function resolveServerDistPath(serverOutDir: string): string {
+  const mjsPath = path.resolve(serverOutDir, 'server-entry.mjs')
+  const jsPath = path.resolve(serverOutDir, 'server-entry.js')
 
   if (fs.existsSync(mjsPath)) {
     return mjsPath
@@ -128,17 +118,13 @@ export function resolveServerDistPath(config: ResolvedIslandsConfig): string {
 /**
  * Resolves the client manifest file path
  */
-export function resolveClientManifestPath(
-  config: ResolvedIslandsConfig,
-): string {
-  return path.resolve(config.root, config.clientOutDir, '.vite/manifest.json')
+export function resolveClientManifestPath(clientOutDir: string): string {
+  return path.resolve(clientOutDir, '.vite/manifest.json')
 }
 
 /**
  * Resolves the entry metadata file path
  */
-export function resolveEntryMetadataPath(
-  config: ResolvedIslandsConfig,
-): string {
-  return path.resolve(config.root, config.clientOutDir, entryMetadataPath)
+export function resolveEntryMetadataPath(clientOutDir: string): string {
+  return path.resolve(clientOutDir, entryMetadataPath)
 }

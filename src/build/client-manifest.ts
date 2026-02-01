@@ -1,4 +1,8 @@
-import { Manifest } from 'vite'
+import {
+  Manifest,
+  ResolvedServerOptions,
+  ResolvedConfig as ResolvedViteConfig,
+} from 'vite'
 import { parse, SFCBlock } from 'vue/compiler-sfc'
 import path from 'node:path'
 import baseFs from 'node:fs'
@@ -9,13 +13,20 @@ import {
   resolveClientManifestPath,
   resolveEntryMetadataPath,
 } from './paths.js'
-import { ResolvedIslandsConfig } from './config.js'
 import assert from 'node:assert'
 
-interface ClientManifestConfig {
+type ClientManifestViteConfig = Pick<
+  ResolvedViteConfig,
+  'command' | 'isProduction' | 'root' | 'base'
+> & {
+  server: ClientManifestViteServerOptions
+}
+
+type ClientManifestViteServerOptions = Pick<ResolvedServerOptions, 'origin'>
+
+interface ClientManifestConfig extends ClientManifestViteConfig {
   manifest: string
-  command: 'serve' | 'build'
-  isProduction: boolean
+  clientOutDir: string
   fs?: ClientManifestFs
 }
 
@@ -27,11 +38,9 @@ export interface EntryMetadata {
   css: string[]
 }
 
-export function clientManifest(
-  islandsConfig: ResolvedIslandsConfig,
-  manifestConfig: ClientManifestConfig,
-) {
+export function clientManifest(manifestConfig: ClientManifestConfig) {
   const fs = manifestConfig.fs || baseFs
+  const { root, base, clientOutDir } = manifestConfig
 
   let clientManifest: Manifest
   let entryMetaData: EntryMetadata
@@ -42,7 +51,10 @@ export function clientManifest(
     }
 
     clientManifest = JSON.parse(
-      fs.readFileSync(resolveClientManifestPath(islandsConfig), 'utf-8'),
+      fs.readFileSync(
+        resolveClientManifestPath(path.join(root, clientOutDir)),
+        'utf-8',
+      ),
     )
     return clientManifest
   }
@@ -53,13 +65,16 @@ export function clientManifest(
     }
 
     entryMetaData = JSON.parse(
-      fs.readFileSync(resolveEntryMetadataPath(islandsConfig), 'utf-8'),
+      fs.readFileSync(
+        resolveEntryMetadataPath(path.join(root, clientOutDir)),
+        'utf-8',
+      ),
     )
     return entryMetaData
   }
 
   function getClientImportId(id: string): string {
-    const relativePath = path.relative(islandsConfig.root, id)
+    const relativePath = path.relative(root, id)
 
     if (manifestConfig.command === 'serve') {
       if (id === customElementEntryPath) {
@@ -79,7 +94,7 @@ export function clientManifest(
   }
 
   function getDependingClientCssIds(id: string, code: string): string[] {
-    const relativePath = path.relative(islandsConfig.root, id)
+    const relativePath = path.relative(root, id)
 
     if (manifestConfig.command === 'serve') {
       if (!id.endsWith('vue')) {
@@ -121,15 +136,15 @@ export function clientManifest(
   }
 
   /**
-   * If specified, prepend dev origin and path part of base to the filePath.
+   * If specified, prepend path part of base to the filePath.
    * @param filePath Must be absolute path without an origin.
    */
   function applyServeBase(filePath: string): string {
     assert(manifestConfig.command === 'serve')
 
     // Normalize origin value
-    const origin = islandsConfig.devOrigin?.replace(/\/$/, '') ?? ''
-    const basePath = basePathForDev(islandsConfig.base)
+    const origin = manifestConfig.server.origin?.replace(/\/$/, '') ?? ''
+    const basePath = basePathForDev(base)
 
     return `${origin}${basePath}${filePath}`
   }
@@ -137,7 +152,7 @@ export function clientManifest(
   function applyBuildBase(filePath: string): string {
     assert(manifestConfig.command === 'build')
 
-    const basePath = basePathForBuild(islandsConfig.base)
+    const basePath = basePathForBuild(base)
     return `${basePath}${filePath}`
   }
 

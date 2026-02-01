@@ -5,7 +5,7 @@
 Directory structure with Vue Islands Renderer will be like this:
 
 ```
-├─ visle.config.ts
+├─ vite.config.ts
 ├─ components/
 │   ├─ Page.vue
 │   ├─ Counter.island.vue
@@ -13,6 +13,22 @@ Directory structure with Vue Islands Renderer will be like this:
 ├─ dist/
 │   ├─ server/
 │   └– client/
+```
+
+Add the Visle plugin to your `vite.config.ts`:
+
+```ts
+// vite.config.ts
+import { defineConfig } from 'vite'
+import { visle } from 'visle/build'
+
+export default defineConfig({
+  plugins: [
+    visle({
+      componentDir: 'components',
+    }),
+  ],
+})
 ```
 
 Add the following Vue components into `components/` directory:
@@ -119,8 +135,6 @@ const app = express()
 +  app.use(express.static(path.resolve('dist/client')))
 +}
 
-const app = express()
-
 app.get('/', async (req, res) => {
   // Render components/Page.vue as a HTML string.
   // Extensions must be omitted.
@@ -139,5 +153,5 @@ in the `dist/server` directory.
 To build components, run the following command:
 
 ```bash
-visle build
+vite build
 ```

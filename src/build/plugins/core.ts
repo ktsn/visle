@@ -1,4 +1,5 @@
-import { Plugin } from 'vite'
+import path from 'node:path'
+import { Plugin, ResolvedConfig } from 'vite'
 import { readFile } from 'node:fs/promises'
 import {
   generateIslandCode,
@@ -18,24 +19,29 @@ import {
   resolveServerComponentIds,
 } from '../paths.js'
 import { clientManifest, EntryMetadata } from '../client-manifest.js'
-import { ResolvedIslandsConfig } from '../config.js'
+import { ResolvedVisleConfig } from '../config.js'
 
-export function islandCorePlugin(config: ResolvedIslandsConfig): Plugin {
+export function islandCorePlugin(config: ResolvedVisleConfig): Plugin {
   let manifest: ReturnType<typeof clientManifest>
+  let viteConfig: ResolvedConfig
 
   return {
     name: 'vue-island-core',
 
-    configResolved(viteConfig) {
-      manifest = clientManifest(config, {
+    configResolved(resolvedConfig) {
+      viteConfig = resolvedConfig
+      manifest = clientManifest({
+        ...resolvedConfig,
         manifest: '.vite/manifest.json',
-        command: viteConfig.command,
-        isProduction: viteConfig.isProduction,
+        clientOutDir: config.clientOutDir,
       })
     },
 
-    resolveId(id, _importer, options) {
-      if (!options?.ssr) {
+    resolveId(id) {
+      // Access environment name via this.environment
+      const isServer = this.environment?.name === 'server'
+
+      if (!isServer) {
         if (id === virtualCustomElementEntryPath) {
           return virtualCustomElementEntryPath
         }
@@ -62,11 +68,16 @@ export function islandCorePlugin(config: ResolvedIslandsConfig): Plugin {
       }
     },
 
-    load(id, options) {
-      if (!options?.ssr) {
+    load(id) {
+      // Access environment name via this.environment
+      const isServer = this.environment?.name === 'server'
+
+      if (!isServer) {
         if (id === clientVirtualEntryId) {
           return generateClientVirtualEntryCode(
-            resolveServerComponentIds(config),
+            resolveServerComponentIds(
+              path.join(viteConfig.root, config.componentDir),
+            ),
           )
         }
 
@@ -79,8 +90,10 @@ export function islandCorePlugin(config: ResolvedIslandsConfig): Plugin {
 
       if (id === serverVirtualEntryId) {
         return generateServerVirtualEntryCode(
-          config,
-          resolveServerComponentIds(config),
+          path.join(viteConfig.root, config.componentDir),
+          resolveServerComponentIds(
+            path.join(viteConfig.root, config.componentDir),
+          ),
         )
       }
 
@@ -89,8 +102,11 @@ export function islandCorePlugin(config: ResolvedIslandsConfig): Plugin {
       }
     },
 
-    transform(code, id, options) {
-      if (!options?.ssr) {
+    transform(code, id) {
+      // Access environment name via this.environment
+      const isServer = this.environment?.name === 'server'
+
+      if (!isServer) {
         return null
       }
 

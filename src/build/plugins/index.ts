@@ -4,9 +4,9 @@ import { islandCorePlugin } from './core.js'
 import { generateComponentId } from '../component-id.js'
 import { devStyleSSRPlugin } from './dev-ssr-css.js'
 import { islandElementName } from '../generate.js'
-import { ResolvedIslandsConfig } from '../config.js'
+import { ResolvedVisleConfig } from '../config.js'
 
-export function islandPlugin(config: ResolvedIslandsConfig): Plugin[] {
+export function islandPlugin(config: ResolvedVisleConfig): Plugin[] {
   return [
     islandCorePlugin(config),
     vue({
