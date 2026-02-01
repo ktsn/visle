@@ -1,8 +1,5 @@
 import { describe, expect, test } from 'vitest'
-import {
-  resolveVisleConfig,
-  defaultConfig,
-} from '../../src/build/config.ts'
+import { resolveVisleConfig, defaultConfig } from '../../src/build/config.ts'
 
 describe('Config', () => {
   describe('resolveVisleConfig', () => {

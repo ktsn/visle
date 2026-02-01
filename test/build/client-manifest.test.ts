@@ -122,7 +122,9 @@ describe('Client manifest', () => {
           file: 'foo-1234.js',
         },
       }
-      const readFileSync = vitest.fn().mockReturnValue(JSON.stringify(viteManifest))
+      const readFileSync = vitest
+        .fn()
+        .mockReturnValue(JSON.stringify(viteManifest))
 
       const manifestInstance = clientManifest({
         manifest: '.vite/manifest.json',
@@ -143,7 +145,9 @@ describe('Client manifest', () => {
 
     test('throw error if manifest does not include passed file path', () => {
       const viteManifest: Manifest = {}
-      const readFileSync = vitest.fn().mockReturnValue(JSON.stringify(viteManifest))
+      const readFileSync = vitest
+        .fn()
+        .mockReturnValue(JSON.stringify(viteManifest))
 
       const manifestInstance = clientManifest({
         manifest: '.vite/manifest.json',
@@ -167,7 +171,9 @@ describe('Client manifest', () => {
           css: ['foo-1234.css'],
         },
       }
-      const readFileSync = vitest.fn().mockReturnValue(JSON.stringify(viteManifest))
+      const readFileSync = vitest
+        .fn()
+        .mockReturnValue(JSON.stringify(viteManifest))
 
       const manifestInstance = clientManifest({
         manifest: '.vite/manifest.json',
@@ -233,7 +239,9 @@ describe('Client manifest', () => {
           file: 'foo-1234.js',
         },
       }
-      const readFileSync = vitest.fn().mockReturnValue(JSON.stringify(viteManifest))
+      const readFileSync = vitest
+        .fn()
+        .mockReturnValue(JSON.stringify(viteManifest))
 
       const manifestInstance = clientManifest({
         manifest: '.vite/manifest.json',
