@@ -31,11 +31,20 @@ export function visle(config: VisleConfig = {}): Plugin[] {
 
       return {
         environments: {
-          client: {
+          style: {
             build: {
               outDir: resolvedConfig.clientOutDir,
               rollupOptions: {
-                input: [customElementEntryPath, clientVirtualEntryId, ...islandPaths],
+                input: [clientVirtualEntryId],
+                preserveEntrySignatures: 'allow-extension',
+              },
+            },
+          },
+          islands: {
+            build: {
+              outDir: resolvedConfig.clientOutDir,
+              rollupOptions: {
+                input: [customElementEntryPath, ...islandPaths],
                 preserveEntrySignatures: 'allow-extension',
               },
             },
@@ -52,8 +61,11 @@ export function visle(config: VisleConfig = {}): Plugin[] {
 
         builder: {
           buildApp: async (builder) => {
-            // Build client first to generate manifest
-            await builder.build(builder.environments.client!)
+            // Build style and islands in parallel to generate manifest data
+            await Promise.all([
+              builder.build(builder.environments.style!),
+              builder.build(builder.environments.islands!),
+            ])
             // Then build server with manifest info
             await builder.build(builder.environments.server!)
           },
