@@ -1,7 +1,6 @@
-import { Manifest } from 'vite'
 import { describe, expect, test } from 'vitest'
 
-import { clientManifest, EntryMetadata } from '../../src/build/client-manifest.ts'
+import { clientManifest } from '../../src/build/client-manifest.ts'
 import { customElementEntryPath, virtualCustomElementEntryPath } from '../../src/build/paths.ts'
 
 describe('Client manifest', () => {
@@ -117,13 +116,7 @@ describe('Client manifest', () => {
   })
 
   describe('command == build', () => {
-    test('get file path derived from manifest', () => {
-      const viteManifest: Manifest = {
-        'src/foo.vue': {
-          file: 'foo-1234.js',
-        },
-      }
-
+    test('get file path derived from islands build data', () => {
       const manifestInstance = clientManifest({
         command: 'build',
         isProduction: true,
@@ -132,9 +125,8 @@ describe('Client manifest', () => {
         server: {},
       })
 
-      manifestInstance.setBuildData({
-        manifest: viteManifest,
-        entryMetadata: { css: [] },
+      manifestInstance.setIslandsBuildData({
+        jsMap: new Map([['src/foo.vue', 'foo-1234.js']]),
       })
 
       const result = manifestInstance.getClientImportId('/path/to/root/src/foo.vue')
@@ -142,9 +134,7 @@ describe('Client manifest', () => {
       expect(result).toBe('/foo-1234.js')
     })
 
-    test('throw error if manifest does not include passed file path', () => {
-      const viteManifest: Manifest = {}
-
+    test('throw error if islands build data does not include passed file path', () => {
       const manifestInstance = clientManifest({
         command: 'build',
         isProduction: true,
@@ -153,24 +143,16 @@ describe('Client manifest', () => {
         server: {},
       })
 
-      manifestInstance.setBuildData({
-        manifest: viteManifest,
-        entryMetadata: { css: [] },
+      manifestInstance.setIslandsBuildData({
+        jsMap: new Map(),
       })
 
       expect(() => {
         manifestInstance.getClientImportId('/path/to/root/src/foo.vue')
-      }).toThrow(new Error('src/foo.vue not found in manifest'))
+      }).toThrow(new Error('src/foo.vue not found in islands build data'))
     })
 
-    test('get depending css ids from manifest', () => {
-      const viteManifest: Manifest = {
-        'src/foo.vue': {
-          file: 'foo-1234.js',
-          css: ['foo-1234.css'],
-        },
-      }
-
+    test('get depending css ids from style build data', () => {
       const manifestInstance = clientManifest({
         command: 'build',
         isProduction: true,
@@ -179,9 +161,9 @@ describe('Client manifest', () => {
         server: {},
       })
 
-      manifestInstance.setBuildData({
-        manifest: viteManifest,
-        entryMetadata: { css: [] },
+      manifestInstance.setStyleBuildData({
+        cssMap: new Map([['src/foo.vue', ['foo-1234.css']]]),
+        entryCss: [],
       })
 
       const result = manifestInstance.getDependingClientCssIds(
@@ -192,16 +174,7 @@ describe('Client manifest', () => {
       expect(result).toEqual(['/foo-1234.css'])
     })
 
-    test('return entry css id array when manifest does not have css paths', () => {
-      const viteManifest: Manifest = {
-        'src/foo.vue': {
-          file: 'foo-1234.js',
-        },
-      }
-      const entry: EntryMetadata = {
-        css: ['entry-1234.css'],
-      }
-
+    test('return entry css id array when style build data does not have css paths', () => {
       const manifestInstance = clientManifest({
         command: 'build',
         isProduction: true,
@@ -210,9 +183,9 @@ describe('Client manifest', () => {
         server: {},
       })
 
-      manifestInstance.setBuildData({
-        manifest: viteManifest,
-        entryMetadata: entry,
+      manifestInstance.setStyleBuildData({
+        cssMap: new Map(),
+        entryCss: ['entry-1234.css'],
       })
 
       const result = manifestInstance.getDependingClientCssIds(
@@ -227,12 +200,6 @@ describe('Client manifest', () => {
       ['https://example.com/prefix', 'https://example.com/prefix/foo-1234.js'],
       ['/prefix', '/prefix/foo-1234.js'],
     ] as const)('prepend base to file path: %s', ([base, expected]) => {
-      const viteManifest: Manifest = {
-        'src/foo.vue': {
-          file: 'foo-1234.js',
-        },
-      }
-
       const manifestInstance = clientManifest({
         command: 'build',
         isProduction: true,
@@ -241,9 +208,8 @@ describe('Client manifest', () => {
         server: {},
       })
 
-      manifestInstance.setBuildData({
-        manifest: viteManifest,
-        entryMetadata: { css: [] },
+      manifestInstance.setIslandsBuildData({
+        jsMap: new Map([['src/foo.vue', 'foo-1234.js']]),
       })
 
       const result = manifestInstance.getClientImportId('/path/to/root/src/foo.vue')

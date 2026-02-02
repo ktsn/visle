@@ -1,8 +1,8 @@
 import { readFile } from 'node:fs/promises'
 import path from 'node:path'
-import { Manifest, Plugin, ResolvedConfig } from 'vite'
+import { Plugin, ResolvedConfig } from 'vite'
 
-import { clientManifest, EntryMetadata } from '../client-manifest.js'
+import { clientManifest } from '../client-manifest.js'
 import { ResolvedVisleConfig } from '../config.js'
 import {
   generateIslandCode,
@@ -36,64 +36,96 @@ export function islandCorePlugin(config: ResolvedVisleConfig): Plugin {
     },
 
     resolveId(id) {
-      // Access environment name via this.environment
-      const isServer = this.environment?.name === 'server'
+      const envName = this.environment?.name
 
-      if (!isServer) {
+      if (envName === 'style') {
+        if (id === clientVirtualEntryId) {
+          return clientVirtualEntryId
+        }
+        return
+      }
+
+      if (envName === 'islands') {
         if (id === virtualCustomElementEntryPath) {
           return virtualCustomElementEntryPath
         }
+        return
+      }
 
-        if (id === clientVirtualEntryId) {
-          return clientVirtualEntryId
+      if (envName === 'server') {
+        if (id === serverVirtualEntryId) {
+          return serverVirtualEntryId
+        }
+
+        if (id === symbolImportId) {
+          return symbolImportId
+        }
+
+        const { query } = parseId(id)
+
+        if (query.original) {
+          return id
         }
 
         return
       }
 
-      if (id === serverVirtualEntryId) {
-        return serverVirtualEntryId
+      // Dev client environment — resolve both virtual entries
+      if (id === virtualCustomElementEntryPath) {
+        return virtualCustomElementEntryPath
       }
 
-      if (id === symbolImportId) {
-        return symbolImportId
-      }
-
-      const { query } = parseId(id)
-
-      if (query.original) {
-        return id
+      if (id === clientVirtualEntryId) {
+        return clientVirtualEntryId
       }
     },
 
     load(id) {
-      // Access environment name via this.environment
-      const isServer = this.environment?.name === 'server'
+      const envName = this.environment?.name
 
-      if (!isServer) {
+      if (envName === 'style') {
         if (id === clientVirtualEntryId) {
           return generateClientVirtualEntryCode(
             resolveServerComponentIds(path.join(viteConfig.root, config.componentDir)),
           )
         }
+        return null
+      }
 
+      if (envName === 'islands') {
         if (id === virtualCustomElementEntryPath) {
           return readFile(customElementEntryPath, 'utf-8')
+        }
+        return null
+      }
+
+      if (envName === 'server') {
+        if (id === serverVirtualEntryId) {
+          return generateServerVirtualEntryCode(
+            path.join(viteConfig.root, config.componentDir),
+            resolveServerComponentIds(path.join(viteConfig.root, config.componentDir)),
+          )
+        }
+
+        if (id === symbolImportId) {
+          return symbolCode
         }
 
         return null
       }
 
-      if (id === serverVirtualEntryId) {
-        return generateServerVirtualEntryCode(
-          path.join(viteConfig.root, config.componentDir),
+      // Dev client environment — load both virtual entries
+      if (id === clientVirtualEntryId) {
+        return generateClientVirtualEntryCode(
           resolveServerComponentIds(path.join(viteConfig.root, config.componentDir)),
         )
       }
 
-      if (id === symbolImportId) {
-        return symbolCode
+      if (id === virtualCustomElementEntryPath) {
+        return readFile(customElementEntryPath, 'utf-8')
       }
+
+      return null
     },
 
     transform(code, id) {
@@ -132,40 +164,50 @@ export function islandCorePlugin(config: ResolvedVisleConfig): Plugin {
     },
 
     generateBundle(_options, bundle) {
-      if (this.environment?.name !== 'client') {
+      const envName = this.environment?.name
+      const root = viteConfig.root
+
+      if (envName === 'style') {
+        const cssMap = new Map<string, string[]>()
+        let entryCss: string[] = []
+
+        for (const [key, chunk] of Object.entries(bundle)) {
+          if (chunk.type !== 'chunk') {
+            continue
+          }
+
+          if (chunk.facadeModuleId === clientVirtualEntryId) {
+            entryCss = Array.from(chunk.viteMetadata?.importedCss ?? [])
+            delete bundle[key]
+            continue
+          }
+
+          if (chunk.facadeModuleId) {
+            const relativePath = path.relative(root, chunk.facadeModuleId)
+            cssMap.set(relativePath, Array.from(chunk.viteMetadata?.importedCss ?? []))
+          }
+        }
+
+        manifest.setStyleBuildData({ cssMap, entryCss })
         return
       }
 
-      const root = viteConfig.root
-      const viteManifest: Manifest = {}
-      let entryMetadata: EntryMetadata = { css: [] }
+      if (envName === 'islands') {
+        const jsMap = new Map<string, string>()
 
-      for (const [key, chunk] of Object.entries(bundle)) {
-        if (chunk.type !== 'chunk') {
-          continue
-        }
-
-        if (chunk.facadeModuleId === clientVirtualEntryId) {
-          entryMetadata = {
-            css: Array.from(chunk.viteMetadata?.importedCss ?? []),
+        for (const chunk of Object.values(bundle)) {
+          if (chunk.type !== 'chunk') {
+            continue
           }
-          delete bundle[key]
-          continue
-        }
 
-        if (chunk.facadeModuleId) {
-          const relativePath = path.relative(root, chunk.facadeModuleId)
-          viteManifest[relativePath] = {
-            file: chunk.fileName,
-            css: Array.from(chunk.viteMetadata?.importedCss ?? []),
+          if (chunk.facadeModuleId) {
+            const relativePath = path.relative(root, chunk.facadeModuleId)
+            jsMap.set(relativePath, chunk.fileName)
           }
         }
+
+        manifest.setIslandsBuildData({ jsMap })
       }
-
-      manifest.setBuildData({
-        manifest: viteManifest,
-        entryMetadata,
-      })
     },
   }
 }
