@@ -1,6 +1,6 @@
 import assert from 'node:assert'
 import path from 'node:path'
-import { Manifest, ResolvedServerOptions, ResolvedConfig as ResolvedViteConfig } from 'vite'
+import { ResolvedServerOptions, ResolvedConfig as ResolvedViteConfig } from 'vite'
 import { parse, SFCBlock } from 'vue/compiler-sfc'
 
 import { generateComponentId } from './component-id.js'
@@ -15,43 +15,58 @@ type ClientManifestViteConfig = Pick<
 
 type ClientManifestViteServerOptions = Pick<ResolvedServerOptions, 'origin'>
 
-export interface EntryMetadata {
-  css: string[]
+export interface StyleBuildData {
+  cssMap: Map<string, string[]>
+  entryCss: string[]
 }
 
-export interface ClientBuildData {
-  manifest: Manifest
-  entryMetadata: EntryMetadata
+export interface IslandsBuildData {
+  jsMap: Map<string, string>
 }
 
 export function clientManifest(manifestConfig: ClientManifestViteConfig) {
   const { root, base } = manifestConfig
 
-  let clientManifest: Manifest
-  let entryMetaData: EntryMetadata
+  let cssMap: Map<string, string[]> | undefined
+  let entryCss: string[] | undefined
+  let jsMap: Map<string, string> | undefined
 
-  function setBuildData(data: ClientBuildData): void {
-    clientManifest = data.manifest
-    entryMetaData = data.entryMetadata
+  function setStyleBuildData(data: StyleBuildData): void {
+    cssMap = data.cssMap
+    entryCss = data.entryCss
   }
 
-  function ensureClientManifest(): Manifest {
-    if (clientManifest) {
-      return clientManifest
+  function setIslandsBuildData(data: IslandsBuildData): void {
+    jsMap = data.jsMap
+  }
+
+  function ensureJsMap(): Map<string, string> {
+    if (jsMap) {
+      return jsMap
     }
 
     throw new Error(
-      'Client manifest is not available. setBuildData() must be called before accessing manifest in build mode.',
+      'Islands build data is not available. setIslandsBuildData() must be called before accessing JS mappings in build mode.',
     )
   }
 
-  function ensureEntryMetadata(): EntryMetadata {
-    if (entryMetaData) {
-      return entryMetaData
+  function ensureCssMap(): Map<string, string[]> {
+    if (cssMap) {
+      return cssMap
     }
 
     throw new Error(
-      'Entry metadata is not available. setBuildData() must be called before accessing entry metadata in build mode.',
+      'Style build data is not available. setStyleBuildData() must be called before accessing CSS mappings in build mode.',
+    )
+  }
+
+  function ensureEntryCss(): string[] {
+    if (entryCss) {
+      return entryCss
+    }
+
+    throw new Error(
+      'Style build data is not available. setStyleBuildData() must be called before accessing entry CSS in build mode.',
     )
   }
 
@@ -66,10 +81,10 @@ export function clientManifest(manifestConfig: ClientManifestViteConfig) {
       return applyServeBase(`/${relativePath}`)
     }
 
-    const manifest = ensureClientManifest()
-    const file = manifest[relativePath]?.file
+    const js = ensureJsMap()
+    const file = js.get(relativePath)
     if (!file) {
-      throw new Error(`${relativePath} not found in manifest`)
+      throw new Error(`${relativePath} not found in islands build data`)
     }
 
     return applyBuildBase(`/${file}`)
@@ -106,10 +121,10 @@ export function clientManifest(manifestConfig: ClientManifestViteConfig) {
       })
     }
 
-    const manifest = ensureClientManifest()
-    const entry = ensureEntryMetadata()
+    const css = ensureCssMap()
+    const entry = ensureEntryCss()
 
-    const cssIds = manifest[relativePath]?.css ?? entry.css
+    const cssIds = css.get(relativePath) ?? entry
     return cssIds.map((cssId) => applyBuildBase(`/${cssId}`))
   }
 
@@ -137,7 +152,8 @@ export function clientManifest(manifestConfig: ClientManifestViteConfig) {
   return {
     getClientImportId,
     getDependingClientCssIds,
-    setBuildData,
+    setStyleBuildData,
+    setIslandsBuildData,
   }
 }
 
