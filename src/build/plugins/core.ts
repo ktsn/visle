@@ -195,7 +195,18 @@ export function islandCorePlugin(config: ResolvedVisleConfig): Plugin {
       if (envName === 'islands') {
         const jsMap = new Map<string, string>()
 
-        for (const chunk of Object.values(bundle)) {
+        for (const [key, chunk] of Object.entries(bundle)) {
+          // Since we generate all style files in style environment,
+          // delete all css assets in islands environment
+          if (
+            chunk.type === 'asset' &&
+            typeof chunk.fileName === 'string' &&
+            chunk.fileName.endsWith('.css')
+          ) {
+            delete bundle[key]
+            continue
+          }
+
           if (chunk.type !== 'chunk') {
             continue
           }
