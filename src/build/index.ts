@@ -32,6 +32,7 @@ export function visle(config: VisleConfig = {}): Plugin[] {
       return {
         environments: {
           style: {
+            consumer: 'client',
             build: {
               outDir: resolvedConfig.clientOutDir,
               rollupOptions: {
@@ -41,6 +42,7 @@ export function visle(config: VisleConfig = {}): Plugin[] {
             },
           },
           islands: {
+            consumer: 'client',
             build: {
               outDir: resolvedConfig.clientOutDir,
               rollupOptions: {
@@ -50,6 +52,7 @@ export function visle(config: VisleConfig = {}): Plugin[] {
             },
           },
           server: {
+            consumer: 'server',
             build: {
               outDir: resolvedConfig.serverOutDir,
               rollupOptions: {
