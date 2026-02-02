@@ -1,5 +1,6 @@
 import type { Plugin } from 'vite'
 
+import fs from 'node:fs'
 import path from 'node:path'
 
 import { VisleConfig, resolveVisleConfig, setVisleConfig } from './config.js'
@@ -35,6 +36,7 @@ export function visle(config: VisleConfig = {}): Plugin[] {
             consumer: 'client',
             build: {
               outDir: resolvedConfig.clientOutDir,
+              emptyOutDir: false,
               rollupOptions: {
                 input: [clientVirtualEntryId],
                 preserveEntrySignatures: 'allow-extension',
@@ -45,6 +47,7 @@ export function visle(config: VisleConfig = {}): Plugin[] {
             consumer: 'client',
             build: {
               outDir: resolvedConfig.clientOutDir,
+              emptyOutDir: false,
               rollupOptions: {
                 input: [customElementEntryPath, ...islandPaths],
                 preserveEntrySignatures: 'allow-extension',
@@ -64,11 +67,19 @@ export function visle(config: VisleConfig = {}): Plugin[] {
 
         builder: {
           buildApp: async (builder) => {
+            if (userConfig.build?.emptyOutDir) {
+              // We have to manually clean shared clientOutDir once before parallel build
+              // since style and islands build output to the same directory
+              const clientOutDir = path.resolve(root, resolvedConfig.clientOutDir)
+              await fs.promises.rm(clientOutDir, { recursive: true, force: true })
+            }
+
             // Build style and islands in parallel to generate manifest data
             await Promise.all([
               builder.build(builder.environments.style!),
               builder.build(builder.environments.islands!),
             ])
+
             // Then build server with manifest info
             await builder.build(builder.environments.server!)
           },
