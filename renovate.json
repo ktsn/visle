@@ -1,9 +1,9 @@
 {
   "$schema": "https://docs.renovatebot.com/renovate-schema.json",
-  "extends": ["config:recommended", "security:minimumReleaseAgeNpm"],
+  "extends": ["config:recommended", ":automergeDigest", "security:minimumReleaseAgeNpm"],
   "packageRules": [
     {
-      "matchDepTypes": ["devDependencies"],
+      "matchDepTypes": ["devDependencies", "packageManager"],
       "automerge": true
     },
     {
