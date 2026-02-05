@@ -3,7 +3,7 @@ import type { Plugin } from 'vite'
 import fs from 'node:fs'
 import path from 'node:path'
 
-import { VisleConfig, resolveVisleConfig, setVisleConfig } from './config.js'
+import { VisleConfig, defaultConfig, setVisleConfig } from './config.js'
 import { clientVirtualEntryId, serverVirtualEntryId } from './generate.js'
 import { customElementEntryPath, resolvePattern } from './paths.js'
 import { islandPlugin } from './plugins/index.js'
@@ -15,7 +15,10 @@ export type { VisleConfig }
  * Configures client and server environments for islands architecture.
  */
 export function visle(config: VisleConfig = {}): Plugin[] {
-  const resolvedConfig = resolveVisleConfig(config)
+  const resolvedConfig = {
+    ...defaultConfig,
+    ...config,
+  }
 
   const vislePlugin: Plugin = {
     name: 'visle',
