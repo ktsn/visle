@@ -41,7 +41,7 @@
     "@types/node": "^25.0.9",
     "@types/sanitize-html": "^2.16.0",
     "@vitest/coverage-v8": "4.0.18",
-    "oxfmt": "^0.31.0",
+    "oxfmt": "^0.32.0",
     "oxlint": "^1.42.0",
     "rollup": "^4.55.2",
     "typescript": "^5.9.3",
