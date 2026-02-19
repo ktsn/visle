@@ -20,7 +20,7 @@ export function devStyleSSRPlugin(): Plugin {
   let root: string
 
   return {
-    name: 'vile:dev-style-ssr',
+    name: 'visle:dev-style-ssr',
     apply: 'serve',
     enforce: 'post',
 
