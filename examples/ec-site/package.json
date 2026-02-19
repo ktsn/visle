@@ -1,5 +1,5 @@
 {
-  "name": "visle-demo",
+  "name": "ec-site-example",
   "private": true,
   "type": "module",
   "scripts": {
@@ -8,13 +8,12 @@
     "start": "node app/prod.ts"
   },
   "dependencies": {
-    "express": "^5.0.0",
-    "marked": "^17.0.0",
-    "sanitize-html": "^2.13.0",
-    "vue": "^3.5.9"
+    "@hono/node-server": "^1.19.9",
+    "hono": "^4.11.9",
+    "visle": "file:../../",
+    "vue": "^3.5.28"
   },
   "devDependencies": {
-    "visle": "file:../",
     "vite": "^7.3.1"
   }
 }
