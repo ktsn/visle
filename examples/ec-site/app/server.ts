@@ -7,7 +7,7 @@ const render = createRender()
 
 app.get('/', async (c) => {
   const products = getAllProducts()
-  const html = await render('IndexPage', { products })
+  const html = await render('pages/index', { products })
   return c.html(html)
 })
 
@@ -16,7 +16,7 @@ app.get('/products/:id', async (c) => {
   if (!product) {
     return c.text('Not found', 404)
   }
-  const html = await render('DetailPage', { product })
+  const html = await render('pages/detail', { product })
   return c.html(html)
 })
 

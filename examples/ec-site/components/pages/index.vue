@@ -1,6 +1,6 @@
 <script setup lang="ts">
-import type { Product } from '../app/db.ts'
-import Layout from './Layout.vue'
+import type { Product } from '../../app/db.ts'
+import Layout from '../Layout.vue'
 
 defineProps<{
   products: Product[]
