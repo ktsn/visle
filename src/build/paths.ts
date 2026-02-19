@@ -45,14 +45,14 @@ export function resolvePattern(pattern: string | string[], root: string): string
   return pattern.flatMap((p) => resolvePattern(p, root))
 }
 
-/**
- * Parses a file ID into filename and query parts
- */
 export interface ParsedIdQuery {
   original?: boolean
   vue?: boolean
 }
 
+/**
+ * Parses a file ID into filename and query parts
+ */
 export function parseId(id: string): {
   fileName: string
   query: ParsedIdQuery

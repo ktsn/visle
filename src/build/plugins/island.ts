@@ -21,12 +21,18 @@ import {
   resolveServerComponentIds,
 } from '../paths.js'
 
-export function islandCorePlugin(config: ResolvedVisleConfig): Plugin {
+/**
+ * Core Vite plugin for the islands architecture.
+ * Resolves and loads virtual entry modules per environment (style, islands, server),
+ * transforms `.vue` and `.island.vue` files on the server to inject hydration
+ * and CSS asset references, and collects CSS/JS manifest data during bundle generation.
+ */
+export function islandPlugin(config: ResolvedVisleConfig): Plugin {
   let manifest: ReturnType<typeof clientManifest>
   let viteConfig: ResolvedConfig
 
   return {
-    name: 'vue-island-core',
+    name: 'visle:island',
 
     sharedDuringBuild: true,
 

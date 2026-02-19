@@ -11,11 +11,16 @@ function isCSS(id: string): boolean {
   return cssRE.test(id)
 }
 
+/**
+ * Development-only plugin that removes server-rendered `<link>` style tags
+ * when Vite's HMR injects the corresponding `<style>` tags,
+ * preventing duplicate styles during development.
+ */
 export function devStyleSSRPlugin(): Plugin {
   let root: string
 
   return {
-    name: 'dev-style-ssr',
+    name: 'visle:dev-style-ssr',
     apply: 'serve',
     enforce: 'post',
 

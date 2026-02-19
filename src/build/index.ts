@@ -1,24 +1,32 @@
 import type { Plugin } from 'vite'
 
+import vue from '@vitejs/plugin-vue'
 import fs from 'node:fs'
 import path from 'node:path'
 
-import { VisleConfig, resolveVisleConfig, setVisleConfig } from './config.js'
-import { clientVirtualEntryId, serverVirtualEntryId } from './generate.js'
+import { generateComponentId } from './component-id.js'
+import { VisleConfig, defaultConfig, setVisleConfig } from './config.js'
+import { clientVirtualEntryId, islandElementName, serverVirtualEntryId } from './generate.js'
 import { customElementEntryPath, resolvePattern } from './paths.js'
-import { islandPlugin } from './plugins/index.js'
+import { devStyleSSRPlugin } from './plugins/dev-style-ssr.js'
+import { islandPlugin } from './plugins/island.js'
 
 export type { VisleConfig }
 
 /**
  * Visle plugin for Vite.
- * Configures client and server environments for islands architecture.
+ * Configures style, islands, and server build environments,
+ * orchestrates the build order, and sets up Vue SFC compilation
+ * with island component support.
  */
 export function visle(config: VisleConfig = {}): Plugin[] {
-  const resolvedConfig = resolveVisleConfig(config)
+  const resolvedConfig = {
+    ...defaultConfig,
+    ...config,
+  }
 
-  const vislePlugin: Plugin = {
-    name: 'visle',
+  const orchestrationPlugin: Plugin = {
+    name: 'visle:orchestration',
 
     config(userConfig) {
       // Get root from user config or default to cwd
@@ -92,6 +100,21 @@ export function visle(config: VisleConfig = {}): Plugin[] {
     },
   }
 
-  // Return visle plugin along with island plugins
-  return [vislePlugin, ...islandPlugin(resolvedConfig)]
+  return [
+    orchestrationPlugin,
+    islandPlugin(resolvedConfig),
+    vue({
+      features: {
+        componentIdGenerator: (filePath, source, isProduction) => {
+          return generateComponentId(filePath, source, isProduction ?? false)
+        },
+      },
+      template: {
+        compilerOptions: {
+          isCustomElement: (tag) => tag === islandElementName,
+        },
+      },
+    }),
+    devStyleSSRPlugin(),
+  ]
 }
