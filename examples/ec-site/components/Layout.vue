@@ -12,6 +12,13 @@ defineProps<Props>()
       <meta charset="utf-8" />
       <meta name="viewport" content="width=device-width, minimum-scale=1" />
       <title>{{ title }}</title>
+      <style>
+        @media (prefers-reduced-motion: no-preference) {
+          @view-transition {
+            navigation: auto;
+          }
+        }
+      </style>
     </head>
     <body>
       <header :class="$style['site-header']">
@@ -29,12 +36,6 @@ defineProps<Props>()
 </template>
 
 <style>
-@media (prefers-reduced-motion: no-preference) {
-  @view-transition {
-    navigation: auto;
-  }
-}
-
 *,
 *::before,
 *::after {
