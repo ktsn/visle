@@ -6,25 +6,41 @@ const props = defineProps<{
 }>()
 
 const currentIndex = ref(0)
+const direction = ref<'next' | 'prev'>('next')
 
 function prev() {
+  direction.value = 'prev'
   currentIndex.value =
     (currentIndex.value - 1 + props.images.length) % props.images.length
 }
 
 function next() {
+  direction.value = 'next'
   currentIndex.value = (currentIndex.value + 1) % props.images.length
+}
+
+function goTo(i: number) {
+  direction.value = i > currentIndex.value ? 'next' : 'prev'
+  currentIndex.value = i
 }
 </script>
 
 <template>
   <div :class="$style.carousel">
     <div :class="$style['carousel-viewport']">
-      <img
-        :src="images[currentIndex]"
-        :alt="`Image ${currentIndex + 1}`"
-        :class="$style['carousel-image']"
-      />
+      <Transition
+        :enter-active-class="$style['slide-enter-active']"
+        :leave-active-class="$style['slide-leave-active']"
+        :enter-from-class="direction === 'next' ? $style['slide-next-enter-from'] : $style['slide-prev-enter-from']"
+        :leave-to-class="direction === 'next' ? $style['slide-next-leave-to'] : $style['slide-prev-leave-to']"
+      >
+        <img
+          :key="currentIndex"
+          :src="images[currentIndex]"
+          :alt="`Image ${currentIndex + 1}`"
+          :class="$style['carousel-image']"
+        />
+      </Transition>
       <button
         :class="[$style['carousel-btn'], $style['carousel-btn-prev']]"
         @click="prev"
@@ -43,7 +59,7 @@ function next() {
         v-for="(_, i) in images"
         :key="i"
         :class="[$style['carousel-dot'], { [$style.active]: i === currentIndex }]"
-        @click="currentIndex = i"
+        @click="goTo(i)"
       />
     </div>
   </div>
@@ -118,5 +134,33 @@ function next() {
 
 .carousel-dot.active {
   background: #333;
+}
+
+.slide-enter-active,
+.slide-leave-active {
+  transition: transform 0.3s ease;
+}
+
+.slide-leave-active {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+}
+
+.slide-next-enter-from {
+  transform: translateX(100%);
+}
+
+.slide-next-leave-to {
+  transform: translateX(-100%);
+}
+
+.slide-prev-enter-from {
+  transform: translateX(-100%);
+}
+
+.slide-prev-leave-to {
+  transform: translateX(100%);
 }
 </style>
