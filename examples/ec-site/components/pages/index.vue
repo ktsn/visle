@@ -29,7 +29,6 @@ function formatPrice(cents: number): string {
         />
         <div :class="$style['card-body']">
           <h2
-            id="main-content"
             :class="$style['card-title']"
             :style="{ viewTransitionName: `product-title-${product.id}` }"
           >

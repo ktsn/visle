@@ -11,7 +11,6 @@ defineProps<Props>()
     <head>
       <meta charset="utf-8" />
       <meta name="viewport" content="width=device-width, minimum-scale=1" />
-      <link rel="expect" href="#main-content" blocking="render" />
       <title>{{ title }}</title>
     </head>
     <body>
