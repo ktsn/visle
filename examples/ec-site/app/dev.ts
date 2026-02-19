@@ -1,6 +1,7 @@
-import http from 'node:http'
 import { getRequestListener } from '@hono/node-server'
+import http from 'node:http'
 import { createDevLoader } from 'visle/dev'
+
 import { app, render } from './server.ts'
 
 const loader = createDevLoader()

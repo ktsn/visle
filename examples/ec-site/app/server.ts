@@ -1,5 +1,6 @@
 import { Hono } from 'hono'
 import { createRender } from 'visle'
+
 import { getAllProducts, getProduct } from './db.ts'
 
 const app = new Hono()

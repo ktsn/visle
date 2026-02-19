@@ -10,8 +10,7 @@ const direction = ref<'next' | 'prev'>('next')
 
 function prev() {
   direction.value = 'prev'
-  currentIndex.value =
-    (currentIndex.value - 1 + props.images.length) % props.images.length
+  currentIndex.value = (currentIndex.value - 1 + props.images.length) % props.images.length
 }
 
 function next() {
@@ -31,8 +30,12 @@ function goTo(i: number) {
       <Transition
         :enter-active-class="$style['slide-enter-active']"
         :leave-active-class="$style['slide-leave-active']"
-        :enter-from-class="direction === 'next' ? $style['slide-next-enter-from'] : $style['slide-prev-enter-from']"
-        :leave-to-class="direction === 'next' ? $style['slide-next-leave-to'] : $style['slide-prev-leave-to']"
+        :enter-from-class="
+          direction === 'next' ? $style['slide-next-enter-from'] : $style['slide-prev-enter-from']
+        "
+        :leave-to-class="
+          direction === 'next' ? $style['slide-next-leave-to'] : $style['slide-prev-leave-to']
+        "
       >
         <img
           :key="currentIndex"
@@ -41,16 +44,10 @@ function goTo(i: number) {
           :class="$style['carousel-image']"
         />
       </Transition>
-      <button
-        :class="[$style['carousel-btn'], $style['carousel-btn-prev']]"
-        @click="prev"
-      >
+      <button :class="[$style['carousel-btn'], $style['carousel-btn-prev']]" @click="prev">
         &#8249;
       </button>
-      <button
-        :class="[$style['carousel-btn'], $style['carousel-btn-next']]"
-        @click="next"
-      >
+      <button :class="[$style['carousel-btn'], $style['carousel-btn-next']]" @click="next">
         &#8250;
       </button>
     </div>
