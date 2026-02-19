@@ -1,0 +1,19 @@
+{
+  "name": "ec-site-example",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "node app/dev.ts",
+    "build": "vite build",
+    "start": "node app/prod.ts"
+  },
+  "dependencies": {
+    "@hono/node-server": "^1.19.9",
+    "hono": "^4.11.9",
+    "visle": "file:../../",
+    "vue": "^3.5.28"
+  },
+  "devDependencies": {
+    "vite": "^7.3.1"
+  }
+}
