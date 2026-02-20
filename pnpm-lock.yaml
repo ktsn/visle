@@ -16,7 +16,7 @@ importers:
         version: 3.7.0
       glob:
         specifier: ^13.0.0
-        version: 13.0.4
+        version: 13.0.5
       vite:
         specifier: ^7.3.1
         version: 7.3.1(@types/node@25.2.3)
@@ -858,8 +858,8 @@ packages:
     engines: {node: ^8.16.0 || ^10.6.0 || >=11.0.0}
     os: [darwin]
 
-  glob@13.0.4:
-    resolution: {integrity: sha512-KACie1EOs9BIOMtenFaxwmYODWA3/fTfGSUnLhMJpXRntu1g+uL/Xvub5f8SCTppvo9q62Qy4LeOoUiaL54G5A==}
+  glob@13.0.5:
+    resolution: {integrity: sha512-BzXxZg24Ibra1pbQ/zE7Kys4Ua1ks7Bn6pKLkVPZ9FZe4JQS6/Q7ef3LG1H+k7lUf5l4T3PLSyYyYJVYUvfgTw==}
     engines: {node: 20 || >=22}
 
   has-flag@4.0.0:
@@ -1704,7 +1704,7 @@ snapshots:
   fsevents@2.3.3:
     optional: true
 
-  glob@13.0.4:
+  glob@13.0.5:
     dependencies:
       minimatch: 10.2.2
       minipass: 7.1.3
