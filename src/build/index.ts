@@ -1,8 +1,8 @@
-import type { Plugin } from 'vite'
-
-import vue from '@vitejs/plugin-vue'
 import fs from 'node:fs'
 import path from 'node:path'
+
+import vue from '@vitejs/plugin-vue'
+import type { Plugin } from 'vite'
 
 import { generateComponentId } from './component-id.js'
 import { VisleConfig, defaultConfig, setVisleConfig } from './config.js'
