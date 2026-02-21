@@ -64,9 +64,6 @@ export async function prodBuild(root: string): Promise<void> {
   const builder = await createBuilder({
     root,
     plugins: [visle()],
-    build: {
-      emptyOutDir: true,
-    },
     logLevel: 'silent',
   })
 
