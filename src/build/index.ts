@@ -75,7 +75,8 @@ export function visle(config: VisleConfig = {}): Plugin[] {
 
         builder: {
           buildApp: async (builder) => {
-            if (userConfig.build?.emptyOutDir) {
+            const emptyOutDir = userConfig.build?.emptyOutDir ?? true
+            if (emptyOutDir) {
               // We have to manually clean shared clientOutDir once before parallel build
               // since style and islands build output to the same directory
               const clientOutDir = path.resolve(root, resolvedConfig.clientOutDir)
