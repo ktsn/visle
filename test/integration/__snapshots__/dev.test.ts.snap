@@ -4,7 +4,7 @@ exports[`Dev Server SSR > 'CSS modules' 1`] = `
 <link rel="stylesheet"
       href="/components/WithCssModule.vue?vue&type=style&index=0&lang.module.css"
 >
-<div class="_container_184t0_2">
+<div class="_container_[css-module-hash]_2">
   CSS Module
 </div>
 `;
@@ -20,7 +20,7 @@ exports[`Dev Server SSR > 'Component with CSS' 1`] = `
       href="/components/WithCss.vue?vue&type=style&index=0&lang.css"
 >
 <link rel="stylesheet"
-      href="/components/StyledCounter.island.vue?vue&type=style&index=0&scoped=aa4849be&lang.css"
+      href="/components/StyledCounter.island.vue?vue&type=style&index=0&scoped=[scoped]&lang.css"
 >
 <script type="module"
         src="/@visle/entry"
@@ -32,7 +32,7 @@ exports[`Dev Server SSR > 'Component with CSS' 1`] = `
     Styled Page
   </h1>
   <vue-island entry="/components/StyledCounter.island.vue">
-    <button data-v-aa4849be>
+    <button data-v-[scoped]>
       Styled Count: 0
     </button>
   </vue-island>

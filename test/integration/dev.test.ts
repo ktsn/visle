@@ -1,6 +1,6 @@
 import { describe, test, expect, beforeAll } from 'vitest'
 
-import { createTmpDir, copyFixtures, devRender, renderCases } from './utils.ts'
+import { createTmpDir, copyFixtures, devRender, normalizeHashes, renderCases } from './utils.ts'
 
 describe('Dev Server SSR', () => {
   let render: (path: string, props?: any) => Promise<string>
@@ -14,6 +14,6 @@ describe('Dev Server SSR', () => {
   test.for(renderCases)('$name', async ({ component, props }) => {
     const result = await render(component, props)
 
-    expect(result).toMatchSnapshot()
+    expect(normalizeHashes(result)).toMatchSnapshot()
   })
 })

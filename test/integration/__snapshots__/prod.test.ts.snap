@@ -4,7 +4,7 @@ exports[`Production Build SSR > 'CSS modules' 1`] = `
 <link rel="stylesheet"
       href="/assets/client-entry-[hash].css"
 >
-<div class="_container_184t0_2">
+<div class="_container_[css-module-hash]_2">
   CSS Module
 </div>
 `;
@@ -32,7 +32,7 @@ exports[`Production Build SSR > 'Component with CSS' 1`] = `
     Styled Page
   </h1>
   <vue-island entry="/assets/StyledCounter.island-[hash].js">
-    <button data-v-aa4849be>
+    <button data-v-[scoped]>
       Styled Count: 0
     </button>
   </vue-island>
