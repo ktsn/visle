@@ -1,6 +1,7 @@
 import fs from 'node:fs'
 import path from 'node:path'
 import { fileURLToPath } from 'node:url'
+
 import { createServer, ViteDevServer } from 'vite'
 
 const tmpDir = path.resolve('test/__generated__/build-utils')

@@ -1,5 +1,6 @@
 import assert from 'node:assert'
 import path from 'node:path'
+
 import { ResolvedServerOptions, ResolvedConfig as ResolvedViteConfig } from 'vite'
 import { parse, SFCBlock } from 'vue/compiler-sfc'
 

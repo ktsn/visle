@@ -1,5 +1,6 @@
 import { readFile } from 'node:fs/promises'
 import path from 'node:path'
+
 import { Plugin, ResolvedConfig } from 'vite'
 
 import { clientManifest } from '../client-manifest.js'

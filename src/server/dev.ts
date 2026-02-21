@@ -1,5 +1,6 @@
-import connect from 'connect'
 import path from 'node:path'
+
+import connect from 'connect'
 import { Connect, createServer, InlineConfig, RunnableDevEnvironment, ViteDevServer } from 'vite'
 
 import { getVisleConfig } from '../build/config.js'
