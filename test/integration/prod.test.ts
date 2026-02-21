@@ -1,6 +1,7 @@
 import path from 'node:path'
 import { describe, test, expect, beforeAll } from 'vitest'
 
+import { RenderFunction } from '../../src/server/render.ts'
 import {
   createTmpDir,
   copyFixtures,
@@ -13,7 +14,7 @@ import {
 
 describe('Production Build SSR', () => {
   let root: string
-  let render: (path: string, props?: any) => Promise<string>
+  let render: RenderFunction
 
   beforeAll(async () => {
     root = await createTmpDir('prod')

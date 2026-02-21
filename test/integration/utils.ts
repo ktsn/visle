@@ -44,17 +44,17 @@ export async function copyFixtures(root: string): Promise<void> {
 /**
  * Create a dev mode render function.
  */
-export function devRender(root: string): (componentPath: string, props?: any) => Promise<string> {
+export function devRender(root: string) {
   const render = createRender()
 
-  render.setLoader(
-    createDevLoader({
-      root,
-      plugins: [visle()],
-    }),
-  )
+  const loader = createDevLoader({
+    root,
+    plugins: [visle()],
+  })
 
-  return render
+  render.setLoader(loader)
+
+  return { render, close: () => loader.close() }
 }
 
 /**
@@ -76,12 +76,10 @@ export async function prodBuild(root: string): Promise<void> {
 /**
  * Create a prod mode render function (after prodBuild).
  */
-export function prodRender(root: string): (componentPath: string, props?: any) => Promise<string> {
-  const render = createRender({
+export function prodRender(root: string) {
+  return createRender({
     serverOutDir: path.join(root, 'dist/server'),
   })
-
-  return (componentPath: string, props?: any) => render(componentPath, props)
 }
 
 /**

@@ -18,7 +18,7 @@ export interface RenderContext {
   loadJs?: Set<string>
 }
 
-interface RenderFunction {
+export interface RenderFunction {
   (componentPath: string, props?: any): Promise<string>
   setLoader(loader: RenderLoader): void
 }
