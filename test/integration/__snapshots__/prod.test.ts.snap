@@ -1,8 +1,9 @@
 // Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
 
 exports[`Production Build SSR > 'CSS modules' 1`] = `
-<link rel="stylesheet"
-      href="/assets/client-entry-[hash].css"
+<link
+  rel="stylesheet"
+  href="/assets/client-entry-[hash].css"
 >
 <div class="_container_[css-module-hash]_2">
   CSS Module
@@ -10,8 +11,9 @@ exports[`Production Build SSR > 'CSS modules' 1`] = `
 `;
 
 exports[`Production Build SSR > 'Component in subdirectory' 1`] = `
-<link rel="stylesheet"
-      href="/assets/client-entry-[hash].css"
+<link
+  rel="stylesheet"
+  href="/assets/client-entry-[hash].css"
 >
 <div>
   Subdirectory Page
@@ -19,12 +21,14 @@ exports[`Production Build SSR > 'Component in subdirectory' 1`] = `
 `;
 
 exports[`Production Build SSR > 'Component with CSS' 1`] = `
-<link rel="stylesheet"
-      href="/assets/client-entry-[hash].css"
+<link
+  rel="stylesheet"
+  href="/assets/client-entry-[hash].css"
 >
-<script type="module"
-        src="/assets/custom-element-[hash].js"
-        async
+<script
+  type="module"
+  src="/assets/custom-element-[hash].js"
+  async
 >
 </script>
 <div>
@@ -40,12 +44,14 @@ exports[`Production Build SSR > 'Component with CSS' 1`] = `
 `;
 
 exports[`Production Build SSR > 'Component with island' 1`] = `
-<link rel="stylesheet"
-      href="/assets/client-entry-[hash].css"
+<link
+  rel="stylesheet"
+  href="/assets/client-entry-[hash].css"
 >
-<script type="module"
-        src="/assets/custom-element-[hash].js"
-        async
+<script
+  type="module"
+  src="/assets/custom-element-[hash].js"
+  async
 >
 </script>
 <div>
@@ -61,8 +67,9 @@ exports[`Production Build SSR > 'Component with island' 1`] = `
 `;
 
 exports[`Production Build SSR > 'Component with props' 1`] = `
-<link rel="stylesheet"
-      href="/assets/client-entry-[hash].css"
+<link
+  rel="stylesheet"
+  href="/assets/client-entry-[hash].css"
 >
 <div>
   Hello Props
@@ -75,12 +82,14 @@ exports[`Production Build SSR > 'Full HTML document with head/body' 1`] = `
     <title>
       Test Document
     </title>
-    <link rel="stylesheet"
-          href="/assets/client-entry-[hash].css"
+    <link
+      rel="stylesheet"
+      href="/assets/client-entry-[hash].css"
     >
-    <script type="module"
-            src="/assets/custom-element-[hash].js"
-            async
+    <script
+      type="module"
+      src="/assets/custom-element-[hash].js"
+      async
     >
     </script>
   </head>
@@ -98,20 +107,24 @@ exports[`Production Build SSR > 'Full HTML document with head/body' 1`] = `
 `;
 
 exports[`Production Build SSR > 'Island with props' 1`] = `
-<link rel="stylesheet"
-      href="/assets/client-entry-[hash].css"
+<link
+  rel="stylesheet"
+  href="/assets/client-entry-[hash].css"
 >
-<script type="module"
-        src="/assets/custom-element-[hash].js"
-        async
+<script
+  type="module"
+  src="/assets/custom-element-[hash].js"
+  async
 >
 </script>
 <div>
-  <vue-island entry="/assets/Counter.island-[hash].js"
-              serialized-props="{&quot;count&quot;:42,&quot;label&quot;:&quot;Click me&quot;}"
+  <vue-island
+    entry="/assets/Counter.island-[hash].js"
+    serialized-props="{&quot;count&quot;:42,&quot;label&quot;:&quot;Click me&quot;}"
   >
-    <button count="42"
-            label="Click me"
+    <button
+      count="42"
+      label="Click me"
     >
       Count: 0
     </button>
@@ -120,12 +133,14 @@ exports[`Production Build SSR > 'Island with props' 1`] = `
 `;
 
 exports[`Production Build SSR > 'Multiple islands on the same page' 1`] = `
-<link rel="stylesheet"
-      href="/assets/client-entry-[hash].css"
+<link
+  rel="stylesheet"
+  href="/assets/client-entry-[hash].css"
 >
-<script type="module"
-        src="/assets/custom-element-[hash].js"
-        async
+<script
+  type="module"
+  src="/assets/custom-element-[hash].js"
+  async
 >
 </script>
 <div>
@@ -143,12 +158,14 @@ exports[`Production Build SSR > 'Multiple islands on the same page' 1`] = `
 `;
 
 exports[`Production Build SSR > 'Nested island' 1`] = `
-<link rel="stylesheet"
-      href="/assets/client-entry-[hash].css"
+<link
+  rel="stylesheet"
+  href="/assets/client-entry-[hash].css"
 >
-<script type="module"
-        src="/assets/custom-element-[hash].js"
-        async
+<script
+  type="module"
+  src="/assets/custom-element-[hash].js"
+  async
 >
 </script>
 <div>
@@ -166,8 +183,9 @@ exports[`Production Build SSR > 'Nested island' 1`] = `
 `;
 
 exports[`Production Build SSR > 'Server component with slot' 1`] = `
-<link rel="stylesheet"
-      href="/assets/client-entry-[hash].css"
+<link
+  rel="stylesheet"
+  href="/assets/client-entry-[hash].css"
 >
 <div class="layout">
   <header>
@@ -187,8 +205,9 @@ exports[`Production Build SSR > 'Server component with slot' 1`] = `
 `;
 
 exports[`Production Build SSR > 'Static component rendering' 1`] = `
-<link rel="stylesheet"
-      href="/assets/client-entry-[hash].css"
+<link
+  rel="stylesheet"
+  href="/assets/client-entry-[hash].css"
 >
 <div>
   Hello World
