@@ -1,0 +1,211 @@
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
+
+exports[`Production Build SSR > 'CSS modules' 1`] = `
+<link rel="stylesheet"
+      href="/assets/client-entry-[hash].css"
+>
+<div class="_container_184t0_2">
+  CSS Module
+</div>
+`;
+
+exports[`Production Build SSR > 'Component in subdirectory' 1`] = `
+<link rel="stylesheet"
+      href="/assets/client-entry-[hash].css"
+>
+<div>
+  Subdirectory Page
+</div>
+`;
+
+exports[`Production Build SSR > 'Component with CSS' 1`] = `
+<link rel="stylesheet"
+      href="/assets/client-entry-[hash].css"
+>
+<script type="module"
+        src="/assets/custom-element-[hash].js"
+        async
+>
+</script>
+<div>
+  <h1>
+    Styled Page
+  </h1>
+  <vue-island entry="/assets/StyledCounter.island-[hash].js">
+    <button data-v-aa4849be>
+      Styled Count: 0
+    </button>
+  </vue-island>
+</div>
+`;
+
+exports[`Production Build SSR > 'Component with island' 1`] = `
+<link rel="stylesheet"
+      href="/assets/client-entry-[hash].css"
+>
+<script type="module"
+        src="/assets/custom-element-[hash].js"
+        async
+>
+</script>
+<div>
+  <h1>
+    Page
+  </h1>
+  <vue-island entry="/assets/Counter.island-[hash].js">
+    <button>
+      Count: 0
+    </button>
+  </vue-island>
+</div>
+`;
+
+exports[`Production Build SSR > 'Component with props' 1`] = `
+<link rel="stylesheet"
+      href="/assets/client-entry-[hash].css"
+>
+<div>
+  Hello Props
+</div>
+`;
+
+exports[`Production Build SSR > 'Full HTML document with head/body' 1`] = `
+<html>
+  <head>
+    <title>
+      Test Document
+    </title>
+    <link rel="stylesheet"
+          href="/assets/client-entry-[hash].css"
+    >
+    <script type="module"
+            src="/assets/custom-element-[hash].js"
+            async
+    >
+    </script>
+  </head>
+  <body>
+    <h1>
+      Document
+    </h1>
+    <vue-island entry="/assets/Counter.island-[hash].js">
+      <button>
+        Count: 0
+      </button>
+    </vue-island>
+  </body>
+</html>
+`;
+
+exports[`Production Build SSR > 'Island with props' 1`] = `
+<link rel="stylesheet"
+      href="/assets/client-entry-[hash].css"
+>
+<script type="module"
+        src="/assets/custom-element-[hash].js"
+        async
+>
+</script>
+<div>
+  <vue-island entry="/assets/Counter.island-[hash].js"
+              serialized-props="{&quot;count&quot;:42,&quot;label&quot;:&quot;Click me&quot;}"
+  >
+    <button count="42"
+            label="Click me"
+    >
+      Count: 0
+    </button>
+  </vue-island>
+</div>
+`;
+
+exports[`Production Build SSR > 'Multiple islands on the same page' 1`] = `
+<link rel="stylesheet"
+      href="/assets/client-entry-[hash].css"
+>
+<script type="module"
+        src="/assets/custom-element-[hash].js"
+        async
+>
+</script>
+<div>
+  <vue-island entry="/assets/CounterA.island-[hash].js">
+    <button>
+      Counter A
+    </button>
+  </vue-island>
+  <vue-island entry="/assets/CounterB.island-[hash].js">
+    <button>
+      Counter B
+    </button>
+  </vue-island>
+</div>
+`;
+
+exports[`Production Build SSR > 'Nested island' 1`] = `
+<link rel="stylesheet"
+      href="/assets/client-entry-[hash].css"
+>
+<script type="module"
+        src="/assets/custom-element-[hash].js"
+        async
+>
+</script>
+<div>
+  <vue-island entry="/assets/Outer.island-[hash].js">
+    <div class="outer">
+      <span>
+        Outer
+      </span>
+      <span class="inner">
+        Inner
+      </span>
+    </div>
+  </vue-island>
+</div>
+`;
+
+exports[`Production Build SSR > 'Server component with slot' 1`] = `
+<link rel="stylesheet"
+      href="/assets/client-entry-[hash].css"
+>
+<div class="layout">
+  <header>
+    Header
+  </header>
+  <main>
+    <!--[-->
+    <!--[-->
+    <p>
+      Page content
+    </p>
+  </main>
+  <footer>
+    Footer
+  </footer>
+</div>
+`;
+
+exports[`Production Build SSR > 'Static component rendering' 1`] = `
+<link rel="stylesheet"
+      href="/assets/client-entry-[hash].css"
+>
+<div>
+  Hello World
+</div>
+`;
+
+exports[`Production Build SSR > Build output files 1`] = `
+[
+  "assets/Counter.island-[hash].js",
+  "assets/CounterA.island-[hash].js",
+  "assets/CounterB.island-[hash].js",
+  "assets/Inner.island-[hash].js",
+  "assets/Outer.island-[hash].js",
+  "assets/StyledCounter.island-[hash].js",
+  "assets/_plugin-vue_export-helper-[hash].js",
+  "assets/client-entry-[hash].css",
+  "assets/custom-element-[hash].js",
+  "assets/vue.runtime.esm-bundler-[hash].js",
+]
+`;

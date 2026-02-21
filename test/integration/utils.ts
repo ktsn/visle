@@ -1,0 +1,95 @@
+import fs from 'node:fs/promises'
+import path from 'node:path'
+import { fileURLToPath } from 'node:url'
+import { createBuilder } from 'vite'
+
+import { visle } from '../../src/build/index.ts'
+import { createDevLoader } from '../../src/server/dev.ts'
+import { createRender } from '../../src/server/render.ts'
+
+const tmpDir = path.resolve('test/__generated__/integration')
+const fixturesDir = path.resolve(path.dirname(fileURLToPath(import.meta.url)), 'fixtures')
+
+export const renderCases: { name: string; component: string; props?: Record<string, unknown> }[] = [
+  { name: 'Static component rendering', component: 'Static' },
+  { name: 'Component with props', component: 'WithProps', props: { message: 'Hello Props' } },
+  { name: 'Component with island', component: 'WithIsland' },
+  { name: 'Component with CSS', component: 'WithCss' },
+  { name: 'Island with props', component: 'WithIslandProps' },
+  { name: 'Component in subdirectory', component: 'pages/index' },
+  { name: 'Server component with slot', component: 'WithSlot' },
+  { name: 'Full HTML document with head/body', component: 'Document' },
+  { name: 'CSS modules', component: 'WithCssModule' },
+  { name: 'Nested island', component: 'WithNestedIsland' },
+  { name: 'Multiple islands on the same page', component: 'WithMultipleIslands' },
+]
+
+/**
+ * Create a unique temporary directory for a test suite.
+ */
+export async function createTmpDir(name: string): Promise<string> {
+  const root = path.join(tmpDir, name)
+  await fs.rm(root, { recursive: true, force: true })
+  await fs.mkdir(root, { recursive: true })
+  return root
+}
+
+/**
+ * Copy fixture files into a temporary directory.
+ */
+export async function copyFixtures(root: string): Promise<void> {
+  await fs.cp(fixturesDir, root, { recursive: true })
+}
+
+/**
+ * Create a dev mode render function.
+ */
+export function devRender(root: string): (componentPath: string, props?: any) => Promise<string> {
+  const render = createRender()
+
+  render.setLoader(
+    createDevLoader({
+      root,
+      plugins: [visle()],
+    }),
+  )
+
+  return render
+}
+
+/**
+ * Run a production Vite build.
+ */
+export async function prodBuild(root: string): Promise<void> {
+  const builder = await createBuilder({
+    root,
+    plugins: [visle()],
+    build: {
+      emptyOutDir: true,
+    },
+    logLevel: 'silent',
+  })
+
+  await builder.buildApp()
+}
+
+/**
+ * Create a prod mode render function (after prodBuild).
+ */
+export function prodRender(root: string): (componentPath: string, props?: any) => Promise<string> {
+  const render = createRender({
+    serverOutDir: path.join(root, 'dist/server'),
+  })
+
+  return (componentPath: string, props?: any) => render(componentPath, props)
+}
+
+/**
+ * List all files in a directory recursively, returning paths relative to the directory.
+ */
+export async function listFiles(dir: string): Promise<string[]> {
+  const entries = await fs.readdir(dir, { withFileTypes: true, recursive: true })
+  return entries
+    .filter((e) => e.isFile())
+    .map((e) => path.relative(dir, path.join(e.parentPath, e.name)))
+}
