@@ -1,16 +1,16 @@
 import type { Plugin } from 'vite'
 
 import vue from '@vitejs/plugin-vue'
-import fs from 'node:fs'
+import fs from 'node:fs/promises'
 import path from 'node:path'
 
-import { writeManifestFile } from './client-manifest.js'
 import { generateComponentId } from './component-id.js'
 import { VisleConfig, defaultConfig, setVisleConfig } from './config.js'
 import { clientVirtualEntryId, islandElementName, serverVirtualEntryId } from './generate.js'
 import { customElementEntryPath } from './paths.js'
 import { devStyleSSRPlugin } from './plugins/dev-style-ssr.js'
 import { islandPlugin } from './plugins/island.js'
+import { manifestFileName, manifestPlugin } from './plugins/manifest.js'
 import { serverTransformPlugin } from './plugins/server-transform.js'
 
 export type { VisleConfig }
@@ -28,7 +28,8 @@ export function visle(config: VisleConfig = {}): Plugin[] {
   }
 
   const { plugin: serverTransform, islandPaths } = serverTransformPlugin()
-  const { plugin: island, getManifest } = islandPlugin(resolvedConfig)
+  const island = islandPlugin(resolvedConfig)
+  const { plugin: manifest, getManifestData } = manifestPlugin()
 
   const orchestrationPlugin: Plugin = {
     name: 'visle:orchestration',
@@ -82,7 +83,7 @@ export function visle(config: VisleConfig = {}): Plugin[] {
               // We have to manually clean shared clientOutDir once before parallel build
               // since style and islands build output to the same directory
               const clientOutDir = path.resolve(root, resolvedConfig.clientOutDir)
-              await fs.promises.rm(clientOutDir, { recursive: true, force: true })
+              await fs.rm(clientOutDir, { recursive: true, force: true })
             }
 
             // Build style and server in parallel
@@ -106,7 +107,11 @@ export function visle(config: VisleConfig = {}): Plugin[] {
 
             // Write manifest file after all builds
             const serverOutDir = path.resolve(root, resolvedConfig.serverOutDir)
-            writeManifestFile(serverOutDir, getManifest().getManifestData())
+            await fs.mkdir(serverOutDir, { recursive: true })
+            await fs.writeFile(
+              path.join(serverOutDir, manifestFileName),
+              JSON.stringify(getManifestData()),
+            )
           },
         },
       }
@@ -121,6 +126,7 @@ export function visle(config: VisleConfig = {}): Plugin[] {
     orchestrationPlugin,
     serverTransform,
     island,
+    manifest,
     vue({
       features: {
         componentIdGenerator: (filePath, source, isProduction) => {

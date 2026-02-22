@@ -229,3 +229,21 @@ exports[`Production Build SSR > Build output files 1`] = `
   "assets/vue.runtime.esm-bundler-[hash].js",
 ]
 `;
+
+exports[`Production Build SSR > Build output files 2`] = `
+{
+  "cssMap": {},
+  "entryCss": [
+    "assets/client-entry-[hash].css",
+  ],
+  "jsMap": {
+    "../../../../src/client/custom-element.ts": "assets/custom-element-[hash].js",
+    "components/Counter.vue": "assets/Counter-[hash].js",
+    "components/CounterA.vue": "assets/CounterA-[hash].js",
+    "components/CounterB.vue": "assets/CounterB-[hash].js",
+    "components/Inner.vue": "assets/Inner-[hash].js",
+    "components/Outer.vue": "assets/Outer-[hash].js",
+    "components/StyledCounter.vue": "assets/StyledCounter-[hash].js",
+  },
+}
+`;

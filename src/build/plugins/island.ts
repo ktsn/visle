@@ -2,7 +2,6 @@ import { readFile } from 'node:fs/promises'
 import path from 'node:path'
 import { Plugin, ResolvedConfig } from 'vite'
 
-import { clientManifest } from '../client-manifest.js'
 import { ResolvedVisleConfig } from '../config.js'
 import {
   generateIslandWrapperCodeJS,
@@ -23,20 +22,13 @@ import {
 
 /**
  * Core Vite plugin for the islands architecture.
- * Resolves and loads virtual entry modules per environment (style, islands, server),
- * handles island wrapper virtual modules for island wrapper code generation,
- * and collects CSS/JS manifest data during bundle generation.
+ * Resolves and loads virtual entry modules per environment (style, islands, server)
+ * and handles island wrapper virtual modules for island wrapper code generation.
  */
-interface IslandPluginResult {
-  plugin: Plugin
-  getManifest(): ReturnType<typeof clientManifest>
-}
-
-export function islandPlugin(config: ResolvedVisleConfig): IslandPluginResult {
-  let manifest: ReturnType<typeof clientManifest>
+export function islandPlugin(config: ResolvedVisleConfig): Plugin {
   let viteConfig: ResolvedConfig
 
-  const plugin: Plugin = {
+  return {
     name: 'visle:island',
 
     enforce: 'pre',
@@ -45,7 +37,6 @@ export function islandPlugin(config: ResolvedVisleConfig): IslandPluginResult {
 
     configResolved(resolvedConfig) {
       viteConfig = resolvedConfig
-      manifest = clientManifest(resolvedConfig)
     },
 
     resolveId(id) {
@@ -152,71 +143,6 @@ export function islandPlugin(config: ResolvedVisleConfig): IslandPluginResult {
       }
 
       return null
-    },
-
-    generateBundle(_options, bundle) {
-      const envName = this.environment?.name
-      const root = viteConfig.root
-
-      if (envName === 'style') {
-        const cssMap = new Map<string, string[]>()
-        let entryCss: string[] = []
-
-        for (const [key, chunk] of Object.entries(bundle)) {
-          if (chunk.type !== 'chunk') {
-            continue
-          }
-
-          if (chunk.facadeModuleId === clientVirtualEntryId) {
-            entryCss = Array.from(chunk.viteMetadata?.importedCss ?? [])
-            delete bundle[key]
-            continue
-          }
-
-          if (chunk.facadeModuleId) {
-            const relativePath = path.relative(root, chunk.facadeModuleId)
-            cssMap.set(relativePath, Array.from(chunk.viteMetadata?.importedCss ?? []))
-          }
-        }
-
-        manifest.setStyleBuildData({ cssMap, entryCss })
-        return
-      }
-
-      if (envName === 'islands') {
-        const jsMap = new Map<string, string>()
-
-        for (const [key, chunk] of Object.entries(bundle)) {
-          // Since we generate all style files in style environment,
-          // delete all css assets in islands environment
-          if (
-            chunk.type === 'asset' &&
-            typeof chunk.fileName === 'string' &&
-            chunk.fileName.endsWith('.css')
-          ) {
-            delete bundle[key]
-            continue
-          }
-
-          if (chunk.type !== 'chunk') {
-            continue
-          }
-
-          if (chunk.facadeModuleId) {
-            const relativePath = path.relative(root, chunk.facadeModuleId)
-            jsMap.set(relativePath, chunk.fileName)
-          }
-        }
-
-        manifest.setIslandsBuildData({ jsMap })
-      }
-    },
-  }
-
-  return {
-    plugin,
-    getManifest() {
-      return manifest
     },
   }
 }

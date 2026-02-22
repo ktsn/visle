@@ -1,6 +1,8 @@
+import fs from 'node:fs/promises'
 import path from 'node:path'
 import { describe, test, expect, beforeAll } from 'vitest'
 
+import { manifestFileName } from '../../src/build/plugins/manifest.ts'
 import { RenderFunction } from '../../src/server/render.ts'
 import {
   createTmpDir,
@@ -30,6 +32,10 @@ describe('Production Build SSR', () => {
     const normalized = files.map(normalizeHashes).toSorted()
 
     expect(normalized).toMatchSnapshot()
+
+    const manifestPath = path.join(root, 'dist/server', manifestFileName)
+    const manifestJson = await fs.readFile(manifestPath, 'utf-8')
+    expect(JSON.parse(normalizeHashes(manifestJson))).toMatchSnapshot()
   })
 
   test.for(renderCases)('$name', async ({ component, props }) => {
