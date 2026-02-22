@@ -1,7 +1,7 @@
 import { readFile } from 'node:fs/promises'
 import path from 'node:path'
 
-import { Plugin, ResolvedConfig } from 'vite'
+import { Plugin } from 'vite'
 
 import { ResolvedVisleConfig } from '../config.js'
 import {
@@ -23,13 +23,13 @@ import {
  * per environment (style, islands, server, dev client).
  */
 export function virtualFilePlugin(config: ResolvedVisleConfig): Plugin {
-  let viteConfig: ResolvedConfig
+  let entryRoot: string
 
   return {
     name: 'visle:virtual-file',
 
     configResolved(resolvedConfig) {
-      viteConfig = resolvedConfig
+      entryRoot = path.join(resolvedConfig.root, config.entryDir)
     },
 
     resolveId(id) {
@@ -49,8 +49,6 @@ export function virtualFilePlugin(config: ResolvedVisleConfig): Plugin {
       if (id === symbolImportId) {
         return symbolCode
       }
-
-      const entryRoot = path.join(viteConfig.root, config.entryDir)
 
       if (id === serverVirtualEntryId) {
         return generateServerVirtualEntryCode(entryRoot, resolveServerComponentIds(entryRoot))

@@ -1,5 +1,7 @@
 import path from 'node:path'
 
+import { normalizePath } from 'vite'
+
 import { pathToExportName } from './paths.js'
 
 export const clientVirtualEntryId = '\0@visle/client-entry'
@@ -45,15 +47,18 @@ export function generateServerComponentCodeJS(
   filePath: string,
   componentRelativePath: string,
 ): string {
+  const normalizedFilePath = normalizePath(filePath)
+  const normalizedRelativePath = normalizePath(componentRelativePath)
+
   return `import { defineComponent, h, useSSRContext } from 'vue'
-import OriginalComponent from '${filePath}'
+import OriginalComponent from '${normalizedFilePath}'
 
 export default defineComponent({
   setup(_props, { slots }) {
     const context = useSSRContext()
     const manifest = context.manifest
 
-    const cssIds = manifest.getDependingClientCssIds('${componentRelativePath}')
+    const cssIds = manifest.getDependingClientCssIds('${normalizedRelativePath}')
 
     context.loadCss ??= new Set()
     for (const cssId of cssIds) {
@@ -71,9 +76,13 @@ export function generateIslandWrapperCodeJS(
   componentRelativePath: string,
   customElementEntryRelativePath: string,
 ): string {
+  const normalizedFilePath = normalizePath(filePath)
+  const normalizedRelativePath = normalizePath(componentRelativePath)
+  const normalizedEntryRelativePath = normalizePath(customElementEntryRelativePath)
+
   return `import { defineComponent, h, useSSRContext, useAttrs, inject, provide } from 'vue'
 import { islandSymbol } from '${symbolImportId}'
-import OriginalComponent from '${filePath}'
+import OriginalComponent from '${normalizedFilePath}'
 
 export default defineComponent({
   inheritAttrs: false,
@@ -85,9 +94,9 @@ export default defineComponent({
     const attrs = useAttrs()
     const manifest = context.manifest
 
-    const clientImportId = manifest.getClientImportId('${componentRelativePath}')
-    const entryImportId = manifest.getClientImportId('${customElementEntryRelativePath}')
-    const cssIds = manifest.getDependingClientCssIds('${componentRelativePath}')
+    const clientImportId = manifest.getClientImportId('${normalizedRelativePath}')
+    const entryImportId = manifest.getClientImportId('${normalizedEntryRelativePath}')
+    const cssIds = manifest.getDependingClientCssIds('${normalizedRelativePath}')
 
     context.loadJs ??= new Set()
     context.loadJs.add(entryImportId)
