@@ -28,7 +28,7 @@ export function manifestPlugin(): ManifestPluginResult {
 
   const plugin: Plugin = {
     name: 'visle:manifest',
-
+    apply: 'build',
     sharedDuringBuild: true,
 
     configResolved(resolvedConfig) {

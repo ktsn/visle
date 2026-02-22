@@ -9,7 +9,7 @@ import { VisleConfig, defaultConfig, setVisleConfig } from './config.js'
 import { clientVirtualEntryId, islandElementName, serverVirtualEntryId } from './generate.js'
 import { customElementEntryPath } from './paths.js'
 import { devStyleSSRPlugin } from './plugins/dev-style-ssr.js'
-import { islandPlugin } from './plugins/island.js'
+import { virtualFilePlugin } from './plugins/virtual-file.js'
 import { manifestFileName, manifestPlugin } from './plugins/manifest.js'
 import { serverTransformPlugin } from './plugins/server-transform.js'
 
@@ -28,7 +28,7 @@ export function visle(config: VisleConfig = {}): Plugin[] {
   }
 
   const { plugin: serverTransform, islandPaths } = serverTransformPlugin()
-  const island = islandPlugin(resolvedConfig)
+  const virtualFile = virtualFilePlugin(resolvedConfig)
   const { plugin: manifest, getManifestData } = manifestPlugin()
 
   const orchestrationPlugin: Plugin = {
@@ -75,8 +75,6 @@ export function visle(config: VisleConfig = {}): Plugin[] {
         },
 
         builder: {
-          sharedConfigBuild: true,
-
           buildApp: async (builder) => {
             // Build style and server in parallel
             // - Style build produces cssMap (component -> CSS file mappings)
@@ -117,7 +115,7 @@ export function visle(config: VisleConfig = {}): Plugin[] {
   return [
     orchestrationPlugin,
     serverTransform,
-    island,
+    virtualFile,
     manifest,
     vue({
       features: {
