@@ -147,8 +147,8 @@ export function serverTransformPlugin(): ServerTransformPluginResult {
         // Check if this is a statically imported component
         const importSource = importMap.get(tag)
         if (!importSource) {
-          console.warn(
-            `[visle] v-client:load on "${tag}" is not supported. ` +
+          this.error(
+            `v-client:load on "${tag}" is not supported. ` +
               'Only statically imported Vue components are supported.',
           )
           continue
