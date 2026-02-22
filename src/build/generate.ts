@@ -33,7 +33,7 @@ export const serverWrapPrefix = '\0visle:server-wrap:'
 
 /**
  * Source-importable prefix for island wrapper virtual modules.
- * Used in generated source code (e.g., by the v-client plugin).
+ * Used in generated source code (e.g., by the server-transform plugin).
  * resolveId maps this to the virtual module prefix (islandWrapPrefix).
  */
 export const islandWrapId = 'visle:island-wrap:'

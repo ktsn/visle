@@ -11,7 +11,7 @@ import { clientVirtualEntryId, islandElementName, serverVirtualEntryId } from '.
 import { customElementEntryPath } from './paths.js'
 import { devStyleSSRPlugin } from './plugins/dev-style-ssr.js'
 import { islandPlugin } from './plugins/island.js'
-import { vClientPlugin } from './plugins/v-client.js'
+import { serverTransformPlugin } from './plugins/server-transform.js'
 
 export type { VisleConfig }
 
@@ -27,7 +27,7 @@ export function visle(config: VisleConfig = {}): Plugin[] {
     ...config,
   }
 
-  const { plugin: vClient, islandPaths } = vClientPlugin()
+  const { plugin: serverTransform, islandPaths } = serverTransformPlugin()
   const { plugin: island, getManifest } = islandPlugin(resolvedConfig)
 
   const orchestrationPlugin: Plugin = {
@@ -87,7 +87,7 @@ export function visle(config: VisleConfig = {}): Plugin[] {
 
             // Build style and server in parallel
             // - Style build produces cssMap (component -> CSS file mappings)
-            // - Server build discovers island component paths via v-client:load rewriting
+            // - Server build discovers island component paths via server-transform rewriting
             await Promise.all([
               builder.build(builder.environments.style!),
               builder.build(builder.environments.server!),
@@ -119,7 +119,7 @@ export function visle(config: VisleConfig = {}): Plugin[] {
 
   return [
     orchestrationPlugin,
-    vClient,
+    serverTransform,
     island,
     vue({
       features: {

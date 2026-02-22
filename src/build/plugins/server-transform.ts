@@ -4,32 +4,66 @@ import MagicString from 'magic-string'
 import path from 'node:path'
 import { parse } from 'vue/compiler-sfc'
 
-import { islandWrapId } from '../generate.js'
+import { islandWrapId, serverWrapPrefix, islandWrapPrefix } from '../generate.js'
+import { parseId } from '../paths.js'
 
-interface VClientPluginResult {
+interface ServerTransformPluginResult {
   plugin: Plugin
   islandPaths: Set<string>
 }
 
+function toAbsolutePath(fileName: string, importer: string | undefined): string {
+  if (path.isAbsolute(fileName)) {
+    return fileName
+  }
+  if (importer) {
+    const importerFileName = parseId(importer).fileName
+    return path.resolve(path.dirname(importerFileName), fileName)
+  }
+  return path.resolve(fileName)
+}
+
 /**
- * Vite plugin that rewrites SFC templates containing `v-client:load` directives.
- * Processes `.vue` files to replace components with island wrappers
- * and collect island paths for the build.
+ * Vite plugin that transforms Vue SFC imports on the server environment.
+ * - Redirects `.vue` imports to server component wrapper virtual modules
+ * - Rewrites SFC templates containing `v-client:load` directives
+ *   to replace components with island wrappers
+ * - Collects island component paths for the islands build
  */
-export function vClientPlugin(): VClientPluginResult {
+export function serverTransformPlugin(): ServerTransformPluginResult {
   const islandPaths = new Set<string>()
 
   const plugin: Plugin = {
-    name: 'visle:v-client',
+    name: 'visle:server-transform',
 
     enforce: 'pre',
 
-    transform(code, id) {
-      const isServer = this.environment?.name === 'server'
-      if (!isServer) {
-        return null
+    applyToEnvironment(environment) {
+      return environment.name === 'server'
+    },
+
+    resolveId(id, importer) {
+      // Skip island wrapper imports — handled by the island plugin
+      if (id.startsWith(islandWrapId)) {
+        return
       }
 
+      // Redirect .vue imports to server wrapper virtual modules.
+      // Skip when the importer is a wrapper module to avoid infinite recursion.
+      const { fileName, query } = parseId(id)
+
+      if (fileName.endsWith('.vue') && !query.vue) {
+        const isFromWrapper =
+          importer?.startsWith(serverWrapPrefix) ||
+          importer?.startsWith(islandWrapPrefix)
+        if (!isFromWrapper) {
+          const absolutePath = toAbsolutePath(fileName, importer)
+          return serverWrapPrefix + absolutePath
+        }
+      }
+    },
+
+    transform(code, id) {
       // Parse the file path and query
       const questionIdx = id.indexOf('?')
       const filePath = questionIdx >= 0 ? id.slice(0, questionIdx) : id
