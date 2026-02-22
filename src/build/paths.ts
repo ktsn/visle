@@ -48,6 +48,7 @@ export function resolvePattern(pattern: string | string[], root: string): string
 export interface ParsedIdQuery {
   original?: boolean
   vue?: boolean
+  island?: boolean
 }
 
 /**
@@ -67,6 +68,9 @@ export function parseId(id: string): {
   if (parsed.has('vue')) {
     query.vue = true
   }
+  if (parsed.has('island')) {
+    query.island = true
+  }
 
   return {
     fileName: fileName!,
@@ -78,10 +82,7 @@ export function parseId(id: string): {
  * Resolves paths for all server components
  */
 export function resolveServerComponentIds(componentDir: string): string[] {
-  const islandPaths = new Set(resolvePattern('/**/*.island.vue', componentDir))
-  const vuePaths = resolvePattern('/**/*.vue', componentDir)
-
-  return vuePaths.filter((p) => !islandPaths.has(p))
+  return resolvePattern('/**/*.vue', componentDir)
 }
 
 /**

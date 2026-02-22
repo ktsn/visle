@@ -1,4 +1,5 @@
 import assert from 'node:assert'
+import fs from 'node:fs'
 import path from 'node:path'
 import { ResolvedServerOptions, ResolvedConfig as ResolvedViteConfig } from 'vite'
 import { parse, SFCBlock } from 'vue/compiler-sfc'
@@ -149,11 +150,20 @@ export function clientManifest(manifestConfig: ClientManifestViteConfig) {
     return `${basePath}${filePath}`
   }
 
+  function getManifestData(): ManifestData {
+    return {
+      cssMap: Object.fromEntries(ensureCssMap()),
+      entryCss: ensureEntryCss(),
+      jsMap: Object.fromEntries(ensureJsMap()),
+    }
+  }
+
   return {
     getClientImportId,
     getDependingClientCssIds,
     setStyleBuildData,
     setIslandsBuildData,
+    getManifestData,
   }
 }
 
@@ -197,4 +207,17 @@ function basePathForDev(base: string): string {
 
 function basePathForBuild(base: string): string {
   return base.replace(/\/$/, '')
+}
+
+export const manifestFileName = 'visle-manifest.json'
+
+export interface ManifestData {
+  cssMap: Record<string, string[]>
+  entryCss: string[]
+  jsMap: Record<string, string>
+}
+
+export function writeManifestFile(serverOutDir: string, data: ManifestData): void {
+  fs.mkdirSync(serverOutDir, { recursive: true })
+  fs.writeFileSync(path.join(serverOutDir, manifestFileName), JSON.stringify(data))
 }

@@ -5,12 +5,10 @@ import { Plugin, ResolvedConfig } from 'vite'
 import { clientManifest } from '../client-manifest.js'
 import { ResolvedVisleConfig } from '../config.js'
 import {
-  generateIslandCode,
+  generateIslandWrapperCode,
   generateServerComponentCode,
   generateClientVirtualEntryCode,
   generateServerVirtualEntryCode,
-  symbolCode,
-  symbolImportId,
   clientVirtualEntryId,
   serverVirtualEntryId,
 } from '../generate.js'
@@ -24,14 +22,20 @@ import {
 /**
  * Core Vite plugin for the islands architecture.
  * Resolves and loads virtual entry modules per environment (style, islands, server),
- * transforms `.vue` and `.island.vue` files on the server to inject hydration
- * and CSS asset references, and collects CSS/JS manifest data during bundle generation.
+ * transforms `.vue` files on the server to inject CSS asset references,
+ * handles `?island` virtual modules for island wrapper code generation,
+ * and collects CSS/JS manifest data during bundle generation.
  */
-export function islandPlugin(config: ResolvedVisleConfig): Plugin {
+interface IslandPluginResult {
+  plugin: Plugin
+  getManifest(): ReturnType<typeof clientManifest>
+}
+
+export function islandPlugin(config: ResolvedVisleConfig): IslandPluginResult {
   let manifest: ReturnType<typeof clientManifest>
   let viteConfig: ResolvedConfig
 
-  return {
+  const plugin: Plugin = {
     name: 'visle:island',
 
     sharedDuringBuild: true,
@@ -63,11 +67,11 @@ export function islandPlugin(config: ResolvedVisleConfig): Plugin {
           return serverVirtualEntryId
         }
 
-        if (id === symbolImportId) {
-          return symbolImportId
-        }
-
         const { query } = parseId(id)
+
+        if (query.island) {
+          return id
+        }
 
         if (query.original) {
           return id
@@ -113,8 +117,15 @@ export function islandPlugin(config: ResolvedVisleConfig): Plugin {
           )
         }
 
-        if (id === symbolImportId) {
-          return symbolCode
+        const { fileName, query } = parseId(id)
+
+        if (query.island && fileName.endsWith('.vue')) {
+          const componentRelativePath = path.relative(viteConfig.root, fileName)
+          const customElementEntryRelativePath = path.relative(
+            viteConfig.root,
+            customElementEntryPath,
+          )
+          return generateIslandWrapperCode(componentRelativePath, customElementEntryRelativePath)
         }
 
         return null
@@ -157,16 +168,14 @@ export function islandPlugin(config: ResolvedVisleConfig): Plugin {
         return code
       }
 
-      if (fileName.endsWith('.island.vue')) {
-        const clientImportId = manifest.getClientImportId(fileName)
-        const entryImportId = manifest.getClientImportId(customElementEntryPath)
-        const cssIds = manifest.getDependingClientCssIds(fileName, code)
-        return generateIslandCode(fileName, clientImportId, entryImportId, cssIds)
+      // Skip ?island virtual modules
+      if (query.island) {
+        return null
       }
 
-      // .vue file
-      const cssIds = manifest.getDependingClientCssIds(fileName, code)
-      return generateServerComponentCode(fileName, cssIds)
+      // All .vue files get server component wrapping with runtime manifest CSS
+      const componentRelativePath = path.relative(viteConfig.root, fileName)
+      return generateServerComponentCode(fileName, componentRelativePath)
     },
 
     generateBundle(_options, bundle) {
@@ -225,6 +234,13 @@ export function islandPlugin(config: ResolvedVisleConfig): Plugin {
 
         manifest.setIslandsBuildData({ jsMap })
       }
+    },
+  }
+
+  return {
+    plugin,
+    getManifest() {
+      return manifest
     },
   }
 }

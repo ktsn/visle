@@ -6,10 +6,6 @@ export const clientVirtualEntryId = '\0@visle/client-entry'
 
 export const serverVirtualEntryId = '\0@visle/server-entry'
 
-export const symbolImportId = '\0@visle/symbols'
-
-export const symbolCode = `export const islandSymbol = Symbol('@visle/island')`
-
 export const islandElementName = 'vue-island'
 
 export function generateClientVirtualEntryCode(componentIds: string[]): string {
@@ -33,53 +29,60 @@ export function generateServerVirtualEntryCode(
     .join('\n')
 }
 
-export function generateIslandCode(
-  fileName: string,
-  clientImportId: string,
-  entryImportId: string,
-  cssIds: string[],
+export function generateIslandWrapperCode(
+  componentRelativePath: string,
+  customElementEntryRelativePath: string,
 ): string {
   return `<script setup>
-  import { useSSRContext, useAttrs, provide, inject } from 'vue'
-  import { islandSymbol } from '${symbolImportId}'
-  import OriginalComponent from '${fileName}?original'
+  import { useSSRContext, useAttrs } from 'vue'
 
   defineOptions({
     inheritAttrs: false,
   })
 
-  const inIsland = inject(islandSymbol, false)
-  provide(islandSymbol, true)
-
   const context = useSSRContext()
   const attrs = useAttrs()
+  const manifest = context.manifest
+
+  const clientImportId = manifest.getClientImportId('${componentRelativePath}')
+  const entryImportId = manifest.getClientImportId('${customElementEntryRelativePath}')
+  const cssIds = manifest.getDependingClientCssIds('${componentRelativePath}')
 
   context.loadJs ??= new Set()
-  context.loadJs.add('${entryImportId}')
+  context.loadJs.add(entryImportId)
 
   context.loadCss ??= new Set()
-  ${cssIds.map((cssId) => `context.loadCss.add('${cssId}')`).join('\n')}
+  for (const cssId of cssIds) {
+    context.loadCss.add(cssId)
+  }
 
   const isEmptyProps = Object.keys(attrs).length === 0
   </script>
 
   <template>
-    <OriginalComponent v-if="inIsland" v-bind="attrs" />
-    <${islandElementName} v-else entry="${clientImportId}" :serialized-props="isEmptyProps ? undefined : JSON.stringify(attrs)">
-      <OriginalComponent v-bind="attrs" />
+    <${islandElementName} :entry="clientImportId" :serialized-props="isEmptyProps ? undefined : JSON.stringify(attrs)">
+      <slot />
     </${islandElementName}>
   </template>`
 }
 
-export function generateServerComponentCode(fileName: string, cssIds: string[]): string {
+export function generateServerComponentCode(
+  fileName: string,
+  componentRelativePath: string,
+): string {
   return `<script setup>
   import { useSSRContext } from 'vue'
   import OriginalComponent from '${fileName}?original'
 
   const context = useSSRContext()
+  const manifest = context.manifest
+
+  const cssIds = manifest.getDependingClientCssIds('${componentRelativePath}')
 
   context.loadCss ??= new Set()
-  ${cssIds.map((cssId) => `context.loadCss.add('${cssId}')`).join('\n')}
+  for (const cssId of cssIds) {
+    context.loadCss.add(cssId)
+  }
   </script>
 
   <template>

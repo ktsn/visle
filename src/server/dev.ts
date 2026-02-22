@@ -4,6 +4,7 @@ import { Connect, createServer, InlineConfig, RunnableDevEnvironment, ViteDevSer
 
 import { getVisleConfig } from '../build/config.js'
 import { resolveDevComponentPath } from '../build/paths.js'
+import { createDevManifest, RuntimeManifest } from './manifest.js'
 import { RenderLoader } from './render.js'
 
 interface DevRenderLoader extends RenderLoader {
@@ -12,6 +13,7 @@ interface DevRenderLoader extends RenderLoader {
 
 export function createDevLoader(viteConfig: InlineConfig = {}): DevRenderLoader {
   let devServer: ViteDevServer
+  let devManifest: RuntimeManifest
 
   const middleware = connect()
 
@@ -34,6 +36,13 @@ export function createDevLoader(viteConfig: InlineConfig = {}): DevRenderLoader 
           },
           logLevel: 'silent',
         })
+
+        devManifest = createDevManifest({
+          root: devServer.config.root,
+          base: devServer.config.base,
+          server: { origin: devServer.config.server.origin },
+          isProduction: devServer.config.isProduction,
+        })
       }
 
       const visleConfig = getVisleConfig(devServer.config)
@@ -53,6 +62,10 @@ export function createDevLoader(viteConfig: InlineConfig = {}): DevRenderLoader 
         }
         throw e
       }
+    },
+
+    get manifest() {
+      return devManifest
     },
 
     middleware,

@@ -38,12 +38,15 @@ describe('createRender', () => {
   })
 
   describe('isDev = false', () => {
+    const emptyManifest = JSON.stringify({ cssMap: {}, entryCss: [], jsMap: {} })
+
     test('renders vue component with props', async () => {
       const render = createRender({
         serverOutDir: path.join(root, 'dist/server'),
       })
 
       await saveCodes(root, {
+        'dist/server/visle-manifest.json': emptyManifest,
         'dist/server/server-entry.js': `
           import { defineComponent, h } from 'vue'
           export const _Comp = defineComponent({
@@ -70,6 +73,7 @@ describe('createRender', () => {
       })
 
       await saveCodes(root, {
+        'dist/server/visle-manifest.json': emptyManifest,
         'dist/server/server-entry.js': `
           import { defineComponent, h } from 'vue'
           export const _Comp = defineComponent({
@@ -90,6 +94,7 @@ describe('createRender', () => {
       })
 
       await saveCodes(root, {
+        'dist/server/visle-manifest.json': emptyManifest,
         'dist/server/server-entry.mjs': `
           import { defineComponent, h } from 'vue'
           export const _Comp = defineComponent({
@@ -110,6 +115,7 @@ describe('createRender', () => {
       })
 
       await saveCodes(root, {
+        'dist/server/visle-manifest.json': emptyManifest,
         'dist/server/server-entry.js': `
           import { defineComponent, h } from 'vue'
           export const _Comp = defineComponent({
