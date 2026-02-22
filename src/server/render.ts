@@ -22,7 +22,7 @@ export interface RenderContext {
   manifest?: RuntimeManifest
 }
 
-interface RenderFunction {
+export interface RenderFunction {
   (componentPath: string, props?: any): Promise<string>
   setLoader(loader: RenderLoader): void
 }

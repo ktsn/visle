@@ -9,6 +9,7 @@ import { RenderLoader } from './render.js'
 
 interface DevRenderLoader extends RenderLoader {
   middleware: Connect.Server
+  close(): Promise<void>
 }
 
 export function createDevLoader(viteConfig: InlineConfig = {}): DevRenderLoader {
@@ -69,5 +70,11 @@ export function createDevLoader(viteConfig: InlineConfig = {}): DevRenderLoader 
     },
 
     middleware,
+
+    async close() {
+      if (devServer) {
+        await devServer.close()
+      }
+    },
   }
 }
