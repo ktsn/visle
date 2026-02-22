@@ -134,24 +134,7 @@ export function serverTransformPlugin(): ServerTransformPluginResult {
       const importMap = buildImportMap(descriptor.scriptSetup?.content ?? '')
 
       // Find elements with v-client:load
-      const vClientMatches = findVClientElements(descriptor.template.ast.children)
-
-      // Find elements imported from .island.vue files (backward compat)
-      const islandFileTags = new Set<string>()
-      for (const [tag, source] of importMap.entries()) {
-        if (source.endsWith('.island.vue')) {
-          islandFileTags.add(tag)
-        }
-      }
-      const vClientOffsets = new Set(vClientMatches.map((n) => n.loc.start.offset))
-      const islandFileMatches =
-        islandFileTags.size > 0
-          ? findElementsByTags(descriptor.template.ast.children, islandFileTags).filter(
-              (n) => !vClientOffsets.has(n.loc.start.offset),
-            )
-          : []
-
-      const matches = [...vClientMatches, ...islandFileMatches]
+      const matches = findVClientElements(descriptor.template.ast.children)
 
       if (matches.length === 0) {
         return null
@@ -255,29 +238,6 @@ function findVClientElements(children: TemplateChildNode[]): ElementNode[] {
       // A matched parent will be fully rewritten, so collecting its children too
       // would produce overlapping MagicString edits.
       results.push(...findVClientElements(child.children))
-    }
-  }
-
-  return results
-}
-
-/**
- * Recursively finds elements whose tag matches one of the given tags.
- */
-function findElementsByTags(children: TemplateChildNode[], tags: Set<string>): ElementNode[] {
-  const results: ElementNode[] = []
-
-  for (const child of children) {
-    if (child.type !== NodeTypes.ELEMENT) {
-      continue
-    }
-
-    if (tags.has(child.tag)) {
-      results.push(child)
-    }
-
-    if (child.children.length > 0) {
-      results.push(...findElementsByTags(child.children, tags))
     }
   }
 

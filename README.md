@@ -6,9 +6,11 @@ Directory structure with Vue Islands Renderer will be like this:
 
 ```
 ├─ vite.config.ts
+├─ pages/
+│   ├─ index.vue
+│   └...
 ├─ components/
-│   ├─ Page.vue
-│   ├─ Counter.island.vue
+│   ├─ Counter.vue
 │   └...
 ├─ dist/
 │   ├─ server/
@@ -25,24 +27,43 @@ import { visle } from 'visle/build'
 export default defineConfig({
   plugins: [
     visle({
-      componentDir: 'components',
+      entryDir: 'pages',
     }),
   ],
 })
 ```
 
-Add the following Vue components into `components/` directory:
+### `v-client:load` Directive
+
+Use the `v-client:load` directive to mark a component as an island. Island components are server-side rendered like any other component, but they are also bundled for the client and hydrated in the browser. Components without the directive are only rendered on the server and sent as static HTML.
+
+```vue
+<template>
+  <!-- This component will be hydrated on the client -->
+  <Counter v-client:load />
+
+  <!-- Props are passed to the client as well -->
+  <ImageCarousel v-client:load :images="images" />
+
+  <!-- This component is static server-rendered HTML -->
+  <Footer />
+</template>
+```
+
+### Example
+
+Add the following Vue components into `pages/` directory:
 
 ```vue
 <script setup lang="ts">
-// components/Page.vue
-import Counter from './Counter.island.vue'
+// pages/index.vue
+import Counter from '../components/Counter.vue'
 </script>
 
 <template>
   <div>
     <h1>Hello, World!</h1>
-    <Counter />
+    <Counter v-client:load />
   </div>
 </template>
 
@@ -56,7 +77,9 @@ h1 {
 
 ```vue
 <script setup lang="ts">
-// components/Counter.island.vue
+// components/Counter.vue
+import { ref } from 'vue'
+
 const count = ref(0)
 </script>
 
@@ -86,9 +109,9 @@ render.setLoader(loader)
 app.use(loader.middleware)
 
 app.get('/', async (req, res) => {
-  // Render components/Page.vue as a HTML string.
+  // Render pages/index.vue as a HTML string.
   // Extensions must be omitted.
-  const html = await render('Page')
+  const html = await render('index')
   res.send(html)
 })
 
@@ -136,9 +159,9 @@ const app = express()
 +}
 
 app.get('/', async (req, res) => {
-  // Render components/Page.vue as a HTML string.
+  // Render pages/index.vue as a HTML string.
   // Extensions must be omitted.
-  const html = await render('Page')
+  const html = await render('index')
   res.send(html)
 })
 

@@ -13,7 +13,7 @@ export interface VisleConfig {
 export type ResolvedVisleConfig = Required<VisleConfig>
 
 export const defaultConfig: ResolvedVisleConfig = {
-  entryDir: 'components',
+  entryDir: 'pages',
   clientOutDir: 'dist/client',
   serverOutDir: 'dist/server',
 }

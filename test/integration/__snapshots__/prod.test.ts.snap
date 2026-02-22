@@ -35,7 +35,7 @@ exports[`Production Build SSR > 'Component with CSS' 1`] = `
   <h1>
     Styled Page
   </h1>
-  <vue-island entry="/assets/StyledCounter.island-[hash].js">
+  <vue-island entry="/assets/StyledCounter-[hash].js">
     <button data-v-[scoped]>
       Styled Count: 0
     </button>
@@ -58,7 +58,7 @@ exports[`Production Build SSR > 'Component with island' 1`] = `
   <h1>
     Page
   </h1>
-  <vue-island entry="/assets/Counter.island-[hash].js">
+  <vue-island entry="/assets/Counter-[hash].js">
     <button>
       Count: 0
     </button>
@@ -97,7 +97,7 @@ exports[`Production Build SSR > 'Full HTML document with head/body' 1`] = `
     <h1>
       Document
     </h1>
-    <vue-island entry="/assets/Counter.island-[hash].js">
+    <vue-island entry="/assets/Counter-[hash].js">
       <button>
         Count: 0
       </button>
@@ -119,7 +119,7 @@ exports[`Production Build SSR > 'Island with props' 1`] = `
 </script>
 <div>
   <vue-island
-    entry="/assets/Counter.island-[hash].js"
+    entry="/assets/Counter-[hash].js"
     serialized-props="{&quot;count&quot;:42,&quot;label&quot;:&quot;Click me&quot;}"
   >
     <button
@@ -144,12 +144,12 @@ exports[`Production Build SSR > 'Multiple islands on the same page' 1`] = `
 >
 </script>
 <div>
-  <vue-island entry="/assets/CounterA.island-[hash].js">
+  <vue-island entry="/assets/CounterA-[hash].js">
     <button>
       Counter A
     </button>
   </vue-island>
-  <vue-island entry="/assets/CounterB.island-[hash].js">
+  <vue-island entry="/assets/CounterB-[hash].js">
     <button>
       Counter B
     </button>
@@ -169,7 +169,7 @@ exports[`Production Build SSR > 'Nested island' 1`] = `
 >
 </script>
 <div>
-  <vue-island entry="/assets/Outer.island-[hash].js">
+  <vue-island entry="/assets/Outer-[hash].js">
     <div class="outer">
       <span>
         Outer
@@ -215,12 +215,12 @@ exports[`Production Build SSR > 'Static component rendering' 1`] = `
 
 exports[`Production Build SSR > Build output files 1`] = `
 [
-  "assets/Counter.island-[hash].js",
-  "assets/CounterA.island-[hash].js",
-  "assets/CounterB.island-[hash].js",
-  "assets/Inner.island-[hash].js",
-  "assets/Outer.island-[hash].js",
-  "assets/StyledCounter.island-[hash].js",
+  "assets/Counter-[hash].js",
+  "assets/CounterA-[hash].js",
+  "assets/CounterB-[hash].js",
+  "assets/Inner-[hash].js",
+  "assets/Outer-[hash].js",
+  "assets/StyledCounter-[hash].js",
   "assets/_plugin-vue_export-helper-[hash].js",
   "assets/client-entry-[hash].css",
   "assets/custom-element-[hash].js",
@@ -236,12 +236,12 @@ exports[`Production Build SSR > Build output files 2`] = `
   ],
   "jsMap": {
     "../../../../src/client/custom-element.ts": "assets/custom-element-[hash].js",
-    "components/Counter.island.vue": "assets/Counter.island-[hash].js",
-    "components/CounterA.island.vue": "assets/CounterA.island-[hash].js",
-    "components/CounterB.island.vue": "assets/CounterB.island-[hash].js",
-    "components/Inner.island.vue": "assets/Inner.island-[hash].js",
-    "components/Outer.island.vue": "assets/Outer.island-[hash].js",
-    "components/StyledCounter.island.vue": "assets/StyledCounter.island-[hash].js",
+    "components/Counter.vue": "assets/Counter-[hash].js",
+    "components/CounterA.vue": "assets/CounterA-[hash].js",
+    "components/CounterB.vue": "assets/CounterB-[hash].js",
+    "components/Inner.vue": "assets/Inner-[hash].js",
+    "components/Outer.vue": "assets/Outer-[hash].js",
+    "components/StyledCounter.vue": "assets/StyledCounter-[hash].js",
   },
 }
 `;
