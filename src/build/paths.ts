@@ -26,11 +26,31 @@ export const customElementEntryPath = path.resolve(
  */
 export function pathToExportName(targetPath: string): string {
   const stripped = targetPath.replace(/^\//, '').replace(/\.vue$/, '')
-  const replaced = stripped
-    .replaceAll('$', '$$')
-    .replaceAll('.', '$')
-    .replaceAll('_', '__')
-    .replaceAll('/', '_')
+
+  // Single-pass character mapping to avoid collisions from chained replacements
+  // (e.g. chained replaceAll would turn both `_/` and `-` into `___`).
+  let replaced = ''
+  for (const ch of stripped) {
+    switch (ch) {
+      case '$':
+        replaced += '$$'
+        break
+      case '.':
+        replaced += '$d'
+        break
+      case '_':
+        replaced += '$u'
+        break
+      case '-':
+        replaced += '$h'
+        break
+      case '/':
+        replaced += '_'
+        break
+      default:
+        replaced += ch
+    }
+  }
 
   return `_${replaced}`
 }
@@ -78,9 +98,9 @@ export function parseId(id: string): {
 /**
  * Resolves paths for all server components
  */
-export function resolveServerComponentIds(componentDir: string): string[] {
-  const islandPaths = new Set(resolvePattern('/**/*.island.vue', componentDir))
-  const vuePaths = resolvePattern('/**/*.vue', componentDir)
+export function resolveServerComponentIds(entryDir: string): string[] {
+  const islandPaths = new Set(resolvePattern('/**/*.island.vue', entryDir))
+  const vuePaths = resolvePattern('/**/*.vue', entryDir)
 
   return vuePaths.filter((p) => !islandPaths.has(p))
 }
@@ -88,8 +108,8 @@ export function resolveServerComponentIds(componentDir: string): string[] {
 /**
  * Resolves the path for a component in development mode
  */
-export function resolveDevComponentPath(componentDir: string, componentPath: string): string {
-  return path.resolve(componentDir, `${componentPath}.vue`)
+export function resolveDevComponentPath(entryDir: string, componentPath: string): string {
+  return path.resolve(entryDir, `${componentPath}.vue`)
 }
 
 /**
