@@ -28,7 +28,7 @@ describe('Island plugin on server', () => {
     })
 
     expect(code).toBe(
-      '<script type="module" src="/@visle/entry" async></script><div><h1>Counter</h1><vue-island entry="/counter.vue"><!--[--><button>0</button><!--]--></vue-island></div>',
+      '<script type="module" src="/@visle/entry" async></script><div><h1>Counter</h1><vue-island entry="/counter.vue"><button>0</button></vue-island></div>',
     )
   })
 
@@ -57,7 +57,7 @@ describe('Island plugin on server', () => {
     })
 
     expect(code).toBe(
-      '<script type="module" src="/@visle/entry" async></script><vue-island entry="/child.vue" serialized-props="{&quot;foo&quot;:&quot;bar&quot;,&quot;baz&quot;:123,&quot;qux&quot;:true}"><!--[--><div>bar 123 true</div><!--]--></vue-island>',
+      '<script type="module" src="/@visle/entry" async></script><vue-island entry="/child.vue" serialized-props="{&quot;foo&quot;:&quot;bar&quot;,&quot;baz&quot;:123,&quot;qux&quot;:true}"><div>bar 123 true</div></vue-island>',
     )
   })
 
@@ -90,7 +90,7 @@ describe('Island plugin on server', () => {
     })
 
     expect(code).toBe(
-      `<link rel="stylesheet" href="/main.vue?vue&type=style&index=0&lang.css"><link rel="stylesheet" href="/child.vue?vue&type=style&index=0&lang.css"><link rel="stylesheet" href="/child.vue?vue&type=style&index=1&scoped=52e56919&lang.css"><script type="module" src="/@visle/entry" async></script><vue-island entry="/child.vue"><!--[--><button data-v-52e56919>hello</button><!--]--></vue-island>`,
+      `<link rel="stylesheet" href="/main.vue?vue&type=style&index=0&lang.css"><link rel="stylesheet" href="/child.vue?vue&type=style&index=0&lang.css"><link rel="stylesheet" href="/child.vue?vue&type=style&index=1&scoped=52e56919&lang.css"><script type="module" src="/@visle/entry" async></script><vue-island entry="/child.vue"><button data-v-52e56919>hello</button></vue-island>`,
     )
   })
 

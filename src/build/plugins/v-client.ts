@@ -4,6 +4,8 @@ import MagicString from 'magic-string'
 import path from 'node:path'
 import { parse } from 'vue/compiler-sfc'
 
+import { islandWrapId } from '../generate.js'
+
 interface VClientPluginResult {
   plugin: Plugin
   islandPaths: Set<string>
@@ -11,8 +13,8 @@ interface VClientPluginResult {
 
 /**
  * Vite plugin that rewrites SFC templates containing `v-client:load` directives.
- * Processes `?original` files (the actual template source after island plugin wrapping)
- * to wrap components with island wrappers and collect island paths for the build.
+ * Processes `.vue` files to replace components with island wrappers
+ * and collect island paths for the build.
  */
 export function vClientPlugin(): VClientPluginResult {
   const islandPaths = new Set<string>()
@@ -31,16 +33,13 @@ export function vClientPlugin(): VClientPluginResult {
       // Parse the file path and query
       const questionIdx = id.indexOf('?')
       const filePath = questionIdx >= 0 ? id.slice(0, questionIdx) : id
-      const queryString = questionIdx >= 0 ? id.slice(questionIdx + 1) : undefined
 
       if (!filePath.endsWith('.vue')) {
         return null
       }
 
-      // Only process ?original files — these contain the actual template
-      // that needs v-client:load rewriting. Non-query .vue files are
-      // replaced entirely by the island plugin's generateServerComponentCode.
-      if (queryString !== 'original') {
+      // Skip sub-requests (e.g., ?vue&type=style) — only process plain .vue files
+      if (questionIdx >= 0) {
         return null
       }
 
@@ -82,8 +81,8 @@ export function vClientPlugin(): VClientPluginResult {
         const resolvedPath = path.resolve(path.dirname(filePath), importSource)
         islandPaths.add(resolvedPath)
 
-        // Add import for the island wrapper
-        imports.push(`import ${wrapperName} from '${importSource}?island'`)
+        // Add import for the island wrapper virtual module
+        imports.push(`import ${wrapperName} from '${islandWrapId}${resolvedPath}'`)
 
         // Rewrite the element in the template
         rewriteElement(s, node, wrapperName)
@@ -164,8 +163,10 @@ function findVClientElements(children: any[]): any[] {
 }
 
 /**
- * Rewrites an element with v-client:load by wrapping it
- * with an island wrapper component.
+ * Rewrites an element with v-client:load by replacing it
+ * with the island wrapper component. The wrapper imports the original
+ * component internally and renders it inside <vue-island>.
+ * Child content (slots) is preserved and passed through.
  */
 function rewriteElement(s: MagicString, node: any, wrapperName: string): void {
   const start = node.loc.start.offset
@@ -178,18 +179,13 @@ function rewriteElement(s: MagicString, node: any, wrapperName: string): void {
 
   const tag = node.tag as string
 
-  // Build the inner content (the original component for SSR)
-  let innerContent: string
+  let wrapped: string
   if (node.isSelfClosing) {
-    innerContent = `<${tag}${propsStr} />`
+    wrapped = `<${wrapperName}${propsStr} />`
   } else {
-    // Extract children content from original source
     const childrenContent = extractChildrenContent(originalSource, tag)
-    innerContent = `<${tag}${propsStr}>${childrenContent}</${tag}>`
+    wrapped = `<${wrapperName}${propsStr}>${childrenContent}</${wrapperName}>`
   }
-
-  // Build the wrapper
-  const wrapped = `<${wrapperName}${propsStr}>${innerContent}</${wrapperName}>`
 
   s.overwrite(start, end, wrapped)
 }

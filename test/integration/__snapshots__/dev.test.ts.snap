@@ -23,7 +23,7 @@ exports[`Dev Server SSR > 'Component with CSS' 1`] = `
 >
 <link
   rel="stylesheet"
-  href="/components/StyledCounter.island.vue?vue&type=style&index=0&scoped=[scoped]&lang.css"
+  href="/components/StyledCounter.vue?vue&type=style&index=0&scoped=[scoped]&lang.css"
 >
 <script
   type="module"
@@ -35,7 +35,7 @@ exports[`Dev Server SSR > 'Component with CSS' 1`] = `
   <h1>
     Styled Page
   </h1>
-  <vue-island entry="/components/StyledCounter.island.vue">
+  <vue-island entry="/components/StyledCounter.vue">
     <button data-v-[scoped]>
       Styled Count: 0
     </button>
@@ -54,7 +54,7 @@ exports[`Dev Server SSR > 'Component with island' 1`] = `
   <h1>
     Page
   </h1>
-  <vue-island entry="/components/Counter.island.vue">
+  <vue-island entry="/components/Counter.vue">
     <button>
       Count: 0
     </button>
@@ -85,7 +85,7 @@ exports[`Dev Server SSR > 'Full HTML document with head/body' 1`] = `
     <h1>
       Document
     </h1>
-    <vue-island entry="/components/Counter.island.vue">
+    <vue-island entry="/components/Counter.vue">
       <button>
         Count: 0
       </button>
@@ -103,7 +103,7 @@ exports[`Dev Server SSR > 'Island with props' 1`] = `
 </script>
 <div>
   <vue-island
-    entry="/components/Counter.island.vue"
+    entry="/components/Counter.vue"
     serialized-props="{&quot;count&quot;:42,&quot;label&quot;:&quot;Click me&quot;}"
   >
     <button
@@ -124,12 +124,12 @@ exports[`Dev Server SSR > 'Multiple islands on the same page' 1`] = `
 >
 </script>
 <div>
-  <vue-island entry="/components/CounterA.island.vue">
+  <vue-island entry="/components/CounterA.vue">
     <button>
       Counter A
     </button>
   </vue-island>
-  <vue-island entry="/components/CounterB.island.vue">
+  <vue-island entry="/components/CounterB.vue">
     <button>
       Counter B
     </button>
@@ -145,14 +145,16 @@ exports[`Dev Server SSR > 'Nested island' 1`] = `
 >
 </script>
 <div>
-  <vue-island entry="/components/Outer.island.vue">
+  <vue-island entry="/components/Outer.vue">
     <div class="outer">
       <span>
         Outer
       </span>
-      <span class="inner">
-        Inner
-      </span>
+      <vue-island entry="/components/Inner.vue">
+        <span class="inner">
+          Inner
+        </span>
+      </vue-island>
     </div>
   </vue-island>
 </div>
@@ -164,7 +166,6 @@ exports[`Dev Server SSR > 'Server component with slot' 1`] = `
     Header
   </header>
   <main>
-    <!--[-->
     <!--[-->
     <p>
       Page content

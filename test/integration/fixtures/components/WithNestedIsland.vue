@@ -1,9 +1,9 @@
 <script setup>
-import Outer from './Outer.island.vue'
+import Outer from './Outer.vue'
 </script>
 
 <template>
   <div>
-    <Outer />
+    <Outer v-client:load />
   </div>
 </template>

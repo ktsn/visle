@@ -1,11 +1,11 @@
 <script setup>
-import StyledCounter from './StyledCounter.island.vue'
+import StyledCounter from './StyledCounter.vue'
 </script>
 
 <template>
   <div>
     <h1>Styled Page</h1>
-    <StyledCounter />
+    <StyledCounter v-client:load />
   </div>
 </template>
 

@@ -29,65 +29,76 @@ export function generateServerVirtualEntryCode(
     .join('\n')
 }
 
-export function generateIslandWrapperCode(
+export const serverWrapPrefix = '\0visle:server-wrap:'
+
+/**
+ * Source-importable prefix for island wrapper virtual modules.
+ * Used in generated source code (e.g., by the v-client plugin).
+ * resolveId maps this to the virtual module prefix (islandWrapPrefix).
+ */
+export const islandWrapId = 'visle:island-wrap:'
+
+export const islandWrapPrefix = '\0' + islandWrapId
+
+export function generateServerComponentCodeJS(
+  filePath: string,
+  componentRelativePath: string,
+): string {
+  return `import { defineComponent, h, useSSRContext } from 'vue'
+import OriginalComponent from '${filePath}'
+
+export default defineComponent({
+  setup(_props, { slots }) {
+    const context = useSSRContext()
+    const manifest = context.manifest
+
+    const cssIds = manifest.getDependingClientCssIds('${componentRelativePath}')
+
+    context.loadCss ??= new Set()
+    for (const cssId of cssIds) {
+      context.loadCss.add(cssId)
+    }
+
+    return () => h(OriginalComponent, null, slots)
+  },
+})
+`
+}
+
+export function generateIslandWrapperCodeJS(
+  filePath: string,
   componentRelativePath: string,
   customElementEntryRelativePath: string,
 ): string {
-  return `<script setup>
-  import { useSSRContext, useAttrs } from 'vue'
+  return `import { defineComponent, h, useSSRContext, useAttrs } from 'vue'
+import OriginalComponent from '${filePath}'
 
-  defineOptions({
-    inheritAttrs: false,
-  })
+export default defineComponent({
+  inheritAttrs: false,
+  setup(_props, { slots }) {
+    const context = useSSRContext()
+    const attrs = useAttrs()
+    const manifest = context.manifest
 
-  const context = useSSRContext()
-  const attrs = useAttrs()
-  const manifest = context.manifest
+    const clientImportId = manifest.getClientImportId('${componentRelativePath}')
+    const entryImportId = manifest.getClientImportId('${customElementEntryRelativePath}')
+    const cssIds = manifest.getDependingClientCssIds('${componentRelativePath}')
 
-  const clientImportId = manifest.getClientImportId('${componentRelativePath}')
-  const entryImportId = manifest.getClientImportId('${customElementEntryRelativePath}')
-  const cssIds = manifest.getDependingClientCssIds('${componentRelativePath}')
+    context.loadJs ??= new Set()
+    context.loadJs.add(entryImportId)
 
-  context.loadJs ??= new Set()
-  context.loadJs.add(entryImportId)
+    context.loadCss ??= new Set()
+    for (const cssId of cssIds) {
+      context.loadCss.add(cssId)
+    }
 
-  context.loadCss ??= new Set()
-  for (const cssId of cssIds) {
-    context.loadCss.add(cssId)
-  }
+    const isEmptyProps = Object.keys(attrs).length === 0
 
-  const isEmptyProps = Object.keys(attrs).length === 0
-  </script>
-
-  <template>
-    <${islandElementName} :entry="clientImportId" :serialized-props="isEmptyProps ? undefined : JSON.stringify(attrs)">
-      <slot />
-    </${islandElementName}>
-  </template>`
-}
-
-export function generateServerComponentCode(
-  fileName: string,
-  componentRelativePath: string,
-): string {
-  return `<script setup>
-  import { useSSRContext } from 'vue'
-  import OriginalComponent from '${fileName}?original'
-
-  const context = useSSRContext()
-  const manifest = context.manifest
-
-  const cssIds = manifest.getDependingClientCssIds('${componentRelativePath}')
-
-  context.loadCss ??= new Set()
-  for (const cssId of cssIds) {
-    context.loadCss.add(cssId)
-  }
-  </script>
-
-  <template>
-    <OriginalComponent>
-      <template v-for="(_, slot) of $slots" v-slot:[slot]="scope"><slot :name="slot" v-bind="scope"/></template>
-    </OriginalComponent>
-  </template>`
+    return () => h('${islandElementName}', {
+      entry: clientImportId,
+      'serialized-props': isEmptyProps ? undefined : JSON.stringify(attrs),
+    }, [h(OriginalComponent, attrs, slots)])
+  },
+})
+`
 }

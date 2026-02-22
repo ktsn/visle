@@ -46,9 +46,7 @@ export function resolvePattern(pattern: string | string[], root: string): string
 }
 
 export interface ParsedIdQuery {
-  original?: boolean
   vue?: boolean
-  island?: boolean
 }
 
 /**
@@ -62,16 +60,9 @@ export function parseId(id: string): {
   const parsed = new URLSearchParams(searchParams)
 
   const query: ParsedIdQuery = {}
-  if (parsed.has('original')) {
-    query.original = true
-  }
   if (parsed.has('vue')) {
     query.vue = true
   }
-  if (parsed.has('island')) {
-    query.island = true
-  }
-
   return {
     fileName: fileName!,
     query,

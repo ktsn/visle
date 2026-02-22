@@ -1,5 +1,5 @@
 <script setup>
-import Counter from './Counter.island.vue'
+import Counter from './Counter.vue'
 </script>
 
 <template>
@@ -9,7 +9,7 @@ import Counter from './Counter.island.vue'
     </head>
     <body>
       <h1>Document</h1>
-      <Counter />
+      <Counter v-client:load />
     </body>
   </html>
 </template>

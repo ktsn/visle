@@ -1,11 +1,11 @@
 <script setup>
-import CounterA from './CounterA.island.vue'
-import CounterB from './CounterB.island.vue'
+import CounterA from './CounterA.vue'
+import CounterB from './CounterB.vue'
 </script>
 
 <template>
   <div>
-    <CounterA />
-    <CounterB />
+    <CounterA v-client:load />
+    <CounterB v-client:load />
   </div>
 </template>
