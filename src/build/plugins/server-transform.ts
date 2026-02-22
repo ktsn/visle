@@ -1,5 +1,12 @@
 import path from 'node:path'
 
+import type {
+  AttributeNode,
+  DirectiveNode,
+  ElementNode,
+  TemplateChildNode,
+} from '@vue/compiler-core'
+import { NodeTypes } from '@vue/compiler-core'
 import MagicString from 'magic-string'
 import type { Plugin, ResolvedConfig } from 'vite'
 import { parse } from 'vue/compiler-sfc'
@@ -134,7 +141,7 @@ export function serverTransformPlugin(): ServerTransformPluginResult {
 
       for (let i = 0; i < matches.length; i++) {
         const node = matches[i]!
-        const tag = node.tag as string
+        const tag = node.tag
         const wrapperName = `VisleIsland${i}`
 
         // Check if this is a statically imported component
@@ -201,22 +208,20 @@ function buildImportMap(scriptContent: string): Map<string, string> {
 /**
  * Recursively finds elements with v-client:load directive.
  */
-function findVClientElements(children: any[]): any[] {
-  const results: any[] = []
+function findVClientElements(children: TemplateChildNode[]): ElementNode[] {
+  const results: ElementNode[] = []
 
   for (const child of children) {
-    // NodeTypes.ELEMENT === 1
-    if (child.type !== 1) {
+    if (child.type !== NodeTypes.ELEMENT) {
       continue
     }
 
     const hasVClient = child.props.some(
-      (prop: any) =>
-        // NodeTypes.DIRECTIVE === 7
-        prop.type === 7 &&
+      (prop: AttributeNode | DirectiveNode) =>
+        prop.type === NodeTypes.DIRECTIVE &&
         prop.name === 'client' &&
-        prop.arg?.type === 4 &&
-        prop.arg?.content === 'load',
+        prop.arg?.type === NodeTypes.SIMPLE_EXPRESSION &&
+        prop.arg.content === 'load',
     )
 
     if (hasVClient) {
@@ -224,7 +229,7 @@ function findVClientElements(children: any[]): any[] {
     }
 
     // Recurse into children
-    if (child.children && child.children.length > 0) {
+    if (child.children.length > 0) {
       results.push(...findVClientElements(child.children))
     }
   }
@@ -238,7 +243,7 @@ function findVClientElements(children: any[]): any[] {
  * component internally and renders it inside <vue-island>.
  * Child content (slots) is preserved and passed through.
  */
-function rewriteElement(s: MagicString, node: any, wrapperName: string): void {
+function rewriteElement(s: MagicString, node: ElementNode, wrapperName: string): void {
   const start = node.loc.start.offset
   const end = node.loc.end.offset
 
@@ -247,7 +252,7 @@ function rewriteElement(s: MagicString, node: any, wrapperName: string): void {
   // Build props string (excluding v-client:load)
   const propsStr = buildPropsString(node)
 
-  const tag = node.tag as string
+  const tag = node.tag
 
   let wrapped: string
   if (node.isSelfClosing) {
@@ -263,12 +268,12 @@ function rewriteElement(s: MagicString, node: any, wrapperName: string): void {
 /**
  * Builds a props string from element props, excluding v-client:load.
  */
-function buildPropsString(node: any): string {
+function buildPropsString(node: ElementNode): string {
   const props: string[] = []
 
   for (const prop of node.props) {
     // Skip v-client:load directive
-    if (prop.type === 7 && prop.name === 'client') {
+    if (prop.type === NodeTypes.DIRECTIVE && prop.name === 'client') {
       continue
     }
 
