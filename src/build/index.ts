@@ -44,7 +44,6 @@ export function visle(config: VisleConfig = {}): Plugin[] {
             consumer: 'client',
             build: {
               outDir: resolvedConfig.clientOutDir,
-              emptyOutDir: false,
               rollupOptions: {
                 input: [clientVirtualEntryId],
                 preserveEntrySignatures: 'allow-extension',
@@ -79,14 +78,6 @@ export function visle(config: VisleConfig = {}): Plugin[] {
           sharedConfigBuild: true,
 
           buildApp: async (builder) => {
-            const emptyOutDir = userConfig.build?.emptyOutDir ?? true
-            if (emptyOutDir) {
-              // We have to manually clean shared clientOutDir once before parallel build
-              // since style and islands build output to the same directory
-              const clientOutDir = path.resolve(root, resolvedConfig.clientOutDir)
-              await fs.rm(clientOutDir, { recursive: true, force: true })
-            }
-
             // Build style and server in parallel
             // - Style build produces cssMap (component -> CSS file mappings)
             // - Server build discovers island component paths via server-transform rewriting
