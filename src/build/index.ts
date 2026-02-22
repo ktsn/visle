@@ -9,9 +9,9 @@ import { VisleConfig, defaultConfig, setVisleConfig } from './config.js'
 import { clientVirtualEntryId, islandElementName, serverVirtualEntryId } from './generate.js'
 import { customElementEntryPath } from './paths.js'
 import { devStyleSSRPlugin } from './plugins/dev-style-ssr.js'
-import { virtualFilePlugin } from './plugins/virtual-file.js'
 import { manifestFileName, manifestPlugin } from './plugins/manifest.js'
 import { serverTransformPlugin } from './plugins/server-transform.js'
+import { virtualFilePlugin } from './plugins/virtual-file.js'
 
 export type { VisleConfig }
 

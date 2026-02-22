@@ -78,6 +78,8 @@ h1 {
 ```vue
 <script setup lang="ts">
 // components/Counter.vue
+import { ref } from 'vue'
+
 const count = ref(0)
 </script>
 

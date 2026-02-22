@@ -15,7 +15,7 @@ interface DevRenderLoader extends RenderLoader {
 
 export function createDevLoader(viteConfig: InlineConfig = {}): DevRenderLoader {
   let devServer: ViteDevServer
-  let devManifest: RuntimeManifest
+  let devManifest: RuntimeManifest | undefined
 
   const middleware = connect()
 

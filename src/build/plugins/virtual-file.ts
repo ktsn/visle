@@ -50,17 +50,14 @@ export function virtualFilePlugin(config: ResolvedVisleConfig): Plugin {
         return symbolCode
       }
 
+      const entryRoot = path.join(viteConfig.root, config.entryDir)
+
       if (id === serverVirtualEntryId) {
-        return generateServerVirtualEntryCode(
-          path.join(viteConfig.root, config.entryDir),
-          resolveServerComponentIds(path.join(viteConfig.root, config.entryDir)),
-        )
+        return generateServerVirtualEntryCode(entryRoot, resolveServerComponentIds(entryRoot))
       }
 
       if (id === clientVirtualEntryId) {
-        return generateClientVirtualEntryCode(
-          resolveServerComponentIds(path.join(viteConfig.root, config.entryDir)),
-        )
+        return generateClientVirtualEntryCode(resolveServerComponentIds(entryRoot))
       }
 
       if (id === virtualCustomElementEntryPath) {

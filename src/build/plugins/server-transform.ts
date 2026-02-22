@@ -226,10 +226,10 @@ function findVClientElements(children: TemplateChildNode[]): ElementNode[] {
 
     if (hasVClient) {
       results.push(child)
-    }
-
-    // Recurse into children
-    if (child.children.length > 0) {
+    } else if (child.children.length > 0) {
+      // Only recurse into children if the parent itself doesn't have v-client:load.
+      // A matched parent will be fully rewritten, so collecting its children too
+      // would produce overlapping MagicString edits.
       results.push(...findVClientElements(child.children))
     }
   }

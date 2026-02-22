@@ -70,7 +70,7 @@ export function createDevManifest(viteConfig: {
     getDependingClientCssIds(componentRelativePath: string): string[] {
       const absPath = path.resolve(root, componentRelativePath)
 
-      if (!absPath.endsWith('vue')) {
+      if (!absPath.endsWith('.vue')) {
         return []
       }
 

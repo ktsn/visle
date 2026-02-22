@@ -26,12 +26,31 @@ export const customElementEntryPath = path.resolve(
  */
 export function pathToExportName(targetPath: string): string {
   const stripped = targetPath.replace(/^\//, '').replace(/\.vue$/, '')
-  const replaced = stripped
-    .replaceAll('$', '$$')
-    .replaceAll('.', '$')
-    .replaceAll('_', '__')
-    .replaceAll('-', '___')
-    .replaceAll('/', '_')
+
+  // Single-pass character mapping to avoid collisions from chained replacements
+  // (e.g. chained replaceAll would turn both `_/` and `-` into `___`).
+  let replaced = ''
+  for (const ch of stripped) {
+    switch (ch) {
+      case '$':
+        replaced += '$$'
+        break
+      case '.':
+        replaced += '$d'
+        break
+      case '_':
+        replaced += '$u'
+        break
+      case '-':
+        replaced += '$h'
+        break
+      case '/':
+        replaced += '_'
+        break
+      default:
+        replaced += ch
+    }
+  }
 
   return `_${replaced}`
 }
