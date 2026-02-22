@@ -1,4 +1,4 @@
-import fs from 'node:fs'
+import fs from 'node:fs/promises'
 import path from 'node:path'
 
 import vue from '@vitejs/plugin-vue'
@@ -9,7 +9,9 @@ import { VisleConfig, defaultConfig, setVisleConfig } from './config.js'
 import { clientVirtualEntryId, islandElementName, serverVirtualEntryId } from './generate.js'
 import { customElementEntryPath, resolvePattern } from './paths.js'
 import { devStyleSSRPlugin } from './plugins/dev-style-ssr.js'
-import { islandPlugin } from './plugins/island.js'
+import { manifestFileName, manifestPlugin } from './plugins/manifest.js'
+import { serverTransformPlugin } from './plugins/server-transform.js'
+import { virtualFilePlugin } from './plugins/virtual-file.js'
 
 export type { VisleConfig }
 
@@ -25,6 +27,10 @@ export function visle(config: VisleConfig = {}): Plugin[] {
     ...config,
   }
 
+  const { plugin: serverTransform, islandPaths } = serverTransformPlugin()
+  const virtualFile = virtualFilePlugin(resolvedConfig)
+  const { plugin: manifest, getManifestData } = manifestPlugin()
+
   const orchestrationPlugin: Plugin = {
     name: 'visle:orchestration',
 
@@ -32,8 +38,8 @@ export function visle(config: VisleConfig = {}): Plugin[] {
       // Get root from user config or default to cwd
       const root = path.resolve(userConfig.root ?? process.cwd())
 
-      // Find island components for client entry points
-      const islandPaths = resolvePattern(
+      // Find island components by .island.vue suffix for backward compat
+      const scannedIslandPaths = resolvePattern(
         '/**/*.island.vue',
         path.join(root, resolvedConfig.entryDir),
       )
@@ -44,7 +50,6 @@ export function visle(config: VisleConfig = {}): Plugin[] {
             consumer: 'client',
             build: {
               outDir: resolvedConfig.clientOutDir,
-              emptyOutDir: false,
               rollupOptions: {
                 input: [clientVirtualEntryId],
                 preserveEntrySignatures: 'allow-extension',
@@ -57,7 +62,9 @@ export function visle(config: VisleConfig = {}): Plugin[] {
               outDir: resolvedConfig.clientOutDir,
               emptyOutDir: false,
               rollupOptions: {
-                input: [customElementEntryPath, ...islandPaths],
+                // Start with custom element entry + scanned .island.vue paths;
+                // v-client island paths are added after server build
+                input: [customElementEntryPath, ...scannedIslandPaths],
                 preserveEntrySignatures: 'allow-extension',
               },
             },
@@ -75,22 +82,32 @@ export function visle(config: VisleConfig = {}): Plugin[] {
 
         builder: {
           buildApp: async (builder) => {
-            const emptyOutDir = userConfig.build?.emptyOutDir ?? true
-            if (emptyOutDir) {
-              // We have to manually clean shared clientOutDir once before parallel build
-              // since style and islands build output to the same directory
-              const clientOutDir = path.resolve(root, resolvedConfig.clientOutDir)
-              await fs.promises.rm(clientOutDir, { recursive: true, force: true })
-            }
-
-            // Build style and islands in parallel to generate manifest data
+            // Build style and server in parallel
+            // - Style build produces cssMap (component -> CSS file mappings)
+            // - Server build discovers island component paths via server-transform rewriting
             await Promise.all([
               builder.build(builder.environments.style!),
-              builder.build(builder.environments.islands!),
+              builder.build(builder.environments.server!),
             ])
 
-            // Then build server with manifest info
-            await builder.build(builder.environments.server!)
+            // Update islands environment input with paths discovered during server build
+            const islandsEnv = builder.environments.islands!
+            const currentInput = (islandsEnv.config.build.rollupOptions?.input as string[]) ?? [
+              customElementEntryPath,
+            ]
+            islandsEnv.config.build.rollupOptions ??= {}
+            islandsEnv.config.build.rollupOptions.input = [...currentInput, ...islandPaths]
+
+            // Build islands using entry paths collected during server build
+            await builder.build(islandsEnv)
+
+            // Write manifest file after all builds
+            const serverOutDir = path.resolve(root, resolvedConfig.serverOutDir)
+            await fs.mkdir(serverOutDir, { recursive: true })
+            await fs.writeFile(
+              path.join(serverOutDir, manifestFileName),
+              JSON.stringify(getManifestData()),
+            )
           },
         },
       }
@@ -103,7 +120,9 @@ export function visle(config: VisleConfig = {}): Plugin[] {
 
   return [
     orchestrationPlugin,
-    islandPlugin(resolvedConfig),
+    serverTransform,
+    virtualFile,
+    manifest,
     vue({
       features: {
         componentIdGenerator: (filePath, source, isProduction) => {

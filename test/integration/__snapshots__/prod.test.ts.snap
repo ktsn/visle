@@ -193,7 +193,6 @@ exports[`Production Build SSR > 'Server component with slot' 1`] = `
   </header>
   <main>
     <!--[-->
-    <!--[-->
     <p>
       Page content
     </p>
@@ -227,4 +226,22 @@ exports[`Production Build SSR > Build output files 1`] = `
   "assets/custom-element-[hash].js",
   "assets/vue.runtime.esm-bundler-[hash].js",
 ]
+`;
+
+exports[`Production Build SSR > Build output files 2`] = `
+{
+  "cssMap": {},
+  "entryCss": [
+    "assets/client-entry-[hash].css",
+  ],
+  "jsMap": {
+    "../../../../src/client/custom-element.ts": "assets/custom-element-[hash].js",
+    "components/Counter.island.vue": "assets/Counter.island-[hash].js",
+    "components/CounterA.island.vue": "assets/CounterA.island-[hash].js",
+    "components/CounterB.island.vue": "assets/CounterB.island-[hash].js",
+    "components/Inner.island.vue": "assets/Inner.island-[hash].js",
+    "components/Outer.island.vue": "assets/Outer.island-[hash].js",
+    "components/StyledCounter.island.vue": "assets/StyledCounter.island-[hash].js",
+  },
+}
 `;
