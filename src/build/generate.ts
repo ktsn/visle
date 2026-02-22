@@ -6,6 +6,10 @@ export const clientVirtualEntryId = '\0@visle/client-entry'
 
 export const serverVirtualEntryId = '\0@visle/server-entry'
 
+export const symbolImportId = '\0@visle/symbols'
+
+export const symbolCode = `export const islandSymbol = Symbol('@visle/island')`
+
 export const islandElementName = 'vue-island'
 
 export function generateClientVirtualEntryCode(componentIds: string[]): string {
@@ -67,12 +71,16 @@ export function generateIslandWrapperCodeJS(
   componentRelativePath: string,
   customElementEntryRelativePath: string,
 ): string {
-  return `import { defineComponent, h, useSSRContext, useAttrs } from 'vue'
+  return `import { defineComponent, h, useSSRContext, useAttrs, inject, provide } from 'vue'
+import { islandSymbol } from '${symbolImportId}'
 import OriginalComponent from '${filePath}'
 
 export default defineComponent({
   inheritAttrs: false,
   setup(_props, { slots }) {
+    const inIsland = inject(islandSymbol, false)
+    provide(islandSymbol, true)
+
     const context = useSSRContext()
     const attrs = useAttrs()
     const manifest = context.manifest
@@ -87,6 +95,10 @@ export default defineComponent({
     context.loadCss ??= new Set()
     for (const cssId of cssIds) {
       context.loadCss.add(cssId)
+    }
+
+    if (inIsland) {
+      return () => h(OriginalComponent, attrs, slots)
     }
 
     const isEmptyProps = Object.keys(attrs).length === 0

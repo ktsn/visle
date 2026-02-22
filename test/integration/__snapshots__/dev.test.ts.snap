@@ -150,11 +150,9 @@ exports[`Dev Server SSR > 'Nested island' 1`] = `
       <span>
         Outer
       </span>
-      <vue-island entry="/components/Inner.vue">
-        <span class="inner">
-          Inner
-        </span>
-      </vue-island>
+      <span class="inner">
+        Inner
+      </span>
     </div>
   </vue-island>
 </div>

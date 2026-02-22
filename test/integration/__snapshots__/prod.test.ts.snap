@@ -174,11 +174,9 @@ exports[`Production Build SSR > 'Nested island' 1`] = `
       <span>
         Outer
       </span>
-      <vue-island entry="/assets/Inner-[hash].js">
-        <span class="inner">
-          Inner
-        </span>
-      </vue-island>
+      <span class="inner">
+        Inner
+      </span>
     </div>
   </vue-island>
 </div>
