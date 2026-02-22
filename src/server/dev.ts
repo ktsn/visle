@@ -41,7 +41,7 @@ export function createDevLoader(viteConfig: InlineConfig = {}): DevRenderLoader 
       const visleConfig = getVisleConfig(devServer.config)
 
       const modulePath = resolveDevComponentPath(
-        path.join(devServer.config.root, visleConfig.componentDir),
+        path.join(devServer.config.root, visleConfig.entryDir),
         componentPath,
       )
 

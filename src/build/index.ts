@@ -35,7 +35,7 @@ export function visle(config: VisleConfig = {}): Plugin[] {
       // Find island components for client entry points
       const islandPaths = resolvePattern(
         '/**/*.island.vue',
-        path.join(root, resolvedConfig.componentDir),
+        path.join(root, resolvedConfig.entryDir),
       )
 
       return {
