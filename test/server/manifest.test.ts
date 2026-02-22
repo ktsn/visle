@@ -1,10 +1,11 @@
 import fs from 'node:fs'
 import os from 'node:os'
 import path from 'node:path'
+
 import { afterEach, beforeEach, describe, expect, test } from 'vitest'
 
-import { manifestFileName } from '../../src/build/plugins/manifest.ts'
 import { customElementEntryPath, virtualCustomElementEntryPath } from '../../src/build/paths.ts'
+import { manifestFileName } from '../../src/build/plugins/manifest.ts'
 import { createDevManifest, loadManifest } from '../../src/server/manifest.ts'
 
 describe('createDevManifest', () => {
@@ -47,10 +48,7 @@ describe('createDevManifest', () => {
   })
 
   test('return empty id array for css without <style>', () => {
-    fs.writeFileSync(
-      path.join(root, 'src/foo.vue'),
-      '<template><div></div></template>',
-    )
+    fs.writeFileSync(path.join(root, 'src/foo.vue'), '<template><div></div></template>')
 
     const manifest = createDevManifest({
       root,

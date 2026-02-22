@@ -1,8 +1,8 @@
-import type { Plugin } from 'vite'
-
-import vue from '@vitejs/plugin-vue'
 import fs from 'node:fs/promises'
 import path from 'node:path'
+
+import vue from '@vitejs/plugin-vue'
+import type { Plugin } from 'vite'
 
 import { generateComponentId } from './component-id.js'
 import { VisleConfig, defaultConfig, setVisleConfig } from './config.js'
@@ -79,7 +79,8 @@ export function visle(config: VisleConfig = {}): Plugin[] {
           sharedConfigBuild: true,
 
           buildApp: async (builder) => {
-            if (userConfig.build?.emptyOutDir) {
+            const emptyOutDir = userConfig.build?.emptyOutDir ?? true
+            if (emptyOutDir) {
               // We have to manually clean shared clientOutDir once before parallel build
               // since style and islands build output to the same directory
               const clientOutDir = path.resolve(root, resolvedConfig.clientOutDir)

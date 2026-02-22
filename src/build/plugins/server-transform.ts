@@ -1,7 +1,7 @@
-import type { Plugin } from 'vite'
+import path from 'node:path'
 
 import MagicString from 'magic-string'
-import path from 'node:path'
+import type { Plugin } from 'vite'
 import { parse } from 'vue/compiler-sfc'
 
 import { islandWrapId, serverWrapPrefix, islandWrapPrefix } from '../generate.js'
@@ -54,8 +54,7 @@ export function serverTransformPlugin(): ServerTransformPluginResult {
 
       if (fileName.endsWith('.vue') && !query.vue) {
         const isFromWrapper =
-          importer?.startsWith(serverWrapPrefix) ||
-          importer?.startsWith(islandWrapPrefix)
+          importer?.startsWith(serverWrapPrefix) || importer?.startsWith(islandWrapPrefix)
         if (!isFromWrapper) {
           const absolutePath = toAbsolutePath(fileName, importer)
           return serverWrapPrefix + absolutePath

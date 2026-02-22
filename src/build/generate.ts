@@ -17,10 +17,7 @@ export function generateClientVirtualEntryCode(componentIds: string[]): string {
   )
 }
 
-export function generateServerVirtualEntryCode(
-  entryDir: string,
-  componentIds: string[],
-): string {
+export function generateServerVirtualEntryCode(entryDir: string, componentIds: string[]): string {
   return componentIds
     .map((id) => {
       const exportName = pathToExportName(path.relative(entryDir, id))

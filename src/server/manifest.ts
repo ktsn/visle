@@ -1,10 +1,11 @@
 import fs from 'node:fs'
 import path from 'node:path'
+
 import { parse, SFCBlock } from 'vue/compiler-sfc'
 
 import { generateComponentId } from '../build/component-id.js'
-import { manifestFileName, type ManifestData } from '../build/plugins/manifest.js'
 import { virtualCustomElementEntryPath, customElementEntryPath } from '../build/paths.js'
+import { manifestFileName, type ManifestData } from '../build/plugins/manifest.js'
 
 export interface RuntimeManifest {
   getClientImportId(componentRelativePath: string): string

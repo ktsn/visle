@@ -1,5 +1,6 @@
 import fs from 'node:fs/promises'
 import path from 'node:path'
+
 import { describe, test, expect, beforeAll } from 'vitest'
 
 import { manifestFileName } from '../../src/build/plugins/manifest.ts'
