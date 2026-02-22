@@ -1,5 +1,5 @@
 <script setup>
-import Outer from './Outer.vue'
+import Outer from '../components/Outer.vue'
 </script>
 
 <template>

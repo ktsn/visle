@@ -8,7 +8,7 @@ export default defineConfig({
   plugins: [
     visle({
       clientOutDir: 'dist/client',
-      componentDir: '',
+      entryDir: '',
     }),
   ],
 })

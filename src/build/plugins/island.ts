@@ -107,7 +107,7 @@ export function islandPlugin(config: ResolvedVisleConfig): Plugin {
       if (envName === 'style') {
         if (id === clientVirtualEntryId) {
           return generateClientVirtualEntryCode(
-            resolveServerComponentIds(path.join(viteConfig.root, config.componentDir)),
+            resolveServerComponentIds(path.join(viteConfig.root, config.entryDir)),
           )
         }
         return null
@@ -123,8 +123,8 @@ export function islandPlugin(config: ResolvedVisleConfig): Plugin {
       if (envName === 'server') {
         if (id === serverVirtualEntryId) {
           return generateServerVirtualEntryCode(
-            path.join(viteConfig.root, config.componentDir),
-            resolveServerComponentIds(path.join(viteConfig.root, config.componentDir)),
+            path.join(viteConfig.root, config.entryDir),
+            resolveServerComponentIds(path.join(viteConfig.root, config.entryDir)),
           )
         }
 
@@ -134,7 +134,7 @@ export function islandPlugin(config: ResolvedVisleConfig): Plugin {
       // Dev client environment — load both virtual entries
       if (id === clientVirtualEntryId) {
         return generateClientVirtualEntryCode(
-          resolveServerComponentIds(path.join(viteConfig.root, config.componentDir)),
+          resolveServerComponentIds(path.join(viteConfig.root, config.entryDir)),
         )
       }
 

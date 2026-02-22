@@ -1,5 +1,5 @@
 <script setup>
-import StyledCounter from './StyledCounter.vue'
+import StyledCounter from '../components/StyledCounter.vue'
 </script>
 
 <template>

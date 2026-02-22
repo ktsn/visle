@@ -2,7 +2,7 @@
  * Configuration for Visle plugin
  */
 export interface VisleConfig {
-  componentDir?: string
+  entryDir?: string
   serverOutDir?: string
   clientOutDir?: string
 }
@@ -13,7 +13,7 @@ export interface VisleConfig {
 export type ResolvedVisleConfig = Required<VisleConfig>
 
 export const defaultConfig: ResolvedVisleConfig = {
-  componentDir: 'components',
+  entryDir: 'pages',
   clientOutDir: 'dist/client',
   serverOutDir: 'dist/server',
 }

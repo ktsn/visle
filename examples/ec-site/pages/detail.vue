@@ -1,7 +1,7 @@
 <script setup lang="ts">
-import type { Product } from '../../app/db.ts'
-import Layout from '../Layout.vue'
-import ImageCarousel from '../ImageCarousel.vue'
+import type { Product } from '../app/db.ts'
+import Layout from '../components/Layout.vue'
+import ImageCarousel from '../components/ImageCarousel.vue'
 
 const { product } = defineProps<{
   product: Product

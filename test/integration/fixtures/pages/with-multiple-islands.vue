@@ -1,6 +1,6 @@
 <script setup>
-import CounterA from './CounterA.vue'
-import CounterB from './CounterB.vue'
+import CounterA from '../components/CounterA.vue'
+import CounterB from '../components/CounterB.vue'
 </script>
 
 <template>

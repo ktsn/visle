@@ -156,7 +156,7 @@ describe('createRender', () => {
       )
 
       await saveCodes(root, {
-        'components/Comp.vue': `
+        'pages/Comp.vue': `
           <template>
             <div>Hello</div>
           </template>`,

@@ -3,7 +3,7 @@
 exports[`Dev Server SSR > 'CSS modules' 1`] = `
 <link
   rel="stylesheet"
-  href="/components/WithCssModule.vue?vue&type=style&index=0&lang.module.css"
+  href="/pages/with-css-module.vue?vue&type=style&index=0&lang.module.css"
 >
 <div class="_container_[css-module-hash]_2">
   CSS Module
@@ -19,7 +19,7 @@ exports[`Dev Server SSR > 'Component in subdirectory' 1`] = `
 exports[`Dev Server SSR > 'Component with CSS' 1`] = `
 <link
   rel="stylesheet"
-  href="/components/WithCss.vue?vue&type=style&index=0&lang.css"
+  href="/pages/with-css.vue?vue&type=style&index=0&lang.css"
 >
 <link
   rel="stylesheet"

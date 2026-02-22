@@ -1,5 +1,5 @@
 <script setup>
-import Inner from './Inner.vue'
+import Inner from '../components/Inner.vue'
 </script>
 
 <template>

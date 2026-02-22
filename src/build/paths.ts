@@ -29,6 +29,7 @@ export function pathToExportName(targetPath: string): string {
     .replaceAll('$', '$$')
     .replaceAll('.', '$')
     .replaceAll('_', '__')
+    .replaceAll('-', '___')
     .replaceAll('/', '_')
 
   return `_${replaced}`
@@ -72,15 +73,15 @@ export function parseId(id: string): {
 /**
  * Resolves paths for all server components
  */
-export function resolveServerComponentIds(componentDir: string): string[] {
-  return resolvePattern('/**/*.vue', componentDir)
+export function resolveServerComponentIds(entryDir: string): string[] {
+  return resolvePattern('/**/*.vue', entryDir)
 }
 
 /**
  * Resolves the path for a component in development mode
  */
-export function resolveDevComponentPath(componentDir: string, componentPath: string): string {
-  return path.resolve(componentDir, `${componentPath}.vue`)
+export function resolveDevComponentPath(entryDir: string, componentPath: string): string {
+  return path.resolve(entryDir, `${componentPath}.vue`)
 }
 
 /**

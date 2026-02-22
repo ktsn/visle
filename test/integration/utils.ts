@@ -11,17 +11,17 @@ const tmpDir = path.resolve('test/__generated__/integration')
 const fixturesDir = path.resolve(path.dirname(fileURLToPath(import.meta.url)), 'fixtures')
 
 export const renderCases: { name: string; component: string; props?: Record<string, unknown> }[] = [
-  { name: 'Static component rendering', component: 'Static' },
-  { name: 'Component with props', component: 'WithProps', props: { message: 'Hello Props' } },
-  { name: 'Component with island', component: 'WithIsland' },
-  { name: 'Component with CSS', component: 'WithCss' },
-  { name: 'Island with props', component: 'WithIslandProps' },
-  { name: 'Component in subdirectory', component: 'pages/index' },
-  { name: 'Server component with slot', component: 'WithSlot' },
-  { name: 'Full HTML document with head/body', component: 'Document' },
-  { name: 'CSS modules', component: 'WithCssModule' },
-  { name: 'Nested island', component: 'WithNestedIsland' },
-  { name: 'Multiple islands on the same page', component: 'WithMultipleIslands' },
+  { name: 'Static component rendering', component: 'static' },
+  { name: 'Component with props', component: 'with-props', props: { message: 'Hello Props' } },
+  { name: 'Component with island', component: 'with-island' },
+  { name: 'Component with CSS', component: 'with-css' },
+  { name: 'Island with props', component: 'with-island-props' },
+  { name: 'Component in subdirectory', component: 'nested/index' },
+  { name: 'Server component with slot', component: 'with-slot' },
+  { name: 'Full HTML document with head/body', component: 'document' },
+  { name: 'CSS modules', component: 'with-css-module' },
+  { name: 'Nested island', component: 'with-nested-island' },
+  { name: 'Multiple islands on the same page', component: 'with-multiple-islands' },
 ]
 
 /**
