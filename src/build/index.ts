@@ -99,26 +99,35 @@ export function visle(config: VisleConfig = {}): Plugin[] {
       }
     },
 
-    configEnvironment(name) {
-      if (name === 'islands') {
-        // Update islands environment input with paths discovered during server build
-        return {
-          build: {
-            rollupOptions: {
-              input: [...islandPaths],
-            },
-          },
-        }
-      }
-    },
-
     configResolved(viteConfig) {
       setVisleConfig(viteConfig, resolvedConfig)
     },
   }
 
+  const islandsInputPlugin: Plugin = {
+    name: 'visle:islands-input',
+
+    applyToEnvironment: (env) => env.name === 'islands',
+
+    options(opts) {
+      if (islandPaths.size === 0) {
+        return
+      }
+
+      // Update islands environment input with paths discovered during server build
+      const existing = Array.isArray(opts.input)
+        ? opts.input
+        : opts.input
+          ? [opts.input as string]
+          : []
+
+      return { ...opts, input: [...existing, ...islandPaths] }
+    },
+  }
+
   return [
     orchestrationPlugin,
+    islandsInputPlugin,
     serverTransform,
     virtualFile,
     manifest,
