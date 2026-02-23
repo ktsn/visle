@@ -14,17 +14,19 @@ interface DevRenderLoader extends RenderLoader {
 }
 
 export function createDevLoader(viteConfig: InlineConfig = {}): DevRenderLoader {
-  let cachedDevServer: ViteDevServer | undefined
-  let cachedManifest: RuntimeManifest | undefined
+  let cachePromise: Promise<{ devServer: ViteDevServer; manifest: RuntimeManifest }> | undefined
 
   const middleware = connect()
 
   middleware.use((req, res, next) => {
-    if (!cachedDevServer) {
+    if (!cachePromise) {
       return next()
     }
 
-    cachedDevServer.middlewares(req, res, next)
+    cachePromise.then(({ devServer }) => {
+      devServer.middlewares(req, res, next)
+      return
+    })
   })
 
   /**
@@ -32,25 +34,24 @@ export function createDevLoader(viteConfig: InlineConfig = {}): DevRenderLoader 
    * Initialize them if not cached yet.
    */
   async function ensureDeps(): Promise<{ devServer: ViteDevServer; manifest: RuntimeManifest }> {
-    if (!cachedDevServer) {
-      cachedDevServer = await createServer({
+    if (!cachePromise) {
+      cachePromise = createServer({
         ...viteConfig,
         appType: 'custom',
         server: {
+          ...viteConfig.server,
           middlewareMode: true,
         },
         logLevel: 'silent',
+      }).then((devServer) => {
+        return {
+          devServer,
+          manifest: createDevManifest(devServer.config),
+        }
       })
     }
 
-    if (!cachedManifest) {
-      cachedManifest = createDevManifest(cachedDevServer.config)
-    }
-
-    return {
-      devServer: cachedDevServer,
-      manifest: cachedManifest,
-    }
+    return cachePromise
   }
 
   return {
@@ -84,8 +85,9 @@ export function createDevLoader(viteConfig: InlineConfig = {}): DevRenderLoader 
     middleware,
 
     async close() {
-      if (cachedDevServer) {
-        await cachedDevServer.close()
+      if (cachePromise) {
+        const { devServer } = await cachePromise
+        await devServer.close()
       }
     },
   }
