@@ -21,7 +21,7 @@
     "./dev": "./dist/server/dev.js"
   },
   "scripts": {
-    "build": "tsc -p .",
+    "build": "tsc -b ./ ./tsconfig.test.json",
     "test": "vitest",
     "test:coverage": "vitest --coverage --coverage.reporter=lcov",
     "lint": "oxlint",
