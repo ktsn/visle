@@ -9,7 +9,7 @@ import type {
 import { NodeTypes } from '@vue/compiler-core'
 import MagicString from 'magic-string'
 import type { Plugin, ResolvedConfig } from 'vite'
-import { parse } from 'vue/compiler-sfc'
+import { compileScript, parse, type SFCDescriptor } from 'vue/compiler-sfc'
 
 import {
   generateIslandWrapperCodeJS,
@@ -129,7 +129,7 @@ export function serverTransformPlugin(): ServerTransformPluginResult {
       }
 
       // Build tag-name-to-import-source map from <script setup>
-      const importMap = buildImportMap(descriptor.scriptSetup?.content ?? '')
+      const importMap = buildImportMap(descriptor, id)
 
       // Find elements with v-client:load
       const vClientMatches = findVClientElements(descriptor.template.ast.children)
@@ -201,26 +201,25 @@ export function serverTransformPlugin(): ServerTransformPluginResult {
 }
 
 /**
- * Parses import declarations from <script setup> content
+ * Parses import declarations from <script setup> using compileScript
  * to build a tag-name-to-import-source mapping.
  */
-function buildImportMap(scriptContent: string): Map<string, string> {
+function buildImportMap(descriptor: SFCDescriptor, id: string): Map<string, string> {
   const map = new Map<string, string>()
 
-  // Strip comments so we don't match commented-out imports
-  const cleaned = scriptContent.replace(/\/\/.*$/gm, '').replace(/\/\*[\s\S]*?\*\//g, '')
+  if (!descriptor.scriptSetup) {
+    return map
+  }
 
-  // Match: import Name from 'source'
-  const importRegex = /import\s+(\w+)\s+from\s+['"]([^'"]+)['"]/g
-  let match
+  const { imports } = compileScript(descriptor, { id })
 
-  while ((match = importRegex.exec(cleaned)) !== null) {
-    const name = match[1]!
-    const source = match[2]!
+  if (!imports) {
+    return map
+  }
 
-    // Only map .vue imports
-    if (source.endsWith('.vue')) {
-      map.set(name, source)
+  for (const [name, binding] of Object.entries(imports)) {
+    if (binding.source.endsWith('.vue')) {
+      map.set(name, binding.source)
     }
   }
 
