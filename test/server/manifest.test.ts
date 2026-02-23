@@ -25,7 +25,6 @@ describe('createDevManifest', () => {
       root,
       base: '/',
       server: {},
-      isProduction: false,
     })
 
     const relativePath = path.relative(root, customElementEntryPath)
@@ -39,7 +38,6 @@ describe('createDevManifest', () => {
       root,
       base: '/',
       server: {},
-      isProduction: false,
     })
 
     const result = await manifest.getClientImportId('src/foo.vue')
@@ -54,7 +52,6 @@ describe('createDevManifest', () => {
       root,
       base: '/',
       server: {},
-      isProduction: false,
     })
 
     const result = await manifest.getDependingClientCssIds('src/foo.vue')
@@ -70,7 +67,6 @@ describe('createDevManifest', () => {
       root,
       base: '/',
       server: {},
-      isProduction: false,
     })
 
     const result = await manifest.getDependingClientCssIds('src/foo.vue')
@@ -88,7 +84,6 @@ describe('createDevManifest', () => {
       root,
       base: '/',
       server: {},
-      isProduction: false,
     })
 
     const result = await manifest.getDependingClientCssIds('src/foo.vue')
@@ -101,7 +96,6 @@ describe('createDevManifest', () => {
       root,
       base: 'https://example.com/prefix',
       server: {},
-      isProduction: false,
     })
 
     const result = await manifest.getClientImportId('src/foo.vue')
@@ -116,7 +110,6 @@ describe('createDevManifest', () => {
       server: {
         origin: 'http://localhost:3000',
       },
-      isProduction: false,
     })
 
     const result = await manifest.getClientImportId('src/foo.vue')

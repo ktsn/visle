@@ -53,9 +53,8 @@ export function createDevManifest(viteConfig: {
   root: string
   base: string
   server: { origin?: string }
-  isProduction: boolean
 }): RuntimeManifest {
-  const { root, base, isProduction } = viteConfig
+  const { root, base } = viteConfig
 
   // Normalize origin value
   const origin = viteConfig.server.origin?.replace(/\/$/, '') ?? ''
@@ -85,7 +84,7 @@ export function createDevManifest(viteConfig: {
 
       const code = await fs.readFile(absPath, 'utf-8')
       const descriptor = parse(code).descriptor
-      const componentId = generateComponentId(componentRelativePath, code, isProduction)
+      const componentId = generateComponentId(componentRelativePath, code, false)
 
       return descriptor.styles.map((style, i) => {
         if (style.src) {

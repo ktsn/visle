@@ -39,12 +39,7 @@ export function createDevLoader(viteConfig: InlineConfig = {}): DevRenderLoader 
           logLevel: 'silent',
         })
 
-        devManifest = createDevManifest({
-          root: devServer.config.root,
-          base: devServer.config.base,
-          server: { origin: devServer.config.server.origin },
-          isProduction: devServer.config.isProduction,
-        })
+        devManifest = createDevManifest(devServer.config)
       }
 
       const visleConfig = getVisleConfig(devServer.config)
