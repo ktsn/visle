@@ -23,8 +23,8 @@ export interface RenderOptions {
 }
 
 export interface RenderLoader {
-  loadComponent(componentPath: string): Promise<Component>
-  manifest?: RuntimeManifest
+  loadEntry: (componentPath: string) => Promise<Component>
+  getManifest: () => Promise<RuntimeManifest>
 }
 
 export interface RenderContext {
@@ -48,37 +48,29 @@ export function createRender(options: RenderOptions = {}): RenderFunction {
   let cachedManifest: RuntimeManifest | undefined
 
   let loader: RenderLoader = {
-    loadComponent(componentPath) {
+    loadEntry(componentPath) {
       const serverOutDir = options.serverOutDir ?? defaultConfig.serverOutDir
 
       return import(/* @vite-ignore */ resolveServerDistPath(serverOutDir)).then(
         (m) => m[pathToExportName(componentPath)],
       )
     },
-  }
 
-  function getManifest(): RuntimeManifest {
-    if (loader.manifest) {
-      return loader.manifest
-    }
-
-    if (!cachedManifest) {
-      const serverOutDir = options.serverOutDir ?? defaultConfig.serverOutDir
-      const base = options.base ?? '/'
-      cachedManifest = loadManifest(serverOutDir, base)
-    }
-    return cachedManifest
-  }
-
-  async function loadComponent(componentPath: string): Promise<Component> {
-    return loader.loadComponent(componentPath)
+    async getManifest() {
+      if (!cachedManifest) {
+        const serverOutDir = options.serverOutDir ?? defaultConfig.serverOutDir
+        const base = options.base ?? '/'
+        cachedManifest = await loadManifest(serverOutDir, base)
+      }
+      return cachedManifest
+    },
   }
 
   async function render(componentPath: string, props?: any): Promise<string> {
-    const component = await loadComponent(componentPath)
+    const component = await loader.loadEntry(componentPath)
 
     const context: RenderContext = {
-      manifest: getManifest(),
+      manifest: await loader.getManifest(),
     }
 
     const app = createApp(component, props)

@@ -14,33 +14,48 @@ interface DevRenderLoader extends RenderLoader {
 }
 
 export function createDevLoader(viteConfig: InlineConfig = {}): DevRenderLoader {
-  let devServer: ViteDevServer
-  let devManifest: RuntimeManifest | undefined
+  let cachedDevServer: ViteDevServer | undefined
+  let cachedManifest: RuntimeManifest | undefined
 
   const middleware = connect()
 
   middleware.use((req, res, next) => {
-    if (!devServer) {
+    if (!cachedDevServer) {
       return next()
     }
 
-    devServer.middlewares(req, res, next)
+    cachedDevServer.middlewares(req, res, next)
   })
 
-  return {
-    async loadComponent(componentPath) {
-      if (!devServer) {
-        devServer = await createServer({
-          ...viteConfig,
-          appType: 'custom',
-          server: {
-            middlewareMode: true,
-          },
-          logLevel: 'silent',
-        })
+  /**
+   * Get cached devServer and manifest.
+   * Initialize them if not cached yet.
+   */
+  async function ensureDeps(): Promise<{ devServer: ViteDevServer; manifest: RuntimeManifest }> {
+    if (!cachedDevServer) {
+      cachedDevServer = await createServer({
+        ...viteConfig,
+        appType: 'custom',
+        server: {
+          middlewareMode: true,
+        },
+        logLevel: 'silent',
+      })
+    }
 
-        devManifest = createDevManifest(devServer.config)
-      }
+    if (!cachedManifest) {
+      cachedManifest = createDevManifest(cachedDevServer.config)
+    }
+
+    return {
+      devServer: cachedDevServer,
+      manifest: cachedManifest,
+    }
+  }
+
+  return {
+    async loadEntry(componentPath) {
+      const { devServer } = await ensureDeps()
 
       const visleConfig = getVisleConfig(devServer.config)
 
@@ -61,15 +76,16 @@ export function createDevLoader(viteConfig: InlineConfig = {}): DevRenderLoader 
       }
     },
 
-    get manifest() {
-      return devManifest
+    async getManifest() {
+      const { manifest } = await ensureDeps()
+      return manifest
     },
 
     middleware,
 
     async close() {
-      if (devServer) {
-        await devServer.close()
+      if (cachedDevServer) {
+        await cachedDevServer.close()
       }
     },
   }

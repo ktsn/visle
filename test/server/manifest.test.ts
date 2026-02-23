@@ -150,7 +150,7 @@ describe('loadManifest', () => {
       jsMap: { 'src/foo.vue': 'foo-1234.js' },
     })
 
-    const manifest = loadManifest(serverOutDir, '/')
+    const manifest = await loadManifest(serverOutDir, '/')
     const result = await manifest.getClientImportId('src/foo.vue')
 
     expect(result).toBe('/foo-1234.js')
@@ -161,7 +161,7 @@ describe('loadManifest', () => {
       jsMap: {},
     })
 
-    const manifest = loadManifest(serverOutDir, '/')
+    const manifest = await loadManifest(serverOutDir, '/')
 
     await expect(manifest.getClientImportId('src/foo.vue')).rejects.toThrow(
       'src/foo.vue not found in manifest JS map',
@@ -173,7 +173,7 @@ describe('loadManifest', () => {
       cssMap: { 'src/foo.vue': ['foo-1234.css'] },
     })
 
-    const manifest = loadManifest(serverOutDir, '/')
+    const manifest = await loadManifest(serverOutDir, '/')
     const result = await manifest.getDependingClientCssIds('src/foo.vue')
 
     expect(result).toEqual(['/foo-1234.css'])
@@ -185,7 +185,7 @@ describe('loadManifest', () => {
       entryCss: ['entry-1234.css'],
     })
 
-    const manifest = loadManifest(serverOutDir, '/')
+    const manifest = await loadManifest(serverOutDir, '/')
     const result = await manifest.getDependingClientCssIds('src/foo.vue')
 
     expect(result).toEqual(['/entry-1234.css'])
@@ -199,7 +199,7 @@ describe('loadManifest', () => {
       jsMap: { 'src/foo.vue': 'foo-1234.js' },
     })
 
-    const manifest = loadManifest(serverOutDir, base)
+    const manifest = await loadManifest(serverOutDir, base)
     const result = await manifest.getClientImportId('src/foo.vue')
 
     expect(result).toBe(expected)

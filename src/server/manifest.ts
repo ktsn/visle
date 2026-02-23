@@ -15,22 +15,14 @@ export interface RuntimeManifest {
 /**
  * Loads the manifest file from serverOutDir for production SSR.
  */
-export function loadManifest(serverOutDir: string, base: string): RuntimeManifest {
+export async function loadManifest(serverOutDir: string, base: string): Promise<RuntimeManifest> {
   const manifestPath = path.join(serverOutDir, manifestFileName)
   const basePath = base.replace(/\/$/, '')
 
-  let dataPromise: Promise<ManifestData> | undefined
-
-  function getData(): Promise<ManifestData> {
-    if (!dataPromise) {
-      dataPromise = fs.readFile(manifestPath, 'utf-8').then((content) => JSON.parse(content))
-    }
-    return dataPromise
-  }
+  const data: ManifestData = JSON.parse(await fs.readFile(manifestPath, 'utf-8'))
 
   return {
     async getClientImportId(componentRelativePath: string): Promise<string> {
-      const data = await getData()
       const file = data.jsMap[componentRelativePath]
       if (!file) {
         throw new Error(`${componentRelativePath} not found in manifest JS map`)
@@ -39,7 +31,6 @@ export function loadManifest(serverOutDir: string, base: string): RuntimeManifes
     },
 
     async getDependingClientCssIds(componentRelativePath: string): Promise<string[]> {
-      const data = await getData()
       const cssIds = data.cssMap[componentRelativePath] ?? data.entryCss
       return cssIds.map((cssId) => `${basePath}/${cssId}`)
     },
