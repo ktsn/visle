@@ -106,6 +106,7 @@ export function visle(config: VisleConfig = {}): Plugin[] {
 
   const islandsInputPlugin: Plugin = {
     name: 'visle:islands-input',
+    sharedDuringBuild: true,
 
     applyToEnvironment: (env) => env.name === 'islands',
 

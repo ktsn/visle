@@ -34,14 +34,7 @@ export function generateServerVirtualEntryCode(entryDir: string, componentIds: s
 
 export const serverWrapPrefix = '\0visle:server-wrap:'
 
-/**
- * Source-importable prefix for island wrapper virtual modules.
- * Used in generated source code (e.g., by the server-transform plugin).
- * resolveId maps this to the virtual module prefix (islandWrapPrefix).
- */
-export const islandWrapId = 'visle:island-wrap:'
-
-export const islandWrapPrefix = '\0' + islandWrapId
+export const islandWrapPrefix = '\0visle:island-wrap:'
 
 export function generateServerComponentCodeJS(
   filePath: string,
