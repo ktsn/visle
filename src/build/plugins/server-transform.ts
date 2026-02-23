@@ -111,16 +111,14 @@ export function serverTransformPlugin(): ServerTransformPluginResult {
     },
 
     transform(code, id) {
-      // Parse the file path and query
-      const questionIdx = id.indexOf('?')
-      const filePath = questionIdx >= 0 ? id.slice(0, questionIdx) : id
+      const { fileName, query } = parseId(id)
 
-      if (!filePath.endsWith('.vue')) {
+      if (!fileName.endsWith('.vue')) {
         return null
       }
 
       // Skip sub-requests (e.g., ?vue&type=style) — only process plain .vue files
-      if (questionIdx >= 0) {
+      if (query.vue) {
         return null
       }
 
@@ -176,7 +174,7 @@ export function serverTransformPlugin(): ServerTransformPluginResult {
         }
 
         // Resolve the absolute path of the component and collect for islands build
-        const resolvedPath = path.resolve(path.dirname(filePath), importSource)
+        const resolvedPath = path.resolve(path.dirname(fileName), importSource)
         islandPaths.add(resolvedPath)
 
         // Add import for the island wrapper virtual module
