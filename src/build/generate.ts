@@ -22,9 +22,7 @@ export function generateClientVirtualEntryCode(componentIds: string[]): string {
 }
 
 export function generateServerVirtualEntryCode(entryDir: string, componentIds: string[]): string {
-  const imports = componentIds
-    .map((id, i) => `import _${i} from '${id}'`)
-    .join('\n')
+  const imports = componentIds.map((id, i) => `import _${i} from '${id}'`).join('\n')
 
   const entries = componentIds
     .map((id, i) => {
