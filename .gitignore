@@ -1,6 +1,5 @@
 node_modules/
 dist/
 __generated__/
-dist-server/
-dist-client/
 coverage/
+*.tsbuildinfo

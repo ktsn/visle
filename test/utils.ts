@@ -4,9 +4,9 @@ import { fileURLToPath } from 'node:url'
 
 import { createBuilder } from 'vite'
 
-import { visle } from '../../src/build/index.ts'
-import { createDevLoader } from '../../src/server/dev.ts'
-import { createRender } from '../../src/server/render.ts'
+import { visle } from '../src/build/index.ts'
+import { createDevLoader } from '../src/server/dev.ts'
+import { createRender } from '../src/server/render.ts'
 
 const tmpDir = path.resolve('test/__generated__/integration')
 const fixturesDir = path.resolve(path.dirname(fileURLToPath(import.meta.url)), 'fixtures')
