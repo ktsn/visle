@@ -1,4 +1,4 @@
-import fs from 'node:fs'
+import fs from 'node:fs/promises'
 import path from 'node:path'
 
 import { parse, SFCBlock } from 'vue/compiler-sfc'
@@ -8,8 +8,8 @@ import { virtualCustomElementEntryPath, customElementEntryPath } from '../build/
 import { manifestFileName, type ManifestData } from '../build/plugins/manifest.js'
 
 export interface RuntimeManifest {
-  getClientImportId(componentRelativePath: string): string
-  getDependingClientCssIds(componentRelativePath: string): string[]
+  getClientImportId(componentRelativePath: string): Promise<string>
+  getDependingClientCssIds(componentRelativePath: string): Promise<string[]>
 }
 
 /**
@@ -17,12 +17,20 @@ export interface RuntimeManifest {
  */
 export function loadManifest(serverOutDir: string, base: string): RuntimeManifest {
   const manifestPath = path.join(serverOutDir, manifestFileName)
-  const data: ManifestData = JSON.parse(fs.readFileSync(manifestPath, 'utf-8'))
-
   const basePath = base.replace(/\/$/, '')
 
+  let dataPromise: Promise<ManifestData> | undefined
+
+  function getData(): Promise<ManifestData> {
+    if (!dataPromise) {
+      dataPromise = fs.readFile(manifestPath, 'utf-8').then((content) => JSON.parse(content))
+    }
+    return dataPromise
+  }
+
   return {
-    getClientImportId(componentRelativePath: string): string {
+    async getClientImportId(componentRelativePath: string): Promise<string> {
+      const data = await getData()
       const file = data.jsMap[componentRelativePath]
       if (!file) {
         throw new Error(`${componentRelativePath} not found in manifest JS map`)
@@ -30,7 +38,8 @@ export function loadManifest(serverOutDir: string, base: string): RuntimeManifes
       return `${basePath}/${file}`
     },
 
-    getDependingClientCssIds(componentRelativePath: string): string[] {
+    async getDependingClientCssIds(componentRelativePath: string): Promise<string[]> {
+      const data = await getData()
       const cssIds = data.cssMap[componentRelativePath] ?? data.entryCss
       return cssIds.map((cssId) => `${basePath}/${cssId}`)
     },
@@ -57,7 +66,7 @@ export function createDevManifest(viteConfig: {
   }
 
   return {
-    getClientImportId(componentRelativePath: string): string {
+    async getClientImportId(componentRelativePath: string): Promise<string> {
       const absPath = path.resolve(root, componentRelativePath)
 
       if (absPath === customElementEntryPath) {
@@ -67,14 +76,14 @@ export function createDevManifest(viteConfig: {
       return applyServeBase(`/${componentRelativePath}`)
     },
 
-    getDependingClientCssIds(componentRelativePath: string): string[] {
+    async getDependingClientCssIds(componentRelativePath: string): Promise<string[]> {
       const absPath = path.resolve(root, componentRelativePath)
 
       if (!absPath.endsWith('.vue')) {
         return []
       }
 
-      const code = fs.readFileSync(absPath, 'utf-8')
+      const code = await fs.readFile(absPath, 'utf-8')
       const descriptor = parse(code).descriptor
       const componentId = generateComponentId(componentRelativePath, code, isProduction)
 

@@ -50,7 +50,7 @@ export function generateServerComponentCodeJS(
   const normalizedFilePath = normalizePath(filePath)
   const normalizedRelativePath = normalizePath(componentRelativePath)
 
-  return `import { defineComponent, h, useSSRContext } from 'vue'
+  return `import { defineComponent, h, useSSRContext, onServerPrefetch } from 'vue'
 import OriginalComponent from '${normalizedFilePath}'
 
 export default defineComponent({
@@ -58,12 +58,14 @@ export default defineComponent({
     const context = useSSRContext()
     const manifest = context.manifest
 
-    const cssIds = manifest.getDependingClientCssIds('${normalizedRelativePath}')
+    onServerPrefetch(async () => {
+      const cssIds = await manifest.getDependingClientCssIds('${normalizedRelativePath}')
 
-    context.loadCss ??= new Set()
-    for (const cssId of cssIds) {
-      context.loadCss.add(cssId)
-    }
+      context.loadCss ??= new Set()
+      for (const cssId of cssIds) {
+        context.loadCss.add(cssId)
+      }
+    })
 
     return () => h(OriginalComponent, null, slots)
   },
@@ -80,7 +82,7 @@ export function generateIslandWrapperCodeJS(
   const normalizedRelativePath = normalizePath(componentRelativePath)
   const normalizedEntryRelativePath = normalizePath(customElementEntryRelativePath)
 
-  return `import { defineComponent, h, useSSRContext, useAttrs, inject, provide } from 'vue'
+  return `import { defineComponent, h, useSSRContext, useAttrs, inject, provide, onServerPrefetch } from 'vue'
 import { islandSymbol } from '${symbolImportId}'
 import OriginalComponent from '${normalizedFilePath}'
 
@@ -94,17 +96,25 @@ export default defineComponent({
     const attrs = useAttrs()
     const manifest = context.manifest
 
-    const clientImportId = manifest.getClientImportId('${normalizedRelativePath}')
-    const entryImportId = manifest.getClientImportId('${normalizedEntryRelativePath}')
-    const cssIds = manifest.getDependingClientCssIds('${normalizedRelativePath}')
+    let clientImportId = ''
 
-    context.loadJs ??= new Set()
-    context.loadJs.add(entryImportId)
+    onServerPrefetch(async () => {
+      const [resolvedClientImportId, entryImportId, cssIds] = await Promise.all([
+        manifest.getClientImportId('${normalizedRelativePath}'),
+        manifest.getClientImportId('${normalizedEntryRelativePath}'),
+        manifest.getDependingClientCssIds('${normalizedRelativePath}'),
+      ])
 
-    context.loadCss ??= new Set()
-    for (const cssId of cssIds) {
-      context.loadCss.add(cssId)
-    }
+      clientImportId = resolvedClientImportId
+
+      context.loadJs ??= new Set()
+      context.loadJs.add(entryImportId)
+
+      context.loadCss ??= new Set()
+      for (const cssId of cssIds) {
+        context.loadCss.add(cssId)
+      }
+    })
 
     if (inIsland) {
       return () => h(OriginalComponent, attrs, slots)
