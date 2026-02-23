@@ -84,16 +84,8 @@ export function visle(config: VisleConfig = {}): Plugin[] {
               builder.build(builder.environments.server!),
             ])
 
-            // Update islands environment input with paths discovered during server build
-            const islandsEnv = builder.environments.islands!
-            const currentInput = (islandsEnv.config.build.rollupOptions?.input as string[]) ?? [
-              customElementEntryPath,
-            ]
-            islandsEnv.config.build.rollupOptions ??= {}
-            islandsEnv.config.build.rollupOptions.input = [...currentInput, ...islandPaths]
-
             // Build islands using entry paths collected during server build
-            await builder.build(islandsEnv)
+            await builder.build(builder.environments.islands!)
 
             // Write manifest file after all builds
             const serverOutDir = path.resolve(root, resolvedConfig.serverOutDir)
@@ -104,6 +96,19 @@ export function visle(config: VisleConfig = {}): Plugin[] {
             )
           },
         },
+      }
+    },
+
+    configEnvironment(name) {
+      if (name === 'islands') {
+        // Update islands environment input with paths discovered during server build
+        return {
+          build: {
+            rollupOptions: {
+              input: [...islandPaths],
+            },
+          },
+        }
       }
     },
 

@@ -14,38 +14,49 @@ interface DevRenderLoader extends RenderLoader {
 }
 
 export function createDevLoader(viteConfig: InlineConfig = {}): DevRenderLoader {
-  let devServer: ViteDevServer
-  let devManifest: RuntimeManifest | undefined
+  let cachePromise: Promise<{ devServer: ViteDevServer; manifest: RuntimeManifest }> | undefined
 
   const middleware = connect()
 
   middleware.use((req, res, next) => {
-    if (!devServer) {
+    if (!cachePromise) {
       return next()
     }
 
-    devServer.middlewares(req, res, next)
+    cachePromise.then(({ devServer }) => {
+      devServer.middlewares(req, res, next)
+      return
+    })
   })
 
-  return {
-    async loadComponent(componentPath) {
-      if (!devServer) {
-        devServer = await createServer({
-          ...viteConfig,
-          appType: 'custom',
-          server: {
-            middlewareMode: true,
-          },
-          logLevel: 'silent',
-        })
+  /**
+   * Get cached devServer and manifest.
+   * Initialize them if not cached yet.
+   */
+  async function ensureDeps(): Promise<{ devServer: ViteDevServer; manifest: RuntimeManifest }> {
+    if (!cachePromise) {
+      cachePromise = createServer({
+        ...viteConfig,
+        appType: 'custom',
+        server: {
+          ...viteConfig.server,
+          middlewareMode: true,
+        },
+        logLevel: 'silent',
+      }).then((devServer) => {
+        return {
+          devServer,
+          manifest: createDevManifest(devServer.config),
+        }
+      })
+    }
 
-        devManifest = createDevManifest({
-          root: devServer.config.root,
-          base: devServer.config.base,
-          server: { origin: devServer.config.server.origin },
-          isProduction: devServer.config.isProduction,
-        })
-      }
+    return cachePromise
+  }
+
+  return {
+    async loadEntry(componentPath) {
+      const { devServer } = await ensureDeps()
 
       const visleConfig = getVisleConfig(devServer.config)
 
@@ -66,14 +77,16 @@ export function createDevLoader(viteConfig: InlineConfig = {}): DevRenderLoader 
       }
     },
 
-    get manifest() {
-      return devManifest
+    async getManifest() {
+      const { manifest } = await ensureDeps()
+      return manifest
     },
 
     middleware,
 
     async close() {
-      if (devServer) {
+      if (cachePromise) {
+        const { devServer } = await cachePromise
         await devServer.close()
       }
     },

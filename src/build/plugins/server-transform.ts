@@ -1,15 +1,10 @@
 import path from 'node:path'
 
-import type {
-  AttributeNode,
-  DirectiveNode,
-  ElementNode,
-  TemplateChildNode,
-} from '@vue/compiler-core'
+import type { DirectiveNode, ElementNode, TemplateChildNode } from '@vue/compiler-core'
 import { NodeTypes } from '@vue/compiler-core'
 import MagicString from 'magic-string'
 import type { Plugin, ResolvedConfig } from 'vite'
-import { parse } from 'vue/compiler-sfc'
+import { compileScript, parse, type SFCDescriptor } from 'vue/compiler-sfc'
 
 import {
   generateIslandWrapperCodeJS,
@@ -23,6 +18,14 @@ import { customElementEntryPath, parseId } from '../paths.js'
 interface ServerTransformPluginResult {
   plugin: Plugin
   islandPaths: Set<string>
+}
+
+interface ImportInfo {
+  source: string
+  /** Absolute start offset of the source string content (between quotes) in the SFC */
+  sourceStart: number
+  /** Absolute end offset of the source string content (between quotes) in the SFC */
+  sourceEnd: number
 }
 
 function toAbsolutePath(fileName: string, importer: string | undefined): string {
@@ -111,16 +114,14 @@ export function serverTransformPlugin(): ServerTransformPluginResult {
     },
 
     transform(code, id) {
-      // Parse the file path and query
-      const questionIdx = id.indexOf('?')
-      const filePath = questionIdx >= 0 ? id.slice(0, questionIdx) : id
+      const { fileName, query } = parseId(id)
 
-      if (!filePath.endsWith('.vue')) {
+      if (!fileName.endsWith('.vue')) {
         return null
       }
 
       // Skip sub-requests (e.g., ?vue&type=style) — only process plain .vue files
-      if (questionIdx >= 0) {
+      if (query.vue) {
         return null
       }
 
@@ -131,7 +132,7 @@ export function serverTransformPlugin(): ServerTransformPluginResult {
       }
 
       // Build tag-name-to-import-source map from <script setup>
-      const importMap = buildImportMap(descriptor.scriptSetup?.content ?? '')
+      const importMap = buildImportMap(descriptor, id)
 
       // Find elements with v-client:load
       const matches = findVClientElements(descriptor.template.ast.children)
@@ -141,17 +142,15 @@ export function serverTransformPlugin(): ServerTransformPluginResult {
       }
 
       const s = new MagicString(code)
-      const imports: string[] = []
+      const replacedImports = new Set<string>()
 
-      for (let i = 0; i < matches.length; i++) {
-        const node = matches[i]!
+      for (const node of matches) {
         const tag = node.tag
-        const wrapperName = `VisleIsland${i}`
 
         // Check if this is a statically imported component
-        const importSource = importMap.get(tag)
-        if (!importSource) {
-          this.error(
+        const importInfo = importMap.get(tag)
+        if (!importInfo) {
+          this.warn(
             `v-client:load on "${tag}" is not supported. ` +
               'Only statically imported Vue components are supported.',
           )
@@ -159,20 +158,17 @@ export function serverTransformPlugin(): ServerTransformPluginResult {
         }
 
         // Resolve the absolute path of the component and collect for islands build
-        const resolvedPath = path.resolve(path.dirname(filePath), importSource)
+        const resolvedPath = path.resolve(path.dirname(fileName), importInfo.source)
         islandPaths.add(resolvedPath)
 
-        // Add import for the island wrapper virtual module
-        imports.push(`import ${wrapperName} from '${islandWrapId}${resolvedPath}'`)
+        // Replace the original import source with island wrapper (once per component)
+        if (!replacedImports.has(importInfo.source)) {
+          s.overwrite(importInfo.sourceStart, importInfo.sourceEnd, islandWrapId + resolvedPath)
+          replacedImports.add(importInfo.source)
+        }
 
-        // Rewrite the element in the template
-        rewriteElement(s, node, wrapperName)
-      }
-
-      // Inject imports into <script setup> right after the opening tag
-      if (imports.length > 0 && descriptor.scriptSetup) {
-        const contentStart = descriptor.scriptSetup.loc.start.offset
-        s.appendRight(contentStart, '\n' + imports.join('\n'))
+        // Remove v-client:load directive from the element
+        removeVClientDirective(s, node)
       }
 
       return {
@@ -186,26 +182,45 @@ export function serverTransformPlugin(): ServerTransformPluginResult {
 }
 
 /**
- * Parses import declarations from <script setup> content
- * to build a tag-name-to-import-source mapping.
+ * Parses import declarations from <script setup> using compileScript
+ * to build a tag-name-to-import mapping with source locations.
  */
-function buildImportMap(scriptContent: string): Map<string, string> {
-  const map = new Map<string, string>()
+function buildImportMap(descriptor: SFCDescriptor, id: string): Map<string, ImportInfo> {
+  const map = new Map<string, ImportInfo>()
 
-  // Strip comments so we don't match commented-out imports
-  const cleaned = scriptContent.replace(/\/\/.*$/gm, '').replace(/\/\*[\s\S]*?\*\//g, '')
+  if (!descriptor.scriptSetup) {
+    return map
+  }
 
-  // Match: import Name from 'source'
-  const importRegex = /import\s+(\w+)\s+from\s+['"]([^'"]+)['"]/g
-  let match
+  const { imports, scriptSetupAst } = compileScript(descriptor, { id })
 
-  while ((match = importRegex.exec(cleaned)) !== null) {
-    const name = match[1]!
-    const source = match[2]!
+  if (!imports || !scriptSetupAst) {
+    return map
+  }
 
-    // Only map .vue imports
-    if (source.endsWith('.vue')) {
-      map.set(name, source)
+  const baseOffset = descriptor.scriptSetup.loc.start.offset
+
+  // Build source string location map from AST
+  const sourceLocMap = new Map<string, { start: number; end: number }>()
+  for (const stmt of scriptSetupAst) {
+    if (stmt.type === 'ImportDeclaration' && stmt.source.start != null && stmt.source.end != null) {
+      sourceLocMap.set(stmt.source.value, {
+        start: baseOffset + stmt.source.start + 1,
+        end: baseOffset + stmt.source.end - 1,
+      })
+    }
+  }
+
+  for (const [name, binding] of Object.entries(imports)) {
+    if (binding.source.endsWith('.vue')) {
+      const loc = sourceLocMap.get(binding.source)
+      if (loc) {
+        map.set(name, {
+          source: binding.source,
+          sourceStart: loc.start,
+          sourceEnd: loc.end,
+        })
+      }
     }
   }
 
@@ -224,7 +239,7 @@ function findVClientElements(children: TemplateChildNode[]): ElementNode[] {
     }
 
     const hasVClient = child.props.some(
-      (prop: AttributeNode | DirectiveNode) =>
+      (prop) =>
         prop.type === NodeTypes.DIRECTIVE &&
         prop.name === 'client' &&
         prop.arg?.type === NodeTypes.SIMPLE_EXPRESSION &&
@@ -233,10 +248,9 @@ function findVClientElements(children: TemplateChildNode[]): ElementNode[] {
 
     if (hasVClient) {
       results.push(child)
-    } else if (child.children.length > 0) {
-      // Only recurse into children if the parent itself doesn't have v-client:load.
-      // A matched parent will be fully rewritten, so collecting its children too
-      // would produce overlapping MagicString edits.
+    }
+
+    if (child.children.length > 0) {
       results.push(...findVClientElements(child.children))
     }
   }
@@ -245,96 +259,24 @@ function findVClientElements(children: TemplateChildNode[]): ElementNode[] {
 }
 
 /**
- * Rewrites an element with v-client:load by replacing it
- * with the island wrapper component. The wrapper imports the original
- * component internally and renders it inside <vue-island>.
- * Child content (slots) is preserved and passed through.
+ * Removes the v-client directive from an element's template source.
  */
-function rewriteElement(s: MagicString, node: ElementNode, wrapperName: string): void {
-  const start = node.loc.start.offset
-  const end = node.loc.end.offset
+function removeVClientDirective(s: MagicString, node: ElementNode): void {
+  const directive = node.props.find(
+    (prop): prop is DirectiveNode => prop.type === NodeTypes.DIRECTIVE && prop.name === 'client',
+  )
 
-  const originalSource = s.original.slice(start, end)
-
-  // Build props string (excluding v-client:load)
-  const propsStr = buildPropsString(node)
-
-  const tag = node.tag
-
-  let wrapped: string
-  if (node.isSelfClosing) {
-    wrapped = `<${wrapperName}${propsStr} />`
-  } else {
-    const childrenContent = extractChildrenContent(originalSource, tag)
-    wrapped = `<${wrapperName}${propsStr}>${childrenContent}</${wrapperName}>`
+  if (!directive) {
+    return
   }
 
-  s.overwrite(start, end, wrapped)
-}
+  let start = directive.loc.start.offset
+  const end = directive.loc.end.offset
 
-/**
- * Builds a props string from element props, excluding v-client:load.
- */
-function buildPropsString(node: ElementNode): string {
-  const props: string[] = []
-
-  for (const prop of node.props) {
-    // Skip v-client:load directive
-    if (prop.type === NodeTypes.DIRECTIVE && prop.name === 'client') {
-      continue
-    }
-
-    props.push(prop.loc.source)
+  // Remove one preceding space
+  if (start > 0 && s.original[start - 1] === ' ') {
+    start--
   }
 
-  if (props.length === 0) {
-    return ''
-  }
-
-  return ' ' + props.join(' ')
-}
-
-/**
- * Extracts the children content from an element's source string.
- */
-function extractChildrenContent(source: string, tag: string): string {
-  // Find the end of the opening tag
-  const openTagEnd = findOpenTagEnd(source)
-  // Find the start of the closing tag
-  const closeTagStart = source.lastIndexOf(`</${tag}`)
-
-  if (openTagEnd === -1 || closeTagStart === -1) {
-    return ''
-  }
-
-  return source.slice(openTagEnd, closeTagStart)
-}
-
-/**
- * Finds the end position of the opening tag (after the `>`).
- */
-function findOpenTagEnd(source: string): number {
-  let inQuote: string | null = null
-
-  for (let i = 0; i < source.length; i++) {
-    const char = source[i]!
-
-    if (inQuote) {
-      if (char === inQuote) {
-        inQuote = null
-      }
-      continue
-    }
-
-    if (char === '"' || char === "'") {
-      inQuote = char
-      continue
-    }
-
-    if (char === '>') {
-      return i + 1
-    }
-  }
-
-  return -1
+  s.remove(start, end)
 }
