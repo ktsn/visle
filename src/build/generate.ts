@@ -1,5 +1,7 @@
 import path from 'node:path'
 
+import { normalizePath } from 'vite'
+
 import { pathToExportName } from './paths.js'
 
 export const clientVirtualEntryId = '\0@visle/client-entry'
@@ -30,58 +32,101 @@ export function generateServerVirtualEntryCode(entryDir: string, componentIds: s
     .join('\n')
 }
 
-export function generateIslandCode(
-  fileName: string,
-  clientImportId: string,
-  entryImportId: string,
-  cssIds: string[],
+export const serverWrapPrefix = '\0visle:server-wrap:'
+
+/**
+ * Source-importable prefix for island wrapper virtual modules.
+ * Used in generated source code (e.g., by the server-transform plugin).
+ * resolveId maps this to the virtual module prefix (islandWrapPrefix).
+ */
+export const islandWrapId = 'visle:island-wrap:'
+
+export const islandWrapPrefix = '\0' + islandWrapId
+
+export function generateServerComponentCodeJS(
+  filePath: string,
+  componentRelativePath: string,
 ): string {
-  return `<script setup>
-  import { useSSRContext, useAttrs, provide, inject } from 'vue'
-  import { islandSymbol } from '${symbolImportId}'
-  import OriginalComponent from '${fileName}?original'
+  const normalizedFilePath = normalizePath(filePath)
+  const normalizedRelativePath = normalizePath(componentRelativePath)
 
-  defineOptions({
-    inheritAttrs: false,
-  })
+  return `import { defineComponent, h, useSSRContext, onServerPrefetch } from 'vue'
+import OriginalComponent from '${normalizedFilePath}'
 
-  const inIsland = inject(islandSymbol, false)
-  provide(islandSymbol, true)
+export default defineComponent({
+  setup(_props, { slots }) {
+    const context = useSSRContext()
+    const manifest = context.manifest
 
-  const context = useSSRContext()
-  const attrs = useAttrs()
+    onServerPrefetch(async () => {
+      const cssIds = await manifest.getDependingClientCssIds('${normalizedRelativePath}')
 
-  context.loadJs ??= new Set()
-  context.loadJs.add('${entryImportId}')
+      context.loadCss ??= new Set()
+      for (const cssId of cssIds) {
+        context.loadCss.add(cssId)
+      }
+    })
 
-  context.loadCss ??= new Set()
-  ${cssIds.map((cssId) => `context.loadCss.add('${cssId}')`).join('\n')}
-
-  const isEmptyProps = Object.keys(attrs).length === 0
-  </script>
-
-  <template>
-    <OriginalComponent v-if="inIsland" v-bind="attrs" />
-    <${islandElementName} v-else entry="${clientImportId}" :serialized-props="isEmptyProps ? undefined : JSON.stringify(attrs)">
-      <OriginalComponent v-bind="attrs" />
-    </${islandElementName}>
-  </template>`
+    return () => h(OriginalComponent, null, slots)
+  },
+})
+`
 }
 
-export function generateServerComponentCode(fileName: string, cssIds: string[]): string {
-  return `<script setup>
-  import { useSSRContext } from 'vue'
-  import OriginalComponent from '${fileName}?original'
+export function generateIslandWrapperCodeJS(
+  filePath: string,
+  componentRelativePath: string,
+  customElementEntryRelativePath: string,
+): string {
+  const normalizedFilePath = normalizePath(filePath)
+  const normalizedRelativePath = normalizePath(componentRelativePath)
+  const normalizedEntryRelativePath = normalizePath(customElementEntryRelativePath)
 
-  const context = useSSRContext()
+  return `import { defineComponent, h, useSSRContext, useAttrs, inject, provide, onServerPrefetch } from 'vue'
+import { islandSymbol } from '${symbolImportId}'
+import OriginalComponent from '${normalizedFilePath}'
 
-  context.loadCss ??= new Set()
-  ${cssIds.map((cssId) => `context.loadCss.add('${cssId}')`).join('\n')}
-  </script>
+export default defineComponent({
+  inheritAttrs: false,
+  setup(_props, { slots }) {
+    const inIsland = inject(islandSymbol, false)
+    provide(islandSymbol, true)
 
-  <template>
-    <OriginalComponent>
-      <template v-for="(_, slot) of $slots" v-slot:[slot]="scope"><slot :name="slot" v-bind="scope"/></template>
-    </OriginalComponent>
-  </template>`
+    const context = useSSRContext()
+    const attrs = useAttrs()
+    const manifest = context.manifest
+
+    let clientImportId = ''
+
+    onServerPrefetch(async () => {
+      const [resolvedClientImportId, entryImportId, cssIds] = await Promise.all([
+        manifest.getClientImportId('${normalizedRelativePath}'),
+        manifest.getClientImportId('${normalizedEntryRelativePath}'),
+        manifest.getDependingClientCssIds('${normalizedRelativePath}'),
+      ])
+
+      clientImportId = resolvedClientImportId
+
+      context.loadJs ??= new Set()
+      context.loadJs.add(entryImportId)
+
+      context.loadCss ??= new Set()
+      for (const cssId of cssIds) {
+        context.loadCss.add(cssId)
+      }
+    })
+
+    if (inIsland) {
+      return () => h(OriginalComponent, attrs, slots)
+    }
+
+    const isEmptyProps = Object.keys(attrs).length === 0
+
+    return () => h('${islandElementName}', {
+      entry: clientImportId,
+      'serialized-props': isEmptyProps ? undefined : JSON.stringify(attrs),
+    }, [h(OriginalComponent, attrs, slots)])
+  },
+})
+`
 }

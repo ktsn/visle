@@ -165,7 +165,6 @@ exports[`Dev Server SSR > 'Server component with slot' 1`] = `
   </header>
   <main>
     <!--[-->
-    <!--[-->
     <p>
       Page content
     </p>

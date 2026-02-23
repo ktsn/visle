@@ -3,19 +3,34 @@ import { renderToString } from 'vue/server-renderer'
 
 import { defaultConfig } from '../build/config.js'
 import { pathToExportName, resolveServerDistPath } from '../build/paths.js'
+import { RuntimeManifest, loadManifest } from './manifest.js'
 import { transformWithRenderContext } from './transform.js'
 
 export interface RenderOptions {
+  /**
+   * Directory path for server build output.
+   * Pass the same value of Visle Vite plugin's serverOutDir.
+   */
   serverOutDir?: string
+
+  /**
+   * Base public path for serving client assets.
+   * Same as Vite's `base` config. Can be an absolute path (e.g., `/prefix/`)
+   * or a full URL (e.g., `https://cdn.example.com/`).
+   * @default '/'
+   */
+  base?: string
 }
 
 export interface RenderLoader {
-  loadComponent(componentPath: string): Promise<Component>
+  loadEntry: (componentPath: string) => Promise<Component>
+  getManifest: () => Promise<RuntimeManifest>
 }
 
 export interface RenderContext {
   loadCss?: Set<string>
   loadJs?: Set<string>
+  manifest?: RuntimeManifest
 }
 
 export interface RenderFunction {
@@ -30,24 +45,33 @@ export interface RenderFunction {
  * defined in Vite config.
  */
 export function createRender(options: RenderOptions = {}): RenderFunction {
+  let cachedManifest: RuntimeManifest | undefined
+
   let loader: RenderLoader = {
-    loadComponent(componentPath) {
+    loadEntry(componentPath) {
       const serverOutDir = options.serverOutDir ?? defaultConfig.serverOutDir
 
       return import(/* @vite-ignore */ resolveServerDistPath(serverOutDir)).then(
         (m) => m[pathToExportName(componentPath)],
       )
     },
-  }
 
-  async function loadComponent(componentPath: string): Promise<Component> {
-    return loader.loadComponent(componentPath)
+    async getManifest() {
+      if (!cachedManifest) {
+        const serverOutDir = options.serverOutDir ?? defaultConfig.serverOutDir
+        const base = options.base ?? '/'
+        cachedManifest = await loadManifest(serverOutDir, base)
+      }
+      return cachedManifest
+    },
   }
 
   async function render(componentPath: string, props?: any): Promise<string> {
-    const component = await loadComponent(componentPath)
+    const component = await loader.loadEntry(componentPath)
 
-    const context: RenderContext = {}
+    const context: RenderContext = {
+      manifest: await loader.getManifest(),
+    }
 
     const app = createApp(component, props)
     const rendered = await renderToString(app, context)
