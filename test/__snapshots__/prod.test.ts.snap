@@ -179,6 +179,16 @@ exports[`Production Build SSR > 'Nested island' 1`] = `
 </div>
 `;
 
+exports[`Production Build SSR > 'Non-ascii file name' 1`] = `
+<link
+  rel="stylesheet"
+  href="/assets/client-entry-[hash].css"
+>
+<p>
+  Non-ascii file name
+</p>
+`;
+
 exports[`Production Build SSR > 'Server component with slot' 1`] = `
 <link
   rel="stylesheet"

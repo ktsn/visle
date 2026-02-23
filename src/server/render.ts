@@ -2,7 +2,7 @@ import { Component, createApp } from 'vue'
 import { renderToString } from 'vue/server-renderer'
 
 import { defaultConfig } from '../build/config.js'
-import { pathToExportName, resolveServerDistPath } from '../build/paths.js'
+import { resolveServerDistPath } from '../build/paths.js'
 import { RuntimeManifest, loadManifest } from './manifest.js'
 import { transformWithRenderContext } from './transform.js'
 
@@ -52,7 +52,7 @@ export function createRender(options: RenderOptions = {}): RenderFunction {
       const serverOutDir = options.serverOutDir ?? defaultConfig.serverOutDir
 
       return import(/* @vite-ignore */ resolveServerDistPath(serverOutDir)).then(
-        (m) => m[pathToExportName(componentPath)],
+        (m) => m.default[componentPath],
       )
     },
 

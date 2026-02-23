@@ -50,7 +50,7 @@ describe('createRender', () => {
         'dist/server/visle-manifest.json': emptyManifest,
         'dist/server/server-entry.js': `
           import { defineComponent, h } from 'vue'
-          export const _Comp = defineComponent({
+          export default { Comp: defineComponent({
             props: {
               msg: {
                 type: String,
@@ -60,7 +60,7 @@ describe('createRender', () => {
             render() {
               return h('div', {}, [this.msg])
             },
-          })`,
+          }) }`,
       })
 
       const result = await render('Comp', { msg: 'Hello' })
@@ -77,11 +77,11 @@ describe('createRender', () => {
         'dist/server/visle-manifest.json': emptyManifest,
         'dist/server/server-entry.js': `
           import { defineComponent, h } from 'vue'
-          export const _Comp = defineComponent({
+          export default { Comp: defineComponent({
             render() {
               return h('div', {}, ['Hello'])
             },
-          })`,
+          }) }`,
       })
 
       const result = await render('Comp')
@@ -98,11 +98,11 @@ describe('createRender', () => {
         'dist/server/visle-manifest.json': emptyManifest,
         'dist/server/server-entry.mjs': `
           import { defineComponent, h } from 'vue'
-          export const _Comp = defineComponent({
+          export default { Comp: defineComponent({
             render() {
               return h('div', {}, ['Hello'])
             },
-          })`,
+          }) }`,
       })
 
       const result = await render('Comp')
@@ -119,7 +119,7 @@ describe('createRender', () => {
         'dist/server/visle-manifest.json': emptyManifest,
         'dist/server/server-entry.js': `
           import { defineComponent, h } from 'vue'
-          export const _Comp = defineComponent({
+          export default { Comp: defineComponent({
             render() {
               return h('html', {}, [
                 h('head', {}, [
@@ -132,7 +132,7 @@ describe('createRender', () => {
                 ]),
               ])
             },
-          })`,
+          }) }`,
       })
 
       const result = await render('Comp')
