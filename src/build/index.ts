@@ -141,6 +141,12 @@ export function visle(config: VisleConfig = {}): Plugin[] {
       template: {
         compilerOptions: {
           isCustomElement: (tag) => tag === islandElementName,
+          directiveTransforms: {
+            // server-transform plugin searches v-client directive to detect
+            // island component. Strip v-client directive here to make sure to
+            // remove it in all environment.
+            client: () => ({ props: [] }),
+          },
         },
       },
     }),

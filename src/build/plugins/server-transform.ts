@@ -1,8 +1,7 @@
 import path from 'node:path'
 
-import type { DirectiveNode, ElementNode, TemplateChildNode } from '@vue/compiler-core'
+import type { ElementNode, TemplateChildNode } from '@vue/compiler-core'
 import { NodeTypes } from '@vue/compiler-core'
-import MagicString from 'magic-string'
 import type { Plugin, ResolvedConfig } from 'vite'
 import { compileScript, parse, type SFCDescriptor } from 'vue/compiler-sfc'
 
@@ -38,8 +37,7 @@ function toAbsolutePath(fileName: string, importer: string | undefined): string 
  * Vite plugin that transforms Vue SFC imports on the server environment.
  * - Redirects `.vue` imports to server component wrapper virtual modules
  * - Loads server/island wrapper virtual modules with generated code
- * - Rewrites SFC templates containing `v-client:load` directives
- *   to replace components with island wrappers
+ * - Detects `v-client:load` directives and redirects imports to island wrappers
  * - Collects island component paths for the islands build
  */
 export function serverTransformPlugin(): ServerTransformPluginResult {
@@ -148,8 +146,6 @@ export function serverTransformPlugin(): ServerTransformPluginResult {
         return null
       }
 
-      const s = new MagicString(code)
-
       for (const node of matches) {
         const tag = node.tag
 
@@ -175,14 +171,6 @@ export function serverTransformPlugin(): ServerTransformPluginResult {
           islandImportMap.set(fileName, set)
         }
         set.add(resolvedPath)
-
-        // Remove v-client:load directive from the element
-        removeVClientDirective(s, node)
-      }
-
-      return {
-        code: s.toString(),
-        map: s.generateMap({ hires: true }),
       }
     },
   }
@@ -247,27 +235,4 @@ function findVClientElements(children: TemplateChildNode[]): ElementNode[] {
   }
 
   return results
-}
-
-/**
- * Removes the v-client directive from an element's template source.
- */
-function removeVClientDirective(s: MagicString, node: ElementNode): void {
-  const directive = node.props.find(
-    (prop): prop is DirectiveNode => prop.type === NodeTypes.DIRECTIVE && prop.name === 'client',
-  )
-
-  if (!directive) {
-    return
-  }
-
-  let start = directive.loc.start.offset
-  const end = directive.loc.end.offset
-
-  // Remove one preceding space
-  if (start > 0 && s.original[start - 1] === ' ') {
-    start--
-  }
-
-  s.remove(start, end)
 }
