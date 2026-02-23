@@ -63,7 +63,7 @@ describe('Client-side Hydration', () => {
     // Render each page and write as HTML files for the browser
     await Promise.all(
       hydrationCases.map(async ({ component, props }) => {
-        let html = await render(component, props)
+        const html = await render(component, props)
 
         const filePath = path.join(clientDir, `${component}.html`)
         await fs.mkdir(path.dirname(filePath), { recursive: true })
@@ -98,9 +98,14 @@ describe('Client-side Hydration', () => {
       }
     })
 
-    await page.goto(`http://localhost:${port}/${component}.html`)
-    await page.waitForFunction(() => customElements.get('vue-island') !== undefined)
-    await page.waitForLoadState('networkidle')
+    try {
+      await page.goto(`http://localhost:${port}/${component}.html`)
+      await page.waitForFunction(() => customElements.get('vue-island') !== undefined)
+      await page.waitForLoadState('networkidle')
+    } catch (e) {
+      await page.close()
+      throw e
+    }
 
     return { page, errors, warnings }
   }
