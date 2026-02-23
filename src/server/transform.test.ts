@@ -1,7 +1,7 @@
 import { describe, expect, test } from 'vitest'
 
-import { RenderContext } from '../../src/server/render.ts'
-import { transformWithRenderContext } from '../../src/server/transform.ts'
+import { RenderContext } from './render.ts'
+import { transformWithRenderContext } from './transform.ts'
 
 describe('transform rendered html', () => {
   test('prepend if the html is incomplete', () => {

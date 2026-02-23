@@ -1,6 +1,6 @@
 import { describe, test, expect, beforeAll, afterAll } from 'vitest'
 
-import { RenderFunction } from '../../src/server/render.ts'
+import { RenderFunction } from '../src/server/render.ts'
 import { createTmpDir, copyFixtures, devRender, normalizeHashes, renderCases } from './utils.ts'
 
 describe('Dev Server SSR', () => {

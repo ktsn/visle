@@ -4,9 +4,9 @@ import path from 'node:path'
 
 import { afterEach, beforeEach, describe, expect, test } from 'vitest'
 
-import { customElementEntryPath, virtualCustomElementEntryPath } from '../../src/build/paths.ts'
-import { manifestFileName } from '../../src/build/plugins/manifest.ts'
-import { createDevManifest, loadManifest } from '../../src/server/manifest.ts'
+import { customElementEntryPath, virtualCustomElementEntryPath } from '../build/paths.ts'
+import { manifestFileName } from '../build/plugins/manifest.ts'
+import { createDevManifest, loadManifest } from './manifest.ts'
 
 describe('createDevManifest', () => {
   let root: string

@@ -3,8 +3,8 @@ import path from 'node:path'
 
 import { describe, test, expect, beforeAll } from 'vitest'
 
-import { manifestFileName } from '../../src/build/plugins/manifest.ts'
-import { RenderFunction } from '../../src/server/render.ts'
+import { manifestFileName } from '../src/build/plugins/manifest.ts'
+import { RenderFunction } from '../src/server/render.ts'
 import {
   createTmpDir,
   copyFixtures,

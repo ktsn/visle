@@ -3,9 +3,9 @@ import path from 'node:path'
 
 import { describe, test, expect, beforeEach } from 'vitest'
 
-import { visle } from '../../src/build/index.ts'
-import { createDevLoader } from '../../src/server/dev.ts'
-import { createRender } from '../../src/server/render.ts'
+import { visle } from '../build/index.ts'
+import { createDevLoader } from './dev.ts'
+import { createRender } from './render.ts'
 
 /**
  * Save JavaScript code provided as the argument.
