@@ -122,11 +122,8 @@ exports[`Production Build SSR > 'Island with props' 1`] = `
     entry="/assets/Counter-[hash].js"
     serialized-props="{&quot;count&quot;:42,&quot;label&quot;:&quot;Click me&quot;}"
   >
-    <button
-      count="42"
-      label="Click me"
-    >
-      Count: 0
+    <button label="Click me">
+      Count: 42
     </button>
   </vue-island>
 </div>

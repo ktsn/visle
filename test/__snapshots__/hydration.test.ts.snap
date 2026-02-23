@@ -1,0 +1,53 @@
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
+
+exports[`Client-side Hydration > 'Island with props' 1`] = `
+<div>
+  <vue-island
+    entry="/assets/Counter-[hash].js"
+    serialized-props="{&quot;count&quot;:42,&quot;label&quot;:&quot;Click me&quot;}"
+  >
+    <button label="Click me">
+      Count: 42
+    </button>
+  </vue-island>
+</div>
+`;
+
+exports[`Client-side Hydration > 'Multiple islands on the same page' 1`] = `
+<div>
+  <vue-island
+    entry="/assets/CounterA-[hash].js"
+    serialized-props="{}"
+  >
+    <button>
+      Counter A
+    </button>
+  </vue-island>
+  <vue-island
+    entry="/assets/CounterB-[hash].js"
+    serialized-props="{}"
+  >
+    <button>
+      Counter B
+    </button>
+  </vue-island>
+</div>
+`;
+
+exports[`Client-side Hydration > 'Nested island' 1`] = `
+<div>
+  <vue-island
+    entry="/assets/Outer-[hash].js"
+    serialized-props="{}"
+  >
+    <div class="outer">
+      <span>
+        Outer
+      </span>
+      <span class="inner">
+        Inner
+      </span>
+    </div>
+  </vue-island>
+</div>
+`;
