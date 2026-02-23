@@ -26,7 +26,7 @@ export function generateServerVirtualEntryCode(entryDir: string, componentIds: s
 
   const entries = componentIds
     .map((id, i) => {
-      const key = path.relative(entryDir, id).replace(/\.vue$/, '')
+      const key = normalizePath(path.relative(entryDir, id).replace(/\.vue$/, ''))
       return `  '${key}': _${i}`
     })
     .join(',\n')
