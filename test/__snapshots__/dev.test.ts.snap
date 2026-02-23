@@ -155,6 +155,12 @@ exports[`Dev Server SSR > 'Nested island' 1`] = `
 </div>
 `;
 
+exports[`Dev Server SSR > 'Non-ascii file name' 1`] = `
+<p>
+  Non-ascii file name
+</p>
+`;
+
 exports[`Dev Server SSR > 'Server component with slot' 1`] = `
 <div class="layout">
   <header>
