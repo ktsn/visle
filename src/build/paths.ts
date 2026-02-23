@@ -94,10 +94,7 @@ export function parseId(id: string): {
  * Resolves paths for all server components
  */
 export function resolveServerComponentIds(entryDir: string): string[] {
-  const islandPaths = new Set(resolvePattern('/**/*.island.vue', entryDir))
-  const vuePaths = resolvePattern('/**/*.vue', entryDir)
-
-  return vuePaths.filter((p) => !islandPaths.has(p))
+  return resolvePattern('/**/*.vue', entryDir)
 }
 
 /**

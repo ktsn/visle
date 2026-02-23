@@ -1,10 +1,10 @@
 <script setup>
-import Counter from './Counter.island.vue'
+import Counter from '../components/Counter.vue'
 </script>
 
 <template>
   <div>
     <h1>Page</h1>
-    <Counter />
+    <Counter v-client:load />
   </div>
 </template>

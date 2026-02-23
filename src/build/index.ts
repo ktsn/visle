@@ -7,7 +7,7 @@ import type { Plugin } from 'vite'
 import { generateComponentId } from './component-id.js'
 import { VisleConfig, defaultConfig, setVisleConfig } from './config.js'
 import { clientVirtualEntryId, islandElementName, serverVirtualEntryId } from './generate.js'
-import { customElementEntryPath, resolvePattern } from './paths.js'
+import { customElementEntryPath } from './paths.js'
 import { devStyleSSRPlugin } from './plugins/dev-style-ssr.js'
 import { manifestFileName, manifestPlugin } from './plugins/manifest.js'
 import { serverTransformPlugin } from './plugins/server-transform.js'
@@ -38,12 +38,6 @@ export function visle(config: VisleConfig = {}): Plugin[] {
       // Get root from user config or default to cwd
       const root = path.resolve(userConfig.root ?? process.cwd())
 
-      // Find island components by .island.vue suffix for backward compat
-      const scannedIslandPaths = resolvePattern(
-        '/**/*.island.vue',
-        path.join(root, resolvedConfig.entryDir),
-      )
-
       return {
         environments: {
           style: {
@@ -62,9 +56,9 @@ export function visle(config: VisleConfig = {}): Plugin[] {
               outDir: resolvedConfig.clientOutDir,
               emptyOutDir: false,
               rollupOptions: {
-                // Start with custom element entry + scanned .island.vue paths;
+                // Start with custom element entry;
                 // v-client island paths are added after server build
-                input: [customElementEntryPath, ...scannedIslandPaths],
+                input: [customElementEntryPath],
                 preserveEntrySignatures: 'allow-extension',
               },
             },

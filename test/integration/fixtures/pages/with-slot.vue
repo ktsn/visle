@@ -1,5 +1,5 @@
 <script setup>
-import SlotLayout from './SlotLayout.vue'
+import SlotLayout from '../components/SlotLayout.vue'
 </script>
 
 <template>

@@ -7,16 +7,16 @@ describe('Island plugin on server', () => {
     const code = await serveAndRenderMain({
       'main.vue': `
         <script setup>
-          import Counter from "./counter.island.vue";
+          import Counter from "./counter.vue";
         </script>
         <template>
 					<div>
 						<h1>Counter</h1>
-	          <Counter />
+	          <Counter v-client:load />
 					</div>
         </template>
       `,
-      'counter.island.vue': `
+      'counter.vue': `
         <script setup>
           import { ref } from "vue";
           const count = ref(0);
@@ -28,7 +28,7 @@ describe('Island plugin on server', () => {
     })
 
     expect(code).toBe(
-      '<script type="module" src="/@visle/entry" async></script><div><h1>Counter</h1><vue-island entry="/counter.island.vue"><button>0</button></vue-island></div>',
+      '<script type="module" src="/@visle/entry" async></script><div><h1>Counter</h1><vue-island entry="/counter.vue"><button>0</button></vue-island></div>',
     )
   })
 
@@ -36,13 +36,13 @@ describe('Island plugin on server', () => {
     const code = await serveAndRenderMain({
       'main.vue': `
         <script setup>
-        import Child from './child.island.vue'
+        import Child from './child.vue'
         </script>
         <template>
-          <Child foo="bar" :baz="123" :qux="true" />
+          <Child v-client:load foo="bar" :baz="123" :qux="true" />
         </template>
       `,
-      'child.island.vue': `
+      'child.vue': `
         <script setup lang="ts">
         defineProps<{
           foo: string
@@ -57,7 +57,7 @@ describe('Island plugin on server', () => {
     })
 
     expect(code).toBe(
-      '<script type="module" src="/@visle/entry" async></script><vue-island entry="/child.island.vue" serialized-props="{&quot;foo&quot;:&quot;bar&quot;,&quot;baz&quot;:123,&quot;qux&quot;:true}"><div>bar 123 true</div></vue-island>',
+      '<script type="module" src="/@visle/entry" async></script><vue-island entry="/child.vue" serialized-props="{&quot;foo&quot;:&quot;bar&quot;,&quot;baz&quot;:123,&quot;qux&quot;:true}"><div>bar 123 true</div></vue-island>',
     )
   })
 
@@ -65,16 +65,16 @@ describe('Island plugin on server', () => {
     const code = await serveAndRenderMain({
       'main.vue': `
         <script setup>
-        import Child from './child.island.vue'
+        import Child from './child.vue'
         </script>
         <template>
-          <Child />
+          <Child v-client:load />
         </template>
         <style>
         h1 { color: red; }
         </style>
       `,
-      'child.island.vue': `
+      'child.vue': `
         <style>
         button {
           color: red;
@@ -89,8 +89,8 @@ describe('Island plugin on server', () => {
       `,
     })
 
-    expect(code).toBe(
-      `<link rel="stylesheet" href="/main.vue?vue&type=style&index=0&lang.css"><link rel="stylesheet" href="/child.island.vue?vue&type=style&index=0&lang.css"><link rel="stylesheet" href="/child.island.vue?vue&type=style&index=1&scoped=4b3910e4&lang.css"><script type="module" src="/@visle/entry" async></script><vue-island entry="/child.island.vue"><button data-v-4b3910e4>hello</button></vue-island>`,
+    expect(code).toMatch(
+      /^<link rel="stylesheet" href="\/main\.vue\?vue&type=style&index=0&lang\.css"><link rel="stylesheet" href="\/child\.vue\?vue&type=style&index=0&lang\.css"><link rel="stylesheet" href="\/child\.vue\?vue&type=style&index=1&scoped=[a-f0-9]+&lang\.css"><script type="module" src="\/@visle\/entry" async><\/script><vue-island entry="\/child\.vue"><button data-v-[a-f0-9]+>hello<\/button><\/vue-island>$/,
     )
   })
 

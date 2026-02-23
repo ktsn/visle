@@ -1,7 +1,7 @@
 <script setup lang="ts">
-import type { Product } from '../../app/db.ts'
-import Layout from '../Layout.vue'
-import ImageCarousel from '../ImageCarousel.island.vue'
+import type { Product } from '../app/db.ts'
+import Layout from '../components/Layout.vue'
+import ImageCarousel from '../components/ImageCarousel.vue'
 
 const { product } = defineProps<{
   product: Product
@@ -16,7 +16,7 @@ function formatPrice(cents: number): string {
   <Layout :title="product.name">
     <div :class="$style.detail">
       <div :style="{ viewTransitionName: `product-image-${product.id}` }">
-        <ImageCarousel :images="product.images" />
+        <ImageCarousel v-client:load :images="product.images" />
       </div>
 
       <h1
