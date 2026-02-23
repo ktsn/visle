@@ -7,7 +7,18 @@ import { RuntimeManifest, loadManifest } from './manifest.js'
 import { transformWithRenderContext } from './transform.js'
 
 export interface RenderOptions {
+  /**
+   * Directory path for server build output.
+   * Pass the same value of Visle Vite plugin's serverOutDir.
+   */
   serverOutDir?: string
+
+  /**
+   * Base public path for serving client assets.
+   * Same as Vite's `base` config. Can be an absolute path (e.g., `/prefix/`)
+   * or a full URL (e.g., `https://cdn.example.com/`).
+   * @default '/'
+   */
   base?: string
 }
 
