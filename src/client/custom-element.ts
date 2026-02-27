@@ -1,42 +1,35 @@
-import { createSSRApp, defineCustomElement, h, onMounted, useHost } from 'vue'
+class VueIsland extends HTMLElement {
+  #app: { mount(el: Element): void; unmount(): void } | null = null
 
-const IslandElement = defineCustomElement(
-  {
-    props: {
-      entry: {
-        type: String,
-        required: true,
-      },
+  constructor() {
+    super()
+    this.style.display = 'contents'
+  }
 
-      serializedProps: {
-        type: String,
-        default: '{}',
-      },
-    },
+  async connectedCallback(): Promise<void> {
+    const entry = this.getAttribute('entry')
+    if (!entry) {
+      return
+    }
 
-    setup(props) {
-      const host = useHost()!
+    const serializedProps = this.getAttribute('serialized-props') ?? '{}'
 
-      onMounted(async () => {
-        await hydrate()
-      })
+    const [{ createSSRApp }, module] = await Promise.all([
+      import('vue'),
+      import(/* @vite-ignore */ entry),
+    ])
 
-      async function hydrate(): Promise<void> {
-        const module = await import(/* @vite-ignore */ props.entry)
-        const entryComponent = module.default
+    const entryComponent = module.default
+    const parsedProps = JSON.parse(serializedProps)
 
-        const parsedProps = JSON.parse(props.serializedProps)
+    this.#app = createSSRApp(entryComponent, parsedProps)
+    this.#app.mount(this)
+  }
 
-        const app = createSSRApp(entryComponent, parsedProps)
-        app.mount(host)
-      }
+  disconnectedCallback(): void {
+    this.#app?.unmount()
+    this.#app = null
+  }
+}
 
-      return () => h('slot')
-    },
-  },
-  {
-    styles: [':host{display:contents;}'],
-  },
-)
-
-window.customElements.define('vue-island', IslandElement)
+window.customElements.define('vue-island', VueIsland)
