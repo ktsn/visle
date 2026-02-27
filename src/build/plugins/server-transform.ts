@@ -9,8 +9,8 @@ import {
   islandWrapPrefix,
   serverWrapPrefix,
 } from '../generate.js'
-import { buildImportMap, findVClientElements } from './sfc-analysis.js'
 import { customElementEntryPath, parseId } from '../paths.js'
+import { buildImportMap, findVClientElements } from './sfc-analysis.js'
 
 interface ServerTransformPluginResult {
   plugin: Plugin
