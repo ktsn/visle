@@ -289,7 +289,7 @@ describe('findVClientElements', () => {
     const children = parseTemplate('<Counter v-client:load />')
     const results = findVClientElements(children)
     expect(results).toHaveLength(1)
-    expect(results[0].tag).toBe('Counter')
+    expect(results[0]!.tag).toBe('Counter')
   })
 
   test('finds multiple elements with v-client:load', () => {
@@ -310,7 +310,7 @@ describe('findVClientElements', () => {
     `)
     const results = findVClientElements(children)
     expect(results).toHaveLength(1)
-    expect(results[0].tag).toBe('Header')
+    expect(results[0]!.tag).toBe('Header')
   })
 
   test('finds nested elements with v-client:load', () => {
@@ -323,7 +323,7 @@ describe('findVClientElements', () => {
     `)
     const results = findVClientElements(children)
     expect(results).toHaveLength(1)
-    expect(results[0].tag).toBe('Counter')
+    expect(results[0]!.tag).toBe('Counter')
   })
 
   test('finds deeply nested and top-level elements', () => {
@@ -362,13 +362,13 @@ describe('findVClientElements', () => {
     `)
     const results = findVClientElements(children)
     expect(results).toHaveLength(1)
-    expect(results[0].tag).toBe('Header')
+    expect(results[0]!.tag).toBe('Header')
   })
 
   test('finds v-client:load on native HTML elements', () => {
     const children = parseTemplate('<div v-client:load />')
     const results = findVClientElements(children)
     expect(results).toHaveLength(1)
-    expect(results[0].tag).toBe('div')
+    expect(results[0]!.tag).toBe('div')
   })
 })
