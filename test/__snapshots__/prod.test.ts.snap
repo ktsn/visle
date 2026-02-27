@@ -154,6 +154,34 @@ exports[`Production Build SSR > 'Multiple islands on the same page' 1`] = `
 </div>
 `;
 
+exports[`Production Build SSR > 'Named export' 1`] = `
+<link
+  rel="stylesheet"
+  href="/assets/client-entry-[hash].css"
+>
+<script
+  type="module"
+  src="/assets/custom-element-[hash].js"
+  async
+>
+</script>
+<!--[-->
+<div>
+  island
+</div>
+<div>
+  server
+</div>
+<vue-island entry="/assets/NamedExportIsland-[hash].js">
+  <div>
+    Named Export Island
+  </div>
+</vue-island>
+<div>
+  Named Export Server
+</div>
+`;
+
 exports[`Production Build SSR > 'Nested island' 1`] = `
 <link
   rel="stylesheet"
@@ -226,6 +254,7 @@ exports[`Production Build SSR > Build output files 1`] = `
   "assets/CounterA-[hash].js",
   "assets/CounterB-[hash].js",
   "assets/Inner-[hash].js",
+  "assets/NamedExportIsland-[hash].js",
   "assets/Outer-[hash].js",
   "assets/StyledCounter-[hash].js",
   "assets/_plugin-vue_export-helper-[hash].js",
@@ -247,6 +276,7 @@ exports[`Production Build SSR > Build output files 2`] = `
     "components/CounterA.vue": "assets/CounterA-[hash].js",
     "components/CounterB.vue": "assets/CounterB-[hash].js",
     "components/Inner.vue": "assets/Inner-[hash].js",
+    "components/NamedExportIsland.vue": "assets/NamedExportIsland-[hash].js",
     "components/Outer.vue": "assets/Outer-[hash].js",
     "components/StyledCounter.vue": "assets/StyledCounter-[hash].js",
   },
