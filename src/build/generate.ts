@@ -48,6 +48,8 @@ export function generateServerComponentCodeJS(
   return `import { defineComponent, h, useSSRContext, onServerPrefetch } from 'vue'
 import OriginalComponent from '${normalizedFilePath}'
 
+export * from '${normalizedFilePath}'
+
 export default defineComponent({
   setup(_props, { slots }) {
     const context = useSSRContext()
@@ -80,6 +82,8 @@ export function generateIslandWrapperCodeJS(
   return `import { defineComponent, h, useSSRContext, useAttrs, inject, provide, onServerPrefetch } from 'vue'
 import { islandSymbol } from '${symbolImportId}'
 import OriginalComponent from '${normalizedFilePath}'
+
+export * from '${normalizedFilePath}'
 
 export default defineComponent({
   inheritAttrs: false,

@@ -25,6 +25,7 @@ export const renderCases: { name: string; component: string; props?: Record<stri
   { name: 'Multiple islands on the same page', component: 'with-multiple-islands' },
   { name: 'Non-ascii file name', component: 'テスト' },
   { name: 'Island with alias import', component: 'with-island-alias' },
+  { name: 'Named export', component: 'named-export' },
 ]
 
 /**
