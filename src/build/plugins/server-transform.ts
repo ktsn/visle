@@ -3,6 +3,7 @@ import path from 'node:path'
 import type { ElementNode, TemplateChildNode } from '@vue/compiler-core'
 import { NodeTypes } from '@vue/compiler-core'
 import type { Plugin, ResolvedConfig } from 'vite'
+import type { ParserPlugin } from '@babel/parser'
 import type { ObjectExpression } from '@babel/types'
 import { babelParse, compileScript, parse, type SFCDescriptor } from 'vue/compiler-sfc'
 
@@ -236,9 +237,18 @@ function buildImportMap(descriptor: SFCDescriptor, id: string): Map<string, Impo
   }
 
   if (descriptor.script) {
+    const lang = descriptor.script.lang
+    const plugins: ParserPlugin[] = []
+    if (lang === 'ts' || lang === 'tsx') {
+      plugins.push('typescript')
+    }
+    if (lang === 'jsx' || lang === 'tsx') {
+      plugins.push('jsx')
+    }
+
     const ast = babelParse(descriptor.script.content, {
       sourceType: 'module',
-      plugins: descriptor.script.lang === 'ts' ? ['typescript'] : [],
+      plugins,
     })
 
     // Step 1: Build importName → source map from import declarations
@@ -278,20 +288,25 @@ function buildImportMap(descriptor: SFCDescriptor, id: string): Map<string, Impo
       const componentsProp = optionsObject.properties.find(
         (p) =>
           p.type === 'ObjectProperty'
-          && p.key.type === 'Identifier'
-          && p.key.name === 'components',
+          && ((p.key.type === 'Identifier' && p.key.name === 'components')
+            || (p.key.type === 'StringLiteral' && p.key.value === 'components')),
       )
       if (
         componentsProp?.type === 'ObjectProperty'
         && componentsProp.value.type === 'ObjectExpression'
       ) {
         for (const prop of componentsProp.value.properties) {
-          if (
-            prop.type === 'ObjectProperty'
-            && prop.key.type === 'Identifier'
-            && prop.value.type === 'Identifier'
-          ) {
-            componentMap.set(prop.key.name, prop.value.name)
+          if (prop.type !== 'ObjectProperty' || prop.value.type !== 'Identifier') {
+            continue
+          }
+          const keyName =
+            prop.key.type === 'Identifier'
+              ? prop.key.name
+              : prop.key.type === 'StringLiteral'
+                ? prop.key.value
+                : undefined
+          if (keyName) {
+            componentMap.set(keyName, prop.value.name)
           }
         }
       }

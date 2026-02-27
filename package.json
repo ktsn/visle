@@ -37,6 +37,8 @@
     "vite": "^7.3.1"
   },
   "devDependencies": {
+    "@babel/parser": "^7.29.0",
+    "@babel/types": "^7.29.0",
     "@types/connect": "^3.4.38",
     "@types/diffable-html": "^5.0.2",
     "@types/express": "^5.0.6",
