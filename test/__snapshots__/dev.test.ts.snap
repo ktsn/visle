@@ -134,6 +134,30 @@ exports[`Dev Server SSR > 'Multiple islands on the same page' 1`] = `
 </div>
 `;
 
+exports[`Dev Server SSR > 'Named export' 1`] = `
+<script
+  type="module"
+  src="/@visle/entry"
+  async
+>
+</script>
+<!--[-->
+<div>
+  island
+</div>
+<div>
+  server
+</div>
+<vue-island entry="/components/NamedExportIsland.vue">
+  <div>
+    Named Export Island
+  </div>
+</vue-island>
+<div>
+  Named Export Server
+</div>
+`;
+
 exports[`Dev Server SSR > 'Nested island' 1`] = `
 <script
   type="module"
