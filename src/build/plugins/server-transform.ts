@@ -187,7 +187,12 @@ export function serverTransformPlugin(): ServerTransformPluginResult {
           continue
         }
 
-        if (!resolvedPath) continue
+        if (!resolvedPath) {
+          this.warn(
+            `Could not resolve import "${importInfo.source}" for v-client:load component "${tag}" in ${fileName}`,
+          )
+          continue
+        }
 
         islandPaths.add(resolvedPath)
 
