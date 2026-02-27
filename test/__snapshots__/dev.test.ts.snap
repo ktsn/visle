@@ -113,6 +113,44 @@ exports[`Dev Server SSR > 'Island with alias import' 1`] = `
 </div>
 `;
 
+exports[`Dev Server SSR > 'Island with options API renamed compo…' 1`] = `
+<script
+  type="module"
+  src="/@visle/entry"
+  async
+>
+</script>
+<div>
+  <h1>
+    Options API Renamed Page
+  </h1>
+  <vue-island entry="/components/OptionsCounter.vue">
+    <button>
+      Options Count: 0
+    </button>
+  </vue-island>
+</div>
+`;
+
+exports[`Dev Server SSR > 'Island with options API' 1`] = `
+<script
+  type="module"
+  src="/@visle/entry"
+  async
+>
+</script>
+<div>
+  <h1>
+    Options API Page
+  </h1>
+  <vue-island entry="/components/OptionsCounter.vue">
+    <button>
+      Options Count: 0
+    </button>
+  </vue-island>
+</div>
+`;
+
 exports[`Dev Server SSR > 'Island with props' 1`] = `
 <script
   type="module"

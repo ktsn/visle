@@ -3,7 +3,8 @@ import path from 'node:path'
 import type { ElementNode, TemplateChildNode } from '@vue/compiler-core'
 import { NodeTypes } from '@vue/compiler-core'
 import type { Plugin, ResolvedConfig } from 'vite'
-import { compileScript, parse, type SFCDescriptor } from 'vue/compiler-sfc'
+import type { ObjectExpression } from '@babel/types'
+import { babelParse, compileScript, parse, type SFCDescriptor } from 'vue/compiler-sfc'
 
 import {
   generateIslandWrapperCodeJS,
@@ -212,27 +213,102 @@ export function serverTransformPlugin(): ServerTransformPluginResult {
 }
 
 /**
- * Parses import declarations from <script setup> using compileScript
+ * Parses import declarations from <script setup> or <script>
  * to build a tag-name-to-import mapping.
  */
 function buildImportMap(descriptor: SFCDescriptor, id: string): Map<string, ImportInfo> {
   const map = new Map<string, ImportInfo>()
 
-  if (!descriptor.scriptSetup) {
+  if (descriptor.scriptSetup) {
+    const { imports } = compileScript(descriptor, { id })
+
+    if (imports) {
+      for (const [name, binding] of Object.entries(imports)) {
+        if (binding.source.endsWith('.vue')) {
+          map.set(name, {
+            source: binding.source,
+          })
+        }
+      }
+    }
+
     return map
   }
 
-  const { imports } = compileScript(descriptor, { id })
+  if (descriptor.script) {
+    const ast = babelParse(descriptor.script.content, {
+      sourceType: 'module',
+      plugins: descriptor.script.lang === 'ts' ? ['typescript'] : [],
+    })
 
-  if (!imports) {
-    return map
-  }
+    // Step 1: Build importName → source map from import declarations
+    const importSources = new Map<string, string>()
+    for (const node of ast.program.body) {
+      if (node.type === 'ImportDeclaration') {
+        const source = node.source.value
+        if (typeof source === 'string' && source.endsWith('.vue')) {
+          for (const specifier of node.specifiers) {
+            if (specifier.type === 'ImportDefaultSpecifier') {
+              importSources.set(specifier.local.name, source)
+            }
+          }
+        }
+      }
+    }
 
-  for (const [name, binding] of Object.entries(imports)) {
-    if (binding.source.endsWith('.vue')) {
-      map.set(name, {
-        source: binding.source,
-      })
+    // Step 2: Find options object from export default
+    // Supports: export default { ... } and export default fn({ ... })
+    let optionsObject: ObjectExpression | undefined
+    for (const node of ast.program.body) {
+      if (node.type === 'ExportDefaultDeclaration') {
+        if (node.declaration.type === 'ObjectExpression') {
+          optionsObject = node.declaration
+        } else if (
+          node.declaration.type === 'CallExpression'
+          && node.declaration.arguments[0]?.type === 'ObjectExpression'
+        ) {
+          optionsObject = node.declaration.arguments[0]
+        }
+      }
+    }
+
+    // Step 3: Extract components option to get tag name mappings
+    const componentMap = new Map<string, string>() // tagName → importName
+    if (optionsObject) {
+      const componentsProp = optionsObject.properties.find(
+        (p) =>
+          p.type === 'ObjectProperty'
+          && p.key.type === 'Identifier'
+          && p.key.name === 'components',
+      )
+      if (
+        componentsProp?.type === 'ObjectProperty'
+        && componentsProp.value.type === 'ObjectExpression'
+      ) {
+        for (const prop of componentsProp.value.properties) {
+          if (
+            prop.type === 'ObjectProperty'
+            && prop.key.type === 'Identifier'
+            && prop.value.type === 'Identifier'
+          ) {
+            componentMap.set(prop.key.name, prop.value.name)
+          }
+        }
+      }
+    }
+
+    // Step 4: Combine — use componentMap if available, otherwise fall back to import names
+    if (componentMap.size > 0) {
+      for (const [tagName, importName] of componentMap) {
+        const source = importSources.get(importName)
+        if (source) {
+          map.set(tagName, { source })
+        }
+      }
+    } else {
+      for (const [importName, source] of importSources) {
+        map.set(importName, { source })
+      }
     }
   }
 
