@@ -24,6 +24,7 @@ export const renderCases: { name: string; component: string; props?: Record<stri
   { name: 'Nested island', component: 'with-nested-island' },
   { name: 'Multiple islands on the same page', component: 'with-multiple-islands' },
   { name: 'Non-ascii file name', component: 'テスト' },
+  { name: 'Island with alias import', component: 'with-island-alias' },
   { name: 'Named export', component: 'named-export' },
 ]
 
@@ -53,6 +54,9 @@ export function devRender(root: string) {
   const loader = createDevLoader({
     root,
     plugins: [visle()],
+    resolve: {
+      alias: { '@': root },
+    },
   })
 
   render.setLoader(loader)
@@ -67,6 +71,9 @@ export async function prodBuild(root: string): Promise<void> {
   const builder = await createBuilder({
     root,
     plugins: [visle()],
+    resolve: {
+      alias: { '@': root },
+    },
     logLevel: 'silent',
   })
 
