@@ -5,6 +5,7 @@ exports[`Client-side Hydration > 'Island with props' 1`] = `
   <vue-island
     entry="/assets/Counter-[hash].js"
     serialized-props="{&quot;count&quot;:42,&quot;label&quot;:&quot;Click me&quot;}"
+    style="display: contents;"
   >
     <button label="Click me">
       Count: 42
@@ -15,12 +16,18 @@ exports[`Client-side Hydration > 'Island with props' 1`] = `
 
 exports[`Client-side Hydration > 'Multiple islands on the same page' 1`] = `
 <div>
-  <vue-island entry="/assets/CounterA-[hash].js">
+  <vue-island
+    entry="/assets/CounterA-[hash].js"
+    style="display: contents;"
+  >
     <button>
       Counter A
     </button>
   </vue-island>
-  <vue-island entry="/assets/CounterB-[hash].js">
+  <vue-island
+    entry="/assets/CounterB-[hash].js"
+    style="display: contents;"
+  >
     <button>
       Counter B
     </button>
@@ -30,7 +37,10 @@ exports[`Client-side Hydration > 'Multiple islands on the same page' 1`] = `
 
 exports[`Client-side Hydration > 'Nested island' 1`] = `
 <div>
-  <vue-island entry="/assets/Outer-[hash].js">
+  <vue-island
+    entry="/assets/Outer-[hash].js"
+    style="display: contents;"
+  >
     <div class="outer">
       <span>
         Outer
