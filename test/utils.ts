@@ -26,6 +26,8 @@ export const renderCases: { name: string; component: string; props?: Record<stri
   { name: 'Non-ascii file name', component: 'テスト' },
   { name: 'Island with alias import', component: 'with-island-alias' },
   { name: 'Named export', component: 'named-export' },
+  { name: 'Island with options API', component: 'with-options-api' },
+  { name: 'Island with options API renamed component', component: 'with-options-api-renamed' },
 ]
 
 /**

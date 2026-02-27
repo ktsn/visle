@@ -1,9 +1,7 @@
 import path from 'node:path'
 
-import type { ElementNode, TemplateChildNode } from '@vue/compiler-core'
-import { NodeTypes } from '@vue/compiler-core'
 import type { Plugin, ResolvedConfig } from 'vite'
-import { compileScript, parse, type SFCDescriptor } from 'vue/compiler-sfc'
+import { parse } from 'vue/compiler-sfc'
 
 import {
   generateIslandWrapperCodeJS,
@@ -12,14 +10,11 @@ import {
   serverWrapPrefix,
 } from '../generate.js'
 import { customElementEntryPath, parseId } from '../paths.js'
+import { buildImportMap, findVClientElements } from './sfc-analysis.js'
 
 interface ServerTransformPluginResult {
   plugin: Plugin
   islandPaths: Set<string>
-}
-
-interface ImportInfo {
-  source: string
 }
 
 /**
@@ -209,63 +204,4 @@ export function serverTransformPlugin(): ServerTransformPluginResult {
   }
 
   return { plugin, islandPaths }
-}
-
-/**
- * Parses import declarations from <script setup> using compileScript
- * to build a tag-name-to-import mapping.
- */
-function buildImportMap(descriptor: SFCDescriptor, id: string): Map<string, ImportInfo> {
-  const map = new Map<string, ImportInfo>()
-
-  if (!descriptor.scriptSetup) {
-    return map
-  }
-
-  const { imports } = compileScript(descriptor, { id })
-
-  if (!imports) {
-    return map
-  }
-
-  for (const [name, binding] of Object.entries(imports)) {
-    if (binding.source.endsWith('.vue')) {
-      map.set(name, {
-        source: binding.source,
-      })
-    }
-  }
-
-  return map
-}
-
-/**
- * Recursively finds elements with v-client:load directive.
- */
-function findVClientElements(children: TemplateChildNode[]): ElementNode[] {
-  const results: ElementNode[] = []
-
-  for (const child of children) {
-    if (child.type !== NodeTypes.ELEMENT) {
-      continue
-    }
-
-    const hasVClient = child.props.some(
-      (prop) =>
-        prop.type === NodeTypes.DIRECTIVE &&
-        prop.name === 'client' &&
-        prop.arg?.type === NodeTypes.SIMPLE_EXPRESSION &&
-        prop.arg.content === 'load',
-    )
-
-    if (hasVClient) {
-      results.push(child)
-    }
-
-    if (child.children.length > 0) {
-      results.push(...findVClientElements(child.children))
-    }
-  }
-
-  return results
 }

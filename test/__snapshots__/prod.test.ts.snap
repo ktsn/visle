@@ -129,6 +129,52 @@ exports[`Production Build SSR > 'Island with alias import' 1`] = `
 </div>
 `;
 
+exports[`Production Build SSR > 'Island with options API renamed compo…' 1`] = `
+<link
+  rel="stylesheet"
+  href="/assets/client-entry-[hash].css"
+>
+<script
+  type="module"
+  src="/assets/custom-element-[hash].js"
+  async
+>
+</script>
+<div>
+  <h1>
+    Options API Renamed Page
+  </h1>
+  <vue-island entry="/assets/OptionsCounter-[hash].js">
+    <button>
+      Options Count: 0
+    </button>
+  </vue-island>
+</div>
+`;
+
+exports[`Production Build SSR > 'Island with options API' 1`] = `
+<link
+  rel="stylesheet"
+  href="/assets/client-entry-[hash].css"
+>
+<script
+  type="module"
+  src="/assets/custom-element-[hash].js"
+  async
+>
+</script>
+<div>
+  <h1>
+    Options API Page
+  </h1>
+  <vue-island entry="/assets/OptionsCounter-[hash].js">
+    <button>
+      Options Count: 0
+    </button>
+  </vue-island>
+</div>
+`;
+
 exports[`Production Build SSR > 'Island with props' 1`] = `
 <link
   rel="stylesheet"
@@ -278,6 +324,7 @@ exports[`Production Build SSR > Build output files 1`] = `
   "assets/CounterB-[hash].js",
   "assets/Inner-[hash].js",
   "assets/NamedExportIsland-[hash].js",
+  "assets/OptionsCounter-[hash].js",
   "assets/Outer-[hash].js",
   "assets/StyledCounter-[hash].js",
   "assets/_plugin-vue_export-helper-[hash].js",
@@ -300,6 +347,7 @@ exports[`Production Build SSR > Build output files 2`] = `
     "components/CounterB.vue": "assets/CounterB-[hash].js",
     "components/Inner.vue": "assets/Inner-[hash].js",
     "components/NamedExportIsland.vue": "assets/NamedExportIsland-[hash].js",
+    "components/OptionsCounter.vue": "assets/OptionsCounter-[hash].js",
     "components/Outer.vue": "assets/Outer-[hash].js",
     "components/StyledCounter.vue": "assets/StyledCounter-[hash].js",
   },
