@@ -70,7 +70,7 @@ export function serverTransformPlugin(): ServerTransformPluginResult {
       islandImportMap.clear()
     },
 
-    resolveId(id, importer) {
+    async resolveId(id, importer) {
       // Redirect .vue imports to server wrapper virtual modules.
       // Skip when the importer is a wrapper module to avoid infinite recursion.
       const { fileName, query } = parseId(id)
@@ -79,7 +79,15 @@ export function serverTransformPlugin(): ServerTransformPluginResult {
         const isFromWrapper =
           importer?.startsWith(serverWrapPrefix) || importer?.startsWith(islandWrapPrefix)
         if (!isFromWrapper) {
-          const absolutePath = toAbsolutePath(fileName, importer)
+          let absolutePath: string
+          if (path.isAbsolute(fileName) || fileName.startsWith('.')) {
+            absolutePath = toAbsolutePath(fileName, importer)
+          } else {
+            // Alias or bare specifier — delegate to Vite's resolver
+            const resolved = await this.resolve(id, importer, { skipSelf: true })
+            if (!resolved) return null
+            absolutePath = resolved.id
+          }
 
           // Check if this import was marked as an island by the transform hook.
           // The importer may include a query (e.g. ?vue&type=script), so strip it.
@@ -118,7 +126,7 @@ export function serverTransformPlugin(): ServerTransformPluginResult {
       }
     },
 
-    transform(code, id) {
+    async transform(code, id) {
       const { fileName, query } = parseId(id)
 
       if (!fileName.endsWith('.vue')) {
@@ -146,11 +154,36 @@ export function serverTransformPlugin(): ServerTransformPluginResult {
         return null
       }
 
-      for (const node of matches) {
-        const tag = node.tag
+      // Resolve alias import sources in parallel
+      const resolveResults = await Promise.all(
+        matches.map(async (node) => {
+          const importInfo = importMap.get(node.tag)
+          if (!importInfo) return { tag: node.tag, importInfo: undefined, resolvedPath: undefined }
 
-        // Check if this is a statically imported component
-        const importInfo = importMap.get(tag)
+          const source = importInfo.source
+          let resolvedPath: string | undefined
+          if (path.isAbsolute(source) || source.startsWith('.')) {
+            resolvedPath = path.resolve(path.dirname(fileName), source)
+          } else {
+            // Alias or bare specifier — delegate to Vite's resolver
+            const resolved = await this.resolve(source, id, { skipSelf: true })
+            if (resolved) {
+              // Our resolveId wraps .vue in virtual module prefixes — unwrap to get the real path
+              const resolvedId = resolved.id
+              if (resolvedId.startsWith(serverWrapPrefix)) {
+                resolvedPath = resolvedId.slice(serverWrapPrefix.length)
+              } else if (resolvedId.startsWith(islandWrapPrefix)) {
+                resolvedPath = resolvedId.slice(islandWrapPrefix.length)
+              } else {
+                resolvedPath = resolvedId
+              }
+            }
+          }
+          return { tag: node.tag, importInfo, resolvedPath }
+        }),
+      )
+
+      for (const { tag, importInfo, resolvedPath } of resolveResults) {
         if (!importInfo) {
           this.warn(
             `v-client:load on "${tag}" is not supported. ` +
@@ -159,8 +192,8 @@ export function serverTransformPlugin(): ServerTransformPluginResult {
           continue
         }
 
-        // Resolve the absolute path of the component and collect for islands build
-        const resolvedPath = path.resolve(path.dirname(fileName), importInfo.source)
+        if (!resolvedPath) continue
+
         islandPaths.add(resolvedPath)
 
         // Record in the island import map so resolveId can redirect this import

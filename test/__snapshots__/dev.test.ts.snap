@@ -94,6 +94,25 @@ exports[`Dev Server SSR > 'Full HTML document with head/body' 1`] = `
 </html>
 `;
 
+exports[`Dev Server SSR > 'Island with alias import' 1`] = `
+<script
+  type="module"
+  src="/@visle/entry"
+  async
+>
+</script>
+<div>
+  <h1>
+    Page
+  </h1>
+  <vue-island entry="/components/Counter.vue">
+    <button>
+      Count: 0
+    </button>
+  </vue-island>
+</div>
+`;
+
 exports[`Dev Server SSR > 'Island with props' 1`] = `
 <script
   type="module"

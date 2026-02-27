@@ -106,6 +106,29 @@ exports[`Production Build SSR > 'Full HTML document with head/body' 1`] = `
 </html>
 `;
 
+exports[`Production Build SSR > 'Island with alias import' 1`] = `
+<link
+  rel="stylesheet"
+  href="/assets/client-entry-[hash].css"
+>
+<script
+  type="module"
+  src="/assets/custom-element-[hash].js"
+  async
+>
+</script>
+<div>
+  <h1>
+    Page
+  </h1>
+  <vue-island entry="/assets/Counter-[hash].js">
+    <button>
+      Count: 0
+    </button>
+  </vue-island>
+</div>
+`;
+
 exports[`Production Build SSR > 'Island with props' 1`] = `
 <link
   rel="stylesheet"
