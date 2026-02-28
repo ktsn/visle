@@ -1,5 +1,7 @@
+import { createSSRApp, App } from 'vue'
+
 class VueIsland extends HTMLElement {
-  #app: { mount(el: Element): void; unmount(): void } | null = null
+  #app: App | null = null
 
   constructor() {
     super()
@@ -14,11 +16,7 @@ class VueIsland extends HTMLElement {
 
     const serializedProps = this.getAttribute('serialized-props') ?? '{}'
 
-    const [{ createSSRApp }, module] = await Promise.all([
-      import('vue'),
-      import(/* @vite-ignore */ entry),
-    ])
-
+    const module = await import(/* @vite-ignore */ entry)
     const entryComponent = module.default
     const parsedProps = JSON.parse(serializedProps)
 
