@@ -4,8 +4,8 @@ import type { Plugin, ResolvedConfig } from 'vite'
 import { parse } from 'vue/compiler-sfc'
 
 import {
-  generateIslandWrapperCodeJS,
-  generateServerComponentCodeJS,
+  generateIslandWrapperCode,
+  generateServerComponentCode,
   islandWrapPrefix,
   serverWrapPrefix,
 } from '../generate.js'
@@ -89,7 +89,7 @@ export function serverTransformPlugin(): ServerTransformPluginResult {
       if (id.startsWith(serverWrapPrefix)) {
         const filePath = id.slice(serverWrapPrefix.length)
         const componentRelativePath = path.relative(viteConfig.root, filePath)
-        return generateServerComponentCodeJS(filePath, componentRelativePath)
+        return generateServerComponentCode(filePath, componentRelativePath)
       }
 
       if (id.startsWith(islandWrapPrefix)) {
@@ -99,7 +99,7 @@ export function serverTransformPlugin(): ServerTransformPluginResult {
           viteConfig.root,
           customElementEntryPath,
         )
-        return generateIslandWrapperCodeJS(
+        return generateIslandWrapperCode(
           filePath,
           componentRelativePath,
           customElementEntryRelativePath,

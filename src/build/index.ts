@@ -9,6 +9,7 @@ import { VisleConfig, defaultConfig, setVisleConfig } from './config.js'
 import { clientVirtualEntryId, islandElementName, serverVirtualEntryId } from './generate.js'
 import { customElementEntryPath } from './paths.js'
 import { devStyleSSRPlugin } from './plugins/dev-style-ssr.js'
+import { entryTypesPlugin } from './plugins/entry-types.js'
 import { manifestFileName, manifestPlugin } from './plugins/manifest.js'
 import { serverTransformPlugin } from './plugins/server-transform.js'
 import { virtualFilePlugin } from './plugins/virtual-file.js'
@@ -30,6 +31,7 @@ export function visle(config: VisleConfig = {}): Plugin[] {
   const { plugin: serverTransform, islandPaths } = serverTransformPlugin()
   const virtualFile = virtualFilePlugin(resolvedConfig)
   const { plugin: manifest, getManifestData } = manifestPlugin()
+  const { plugin: entryTypes, generate: generateEntryTypes } = entryTypesPlugin(resolvedConfig)
 
   const orchestrationPlugin: Plugin = {
     name: 'visle:orchestration',
@@ -87,13 +89,17 @@ export function visle(config: VisleConfig = {}): Plugin[] {
             // Build islands using entry paths collected during server build
             await builder.build(builder.environments.islands!)
 
-            // Write manifest file after all builds
+            // Write manifest and type definition files after all builds
             const serverOutDir = path.resolve(root, resolvedConfig.serverOutDir)
             await fs.mkdir(serverOutDir, { recursive: true })
-            await fs.writeFile(
-              path.join(serverOutDir, manifestFileName),
-              JSON.stringify(getManifestData()),
-            )
+
+            await Promise.all([
+              fs.writeFile(
+                path.join(serverOutDir, manifestFileName),
+                JSON.stringify(getManifestData()),
+              ),
+              generateEntryTypes(),
+            ])
           },
         },
       }
@@ -132,6 +138,7 @@ export function visle(config: VisleConfig = {}): Plugin[] {
     serverTransform,
     virtualFile,
     manifest,
+    entryTypes,
     vue({
       features: {
         componentIdGenerator: (filePath, source, isProduction) => {

@@ -33,8 +33,10 @@ export interface RenderContext {
   manifest?: RuntimeManifest
 }
 
-export interface RenderFunction {
-  (componentPath: string, props?: any): Promise<string>
+type RenderArgs<P> = {} extends P ? [props?: P] : [props: P]
+
+export interface RenderFunction<T extends Record<string, any> = Record<string, any>> {
+  <K extends string & keyof T>(componentPath: K, ...args: RenderArgs<T[K]>): Promise<string>
   setLoader(loader: RenderLoader): void
 }
 
@@ -44,7 +46,9 @@ export interface RenderFunction {
  * You need to specify Vite output directory of server build as same value as
  * defined in Vite config.
  */
-export function createRender(options: RenderOptions = {}): RenderFunction {
+export function createRender<T extends Record<string, any> = Record<string, any>>(
+  options: RenderOptions = {},
+): RenderFunction<T> {
   let cachedManifest: RuntimeManifest | undefined
 
   let loader: RenderLoader = {
@@ -83,5 +87,5 @@ export function createRender(options: RenderOptions = {}): RenderFunction {
     loader = newLoader
   }
 
-  return render
+  return render as RenderFunction<T>
 }

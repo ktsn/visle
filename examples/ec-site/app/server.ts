@@ -1,10 +1,10 @@
 import { Hono } from 'hono'
-import { createRender } from 'visle'
+import { createRender, type VisleEntries } from 'visle'
 
 import { getAllProducts, getProduct } from './db.ts'
 
 const app = new Hono()
-const render = createRender()
+const render = createRender<VisleEntries>()
 
 app.get('/', async (c) => {
   const products = getAllProducts()
