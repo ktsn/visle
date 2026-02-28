@@ -3,6 +3,13 @@ import { createSSRApp, App } from 'vue'
 class VueIsland extends HTMLElement {
   #app: App | null = null
 
+  /**
+   * Monotonic counter to invalidate stale async work in connectedCallback.
+   * Incremented on each connect and disconnect so that an in-flight import
+   * from a previous connection is discarded after it resolves.
+   */
+  #connectToken = 0
+
   constructor() {
     super()
 
@@ -16,6 +23,13 @@ class VueIsland extends HTMLElement {
   }
 
   async connectedCallback(): Promise<void> {
+    const token = ++this.#connectToken
+
+    if (this.#app) {
+      this.#app.unmount()
+      this.#app = null
+    }
+
     const entry = this.getAttribute('entry')
     if (!entry) {
       return
@@ -24,16 +38,35 @@ class VueIsland extends HTMLElement {
     const serializedProps = this.getAttribute('serialized-props') ?? '{}'
 
     const module = await import(/* @vite-ignore */ entry)
+
+    if (token !== this.#connectToken || !this.isConnected) {
+      return
+    }
+
     const entryComponent = module.default
-    const parsedProps = JSON.parse(serializedProps)
+    const parsedProps = tryParseProps(serializedProps)
 
     this.#app = createSSRApp(entryComponent, parsedProps)
     this.#app.mount(this)
   }
 
   disconnectedCallback(): void {
+    this.#connectToken++
     this.#app?.unmount()
     this.#app = null
+  }
+}
+
+/**
+ * Parse serialized props.
+ * Return empty object if parsing is failed or parsed value is not an object.
+ */
+function tryParseProps(serialized: string): Record<string, unknown> {
+  try {
+    const parsed = JSON.parse(serialized)
+    return typeof parsed === 'object' && parsed != null ? parsed : {}
+  } catch {
+    return {}
   }
 }
 
