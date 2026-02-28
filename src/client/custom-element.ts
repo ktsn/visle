@@ -1,6 +1,8 @@
 import { createSSRApp, App } from 'vue'
 
-class VueIsland extends HTMLElement {
+import { loadModule } from './load-module.js'
+
+export class VueIsland extends HTMLElement {
   #app: App | null = null
 
   /**
@@ -37,7 +39,7 @@ class VueIsland extends HTMLElement {
 
     const serializedProps = this.getAttribute('serialized-props') ?? '{}'
 
-    const module = await import(/* @vite-ignore */ entry)
+    const module = await loadModule(entry)
 
     if (token !== this.#connectToken || !this.isConnected) {
       return
