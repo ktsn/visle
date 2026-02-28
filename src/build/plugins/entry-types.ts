@@ -42,9 +42,11 @@ export function entryTypesPlugin(config: ResolvedVisleConfig): {
 
   let timer: ReturnType<typeof setTimeout> | undefined
 
-  function scheduleGenerate(): void {
+  function scheduleGenerate(onError: (error: unknown) => void): void {
     clearTimeout(timer)
-    timer = setTimeout(generateAndWrite, 100)
+    timer = setTimeout(() => {
+      generateAndWrite().catch(onError)
+    }, 100)
   }
 
   const plugin: Plugin = {
@@ -57,9 +59,11 @@ export function entryTypesPlugin(config: ResolvedVisleConfig): {
     },
 
     async configureServer(server) {
-      function onChange(filePath: string): void {
+      const onChange = (filePath: string) => {
         if (filePath.endsWith('.vue') && filePath.startsWith(entryRoot)) {
-          scheduleGenerate()
+          scheduleGenerate(() => {
+            this.warn(`Failed to generate dts file to ${config.dts!}`)
+          })
         }
       }
 
