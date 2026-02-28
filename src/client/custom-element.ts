@@ -5,7 +5,14 @@ class VueIsland extends HTMLElement {
 
   constructor() {
     super()
-    this.style.display = 'contents'
+
+    const shadow = this.attachShadow({ mode: 'open' })
+
+    const style = document.createElement('style')
+    style.textContent = ':host{display:contents}'
+    shadow.appendChild(style)
+
+    shadow.appendChild(document.createElement('slot'))
   }
 
   async connectedCallback(): Promise<void> {

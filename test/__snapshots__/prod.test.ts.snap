@@ -271,7 +271,6 @@ exports[`Production Build SSR > Build output files 2`] = `
     "assets/client-entry-[hash].css",
   ],
   "jsMap": {
-    "../../../../node_modules/.pnpm/vue@3.5.29_typescript@5.9.3/node_modules/vue/dist/vue.runtime.esm-bundler.js": "assets/vue.runtime.esm-bundler-[hash].js",
     "../../../../src/client/custom-element.ts": "assets/custom-element-[hash].js",
     "components/Counter.vue": "assets/Counter-[hash].js",
     "components/CounterA.vue": "assets/CounterA-[hash].js",
