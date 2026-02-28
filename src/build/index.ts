@@ -6,8 +6,13 @@ import type { Plugin } from 'vite'
 
 import { generateComponentId } from './component-id.js'
 import { VisleConfig, defaultConfig, setVisleConfig } from './config.js'
-import { clientVirtualEntryId, islandElementName, serverVirtualEntryId } from './generate.js'
-import { customElementEntryPath } from './paths.js'
+import {
+  clientVirtualEntryId,
+  generateEntryTypesCode,
+  islandElementName,
+  serverVirtualEntryId,
+} from './generate.js'
+import { customElementEntryPath, resolveServerComponentIds } from './paths.js'
 import { devStyleSSRPlugin } from './plugins/dev-style-ssr.js'
 import { manifestFileName, manifestPlugin } from './plugins/manifest.js'
 import { serverTransformPlugin } from './plugins/server-transform.js'
@@ -87,13 +92,23 @@ export function visle(config: VisleConfig = {}): Plugin[] {
             // Build islands using entry paths collected during server build
             await builder.build(builder.environments.islands!)
 
-            // Write manifest file after all builds
+            // Write manifest and type definition files after all builds
             const serverOutDir = path.resolve(root, resolvedConfig.serverOutDir)
             await fs.mkdir(serverOutDir, { recursive: true })
-            await fs.writeFile(
-              path.join(serverOutDir, manifestFileName),
-              JSON.stringify(getManifestData()),
-            )
+
+            const entryRoot = path.resolve(root, resolvedConfig.entryDir)
+            const componentIds = resolveServerComponentIds(entryRoot)
+
+            await Promise.all([
+              fs.writeFile(
+                path.join(serverOutDir, manifestFileName),
+                JSON.stringify(getManifestData()),
+              ),
+              fs.writeFile(
+                path.join(root, 'visle-generated.d.ts'),
+                generateEntryTypesCode(entryRoot, root, componentIds),
+              ),
+            ])
           },
         },
       }
