@@ -62,7 +62,7 @@ export function entryTypesPlugin(config: ResolvedVisleConfig): {
       const onChange = (filePath: string) => {
         if (filePath.endsWith('.vue') && filePath.startsWith(entryRoot)) {
           scheduleGenerate(() => {
-            this.warn(`Failed to generate dts file to ${config.dts!}`)
+            this.warn(`Failed to generate a dts file to ${config.dts!}`)
           })
         }
       }
