@@ -3,3 +3,4 @@ dist/
 __generated__/
 coverage/
 *.tsbuildinfo
+visle-generated.d.ts
