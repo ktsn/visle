@@ -36,10 +36,7 @@ export interface RenderContext {
 type RenderArgs<P> = {} extends P ? [props?: P] : [props: P]
 
 export interface RenderFunction<T extends Record<string, any> = Record<string, any>> {
-  <K extends string & keyof T>(
-    componentPath: K,
-    ...args: RenderArgs<T[K]>
-  ): Promise<string>
+  <K extends string & keyof T>(componentPath: K, ...args: RenderArgs<T[K]>): Promise<string>
   setLoader(loader: RenderLoader): void
 }
 

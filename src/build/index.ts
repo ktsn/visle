@@ -6,14 +6,10 @@ import type { Plugin } from 'vite'
 
 import { generateComponentId } from './component-id.js'
 import { VisleConfig, defaultConfig, setVisleConfig } from './config.js'
-import {
-  clientVirtualEntryId,
-  generateEntryTypesCode,
-  islandElementName,
-  serverVirtualEntryId,
-} from './generate.js'
-import { customElementEntryPath, resolveServerComponentIds } from './paths.js'
+import { clientVirtualEntryId, islandElementName, serverVirtualEntryId } from './generate.js'
+import { customElementEntryPath } from './paths.js'
 import { devStyleSSRPlugin } from './plugins/dev-style-ssr.js'
+import { entryTypesPlugin } from './plugins/entry-types.js'
 import { manifestFileName, manifestPlugin } from './plugins/manifest.js'
 import { serverTransformPlugin } from './plugins/server-transform.js'
 import { virtualFilePlugin } from './plugins/virtual-file.js'
@@ -35,6 +31,7 @@ export function visle(config: VisleConfig = {}): Plugin[] {
   const { plugin: serverTransform, islandPaths } = serverTransformPlugin()
   const virtualFile = virtualFilePlugin(resolvedConfig)
   const { plugin: manifest, getManifestData } = manifestPlugin()
+  const { plugin: entryTypes, generate: generateEntryTypes } = entryTypesPlugin(resolvedConfig)
 
   const orchestrationPlugin: Plugin = {
     name: 'visle:orchestration',
@@ -96,18 +93,12 @@ export function visle(config: VisleConfig = {}): Plugin[] {
             const serverOutDir = path.resolve(root, resolvedConfig.serverOutDir)
             await fs.mkdir(serverOutDir, { recursive: true })
 
-            const entryRoot = path.resolve(root, resolvedConfig.entryDir)
-            const componentIds = resolveServerComponentIds(entryRoot)
-
             await Promise.all([
               fs.writeFile(
                 path.join(serverOutDir, manifestFileName),
                 JSON.stringify(getManifestData()),
               ),
-              fs.writeFile(
-                path.join(root, 'visle-generated.d.ts'),
-                generateEntryTypesCode(entryRoot, root, componentIds),
-              ),
+              generateEntryTypes(),
             ])
           },
         },
@@ -147,6 +138,7 @@ export function visle(config: VisleConfig = {}): Plugin[] {
     serverTransform,
     virtualFile,
     manifest,
+    entryTypes,
     vue({
       features: {
         componentIdGenerator: (filePath, source, isProduction) => {
