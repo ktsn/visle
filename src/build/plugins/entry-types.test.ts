@@ -4,6 +4,7 @@ import fs from 'node:fs/promises'
 import type { ResolvedConfig, ViteDevServer } from 'vite'
 import { describe, test, expect, vi, beforeEach, afterEach } from 'vitest'
 
+import { defaultConfig } from '../config.ts'
 import { resolveServerComponentIds } from '../paths.ts'
 import { entryTypesPlugin } from './entry-types.ts'
 
@@ -17,11 +18,9 @@ vi.mock('../paths.ts', () => ({
   resolveServerComponentIds: vi.fn(() => []),
 }))
 
-function createPlugin(dts: string | null = 'visle-generated.d.ts') {
+function createPlugin(dts: string | null = defaultConfig.dts) {
   const { plugin, generate } = entryTypesPlugin({
-    entryDir: 'pages',
-    serverOutDir: 'dist/server',
-    clientOutDir: 'dist/client',
+    ...defaultConfig,
     dts,
   })
 
