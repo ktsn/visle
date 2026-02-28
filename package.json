@@ -46,6 +46,7 @@
     "@types/sanitize-html": "^2.16.0",
     "@vitest/coverage-v8": "4.0.18",
     "diffable-html": "^6.0.1",
+    "happy-dom": "^20.7.0",
     "oxfmt": "^0.35.0",
     "oxlint": "^1.42.0",
     "playwright": "^1.58.2",
