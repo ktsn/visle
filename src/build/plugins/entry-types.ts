@@ -16,6 +16,13 @@ export function entryTypesPlugin(config: ResolvedVisleConfig): {
   plugin: Plugin
   generate: () => Promise<void>
 } {
+  if (config.dts === null) {
+    return {
+      plugin: { name: 'visle:entry-types' },
+      generate: () => Promise.resolve(),
+    }
+  }
+
   let root: string
   let entryRoot: string
   let dtsPath: string
@@ -46,7 +53,7 @@ export function entryTypesPlugin(config: ResolvedVisleConfig): {
     configResolved(viteConfig) {
       root = viteConfig.root
       entryRoot = path.resolve(root, config.entryDir)
-      dtsPath = path.join(root, 'visle-generated.d.ts')
+      dtsPath = path.resolve(root, config.dts!)
     },
 
     async configureServer(server) {

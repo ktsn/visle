@@ -17,16 +17,17 @@ vi.mock('../paths.ts', () => ({
   resolveServerComponentIds: vi.fn(() => []),
 }))
 
-function createPlugin() {
+function createPlugin(dts: string | null = 'visle-generated.d.ts') {
   const { plugin, generate } = entryTypesPlugin({
     entryDir: 'pages',
     serverOutDir: 'dist/server',
     clientOutDir: 'dist/client',
+    dts,
   })
 
   // Call configResolved to set up paths
-  const hook = plugin.configResolved as (config: ResolvedConfig) => void
-  hook({ root: '/project' } as ResolvedConfig)
+  const hook = plugin.configResolved as ((config: ResolvedConfig) => void) | undefined
+  hook?.({ root: '/project' } as ResolvedConfig)
 
   return { plugin, generate }
 }
@@ -192,5 +193,29 @@ describe('entryTypesPlugin', () => {
 
     // Only the initial write
     expect(fs.writeFile).toHaveBeenCalledTimes(1)
+  })
+
+  test('skips dts generation when dts is null', async () => {
+    const { plugin, generate } = createPlugin(null)
+
+    // generate() should be a no-op
+    await generate()
+    expect(fs.writeFile).not.toHaveBeenCalled()
+
+    // configureServer hook should not exist
+    expect(plugin.configureServer).toBeUndefined()
+  })
+
+  test('uses custom dts path', async () => {
+    const { generate } = createPlugin('types/visle.d.ts')
+
+    vi.mocked(resolveServerComponentIds).mockReturnValue(['/project/pages/Index.vue'])
+
+    await generate()
+
+    expect(fs.writeFile).toHaveBeenCalledWith(
+      '/project/types/visle.d.ts',
+      expect.stringMatching('Index'),
+    )
   })
 })

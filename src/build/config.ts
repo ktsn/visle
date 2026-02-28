@@ -5,6 +5,7 @@ export interface VisleConfig {
   entryDir?: string
   serverOutDir?: string
   clientOutDir?: string
+  dts?: string | null
 }
 
 /**
@@ -16,6 +17,7 @@ export const defaultConfig: ResolvedVisleConfig = {
   entryDir: 'pages',
   clientOutDir: 'dist/client',
   serverOutDir: 'dist/server',
+  dts: 'visle-generated.d.ts',
 }
 
 const visleConfigKey = '__visle'
