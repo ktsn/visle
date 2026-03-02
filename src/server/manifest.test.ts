@@ -186,9 +186,7 @@ describe('createDevManifest', () => {
 
     const result = await manifest.getDependingClientCssIds('src/foo.vue')
 
-    expect(result).toEqual([
-      '/unknown-package/style.css?vue&type=style&index=0&src=true&lang.css',
-    ])
+    expect(result).toEqual(['/unknown-package/style.css?vue&type=style&index=0&src=true&lang.css'])
   })
 
   test('return url with path part of base', async () => {

@@ -80,39 +80,39 @@ export function createDevManifest(
       const descriptor = parse(code).descriptor
       const componentId = generateComponentId(componentRelativePath, code, false)
 
-      return Promise.all(descriptor.styles.map(async (style, i) => {
-        const attrsQuery = attrsToQuery(style.attrs, 'css')
-        const srcQuery = style.src ? (style.scoped ? `&src=${componentId}` : '&src=true') : ''
-        const scopedQuery = style.scoped ? `&scoped=${componentId}` : ''
-        const query = `?vue&type=style&index=${i}${srcQuery}${scopedQuery}`
+      return Promise.all(
+        descriptor.styles.map(async (style, i) => {
+          const attrsQuery = attrsToQuery(style.attrs, 'css')
+          const srcQuery = style.src ? (style.scoped ? `&src=${componentId}` : '&src=true') : ''
+          const scopedQuery = style.scoped ? `&scoped=${componentId}` : ''
+          const query = `?vue&type=style&index=${i}${srcQuery}${scopedQuery}`
 
-        let stylePath: string
-        if (!style.src) {
-          stylePath = `/${componentRelativePath}`
-        } else if (style.src.startsWith('.')) {
-          stylePath =
-            '/' +
-            path.posix.normalize(
-              path.posix.join(path.dirname(componentRelativePath), style.src),
-            )
-        } else {
-          const resolved = await resolveId(style.src, absPath)
-          if (resolved) {
-            stylePath = '/' + path.relative(root, resolved)
+          let stylePath: string
+          if (!style.src) {
+            stylePath = `/${componentRelativePath}`
+          } else if (style.src.startsWith('.')) {
+            stylePath =
+              '/' +
+              path.posix.normalize(path.posix.join(path.dirname(componentRelativePath), style.src))
           } else {
-            stylePath = '/' + style.src
+            const resolved = await resolveId(style.src, absPath)
+            if (resolved) {
+              stylePath = '/' + path.relative(root, resolved)
+            } else {
+              stylePath = '/' + style.src
+            }
           }
-        }
 
-        let styleId = `${stylePath}${query}${attrsQuery}`
+          let styleId = `${stylePath}${query}${attrsQuery}`
 
-        if (style.module) {
-          // inject `.module` before extension so vite handles it as css module
-          styleId = styleId.replace(/\.(\w+)$/, '.module.$1')
-        }
+          if (style.module) {
+            // inject `.module` before extension so vite handles it as css module
+            styleId = styleId.replace(/\.(\w+)$/, '.module.$1')
+          }
 
-        return applyServeBase(styleId)
-      }))
+          return applyServeBase(styleId)
+        }),
+      )
     },
   }
 }
