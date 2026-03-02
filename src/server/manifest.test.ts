@@ -21,11 +21,14 @@ describe('createDevManifest', () => {
   })
 
   test('get custom element entry path as virtual path', async () => {
-    const manifest = createDevManifest({
-      root,
-      base: '/',
-      server: {},
-    })
+    const manifest = createDevManifest(
+      {
+        root,
+        base: '/',
+        server: {},
+      },
+      async () => undefined,
+    )
 
     const relativePath = path.relative(root, customElementEntryPath)
     const result = await manifest.getClientImportId(relativePath)
@@ -34,11 +37,14 @@ describe('createDevManifest', () => {
   })
 
   test('get a relative path from the root directory', async () => {
-    const manifest = createDevManifest({
-      root,
-      base: '/',
-      server: {},
-    })
+    const manifest = createDevManifest(
+      {
+        root,
+        base: '/',
+        server: {},
+      },
+      async () => undefined,
+    )
 
     const result = await manifest.getClientImportId('src/foo.vue')
 
@@ -48,11 +54,14 @@ describe('createDevManifest', () => {
   test('return empty id array for css without <style>', async () => {
     fs.writeFileSync(path.join(root, 'src/foo.vue'), '<template><div></div></template>')
 
-    const manifest = createDevManifest({
-      root,
-      base: '/',
-      server: {},
-    })
+    const manifest = createDevManifest(
+      {
+        root,
+        base: '/',
+        server: {},
+      },
+      async () => undefined,
+    )
 
     const result = await manifest.getDependingClientCssIds('src/foo.vue')
 
@@ -63,11 +72,14 @@ describe('createDevManifest', () => {
     const code = '<template><div></div></template><style scoped>h1 { color: red; }</style>'
     fs.writeFileSync(path.join(root, 'src/foo.vue'), code)
 
-    const manifest = createDevManifest({
-      root,
-      base: '/',
-      server: {},
-    })
+    const manifest = createDevManifest(
+      {
+        root,
+        base: '/',
+        server: {},
+      },
+      async () => undefined,
+    )
 
     const result = await manifest.getDependingClientCssIds('src/foo.vue')
 
@@ -80,23 +92,112 @@ describe('createDevManifest', () => {
     const code = '<template><div></div></template><style module>h1 { color: red; }</style>'
     fs.writeFileSync(path.join(root, 'src/foo.vue'), code)
 
-    const manifest = createDevManifest({
-      root,
-      base: '/',
-      server: {},
-    })
+    const manifest = createDevManifest(
+      {
+        root,
+        base: '/',
+        server: {},
+      },
+      async () => undefined,
+    )
 
     const result = await manifest.getDependingClientCssIds('src/foo.vue')
 
     expect(result).toEqual(['/src/foo.vue?vue&type=style&index=0&lang.module.css'])
   })
 
+  test('return ids for <style src> blocks', async () => {
+    const code = '<template><div></div></template><style src="./foo.css"></style>'
+    fs.writeFileSync(path.join(root, 'src/foo.vue'), code)
+    fs.writeFileSync(path.join(root, 'src/foo.css'), 'h1 { color: red; }')
+
+    const manifest = createDevManifest(
+      {
+        root,
+        base: '/',
+        server: {},
+      },
+      async () => undefined,
+    )
+
+    const result = await manifest.getDependingClientCssIds('src/foo.vue')
+
+    expect(result).toEqual(['/src/foo.css?vue&type=style&index=0&src=true&lang.css'])
+  })
+
+  test('return ids for <style src> blocks with scoped', async () => {
+    const code = '<template><div></div></template><style src="./foo.css" scoped></style>'
+    fs.writeFileSync(path.join(root, 'src/foo.vue'), code)
+    fs.writeFileSync(path.join(root, 'src/foo.css'), 'h1 { color: red; }')
+
+    const manifest = createDevManifest(
+      {
+        root,
+        base: '/',
+        server: {},
+      },
+      async () => undefined,
+    )
+
+    const result = await manifest.getDependingClientCssIds('src/foo.vue')
+
+    expect(result).toEqual([
+      expect.stringMatching(
+        /^\/src\/foo\.css\?vue&type=style&index=0&src=[\da-f]+&scoped=[\da-f]+&lang\.css$/,
+      ),
+    ])
+  })
+
+  test('resolve non-relative <style src> path via resolveId', async () => {
+    const code = '<template><div></div></template><style src="@/styles/foo.css"></style>'
+    fs.writeFileSync(path.join(root, 'src/foo.vue'), code)
+
+    const manifest = createDevManifest(
+      {
+        root,
+        base: '/',
+        server: {},
+      },
+      async (id) => {
+        if (id === '@/styles/foo.css') {
+          return path.join(root, 'src/styles/foo.css')
+        }
+        return undefined
+      },
+    )
+
+    const result = await manifest.getDependingClientCssIds('src/foo.vue')
+
+    expect(result).toEqual(['/src/styles/foo.css?vue&type=style&index=0&src=true&lang.css'])
+  })
+
+  test('fall back to raw src value when resolveId returns undefined', async () => {
+    const code = '<template><div></div></template><style src="unknown-package/style.css"></style>'
+    fs.writeFileSync(path.join(root, 'src/foo.vue'), code)
+
+    const manifest = createDevManifest(
+      {
+        root,
+        base: '/',
+        server: {},
+      },
+      async () => undefined,
+    )
+
+    const result = await manifest.getDependingClientCssIds('src/foo.vue')
+
+    expect(result).toEqual(['/unknown-package/style.css?vue&type=style&index=0&src=true&lang.css'])
+  })
+
   test('return url with path part of base', async () => {
-    const manifest = createDevManifest({
-      root,
-      base: 'https://example.com/prefix',
-      server: {},
-    })
+    const manifest = createDevManifest(
+      {
+        root,
+        base: 'https://example.com/prefix',
+        server: {},
+      },
+      async () => undefined,
+    )
 
     const result = await manifest.getClientImportId('src/foo.vue')
 
@@ -104,13 +205,16 @@ describe('createDevManifest', () => {
   })
 
   test('return url with specified dev server origin', async () => {
-    const manifest = createDevManifest({
-      root,
-      base: '/',
-      server: {
-        origin: 'http://localhost:3000',
+    const manifest = createDevManifest(
+      {
+        root,
+        base: '/',
+        server: {
+          origin: 'http://localhost:3000',
+        },
       },
-    })
+      async () => undefined,
+    )
 
     const result = await manifest.getClientImportId('src/foo.vue')
 
