@@ -10,6 +10,29 @@ exports[`Production Build SSR > 'CSS modules' 1`] = `
 </div>
 `;
 
+exports[`Production Build SSR > 'CSS with style src' 1`] = `
+<link
+  rel="stylesheet"
+  href="/assets/client-entry-[hash].css"
+>
+<script
+  type="module"
+  src="/assets/custom-element-[hash].js"
+  async
+>
+</script>
+<div>
+  <h1>
+    External Styled Page
+  </h1>
+  <vue-island entry="/assets/ExternalStyledCounter-[hash].js">
+    <button data-v-[scoped]>
+      Styled Count: 0
+    </button>
+  </vue-island>
+</div>
+`;
+
 exports[`Production Build SSR > 'Component in subdirectory' 1`] = `
 <link
   rel="stylesheet"
@@ -322,6 +345,7 @@ exports[`Production Build SSR > Build output files 1`] = `
   "assets/Counter-[hash].js",
   "assets/CounterA-[hash].js",
   "assets/CounterB-[hash].js",
+  "assets/ExternalStyledCounter-[hash].js",
   "assets/Inner-[hash].js",
   "assets/NamedExportIsland-[hash].js",
   "assets/OptionsCounter-[hash].js",
@@ -345,6 +369,7 @@ exports[`Production Build SSR > Build output files 2`] = `
     "components/Counter.vue": "assets/Counter-[hash].js",
     "components/CounterA.vue": "assets/CounterA-[hash].js",
     "components/CounterB.vue": "assets/CounterB-[hash].js",
+    "components/ExternalStyledCounter.vue": "assets/ExternalStyledCounter-[hash].js",
     "components/Inner.vue": "assets/Inner-[hash].js",
     "components/NamedExportIsland.vue": "assets/NamedExportIsland-[hash].js",
     "components/OptionsCounter.vue": "assets/OptionsCounter-[hash].js",
@@ -375,6 +400,7 @@ declare module 'visle' {
     'with-island-props': ComponentProps<typeof import('./pages/with-island-props.vue')['default']>
     'with-island-alias': ComponentProps<typeof import('./pages/with-island-alias.vue')['default']>
     'with-css': ComponentProps<typeof import('./pages/with-css.vue')['default']>
+    'with-css-src': ComponentProps<typeof import('./pages/with-css-src.vue')['default']>
     'with-css-module': ComponentProps<typeof import('./pages/with-css-module.vue')['default']>
     'static': ComponentProps<typeof import('./pages/static.vue')['default']>
     'named-export': ComponentProps<typeof import('./pages/named-export.vue')['default']>

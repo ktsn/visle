@@ -10,6 +10,33 @@ exports[`Dev Server SSR > 'CSS modules' 1`] = `
 </div>
 `;
 
+exports[`Dev Server SSR > 'CSS with style src' 1`] = `
+<link
+  rel="stylesheet"
+  href="/pages/with-css-src.vue?vue&type=style&index=0&lang.css"
+>
+<link
+  rel="stylesheet"
+  href="/components/external-counter.css?vue&type=style&index=0&src=[src]&scoped=[scoped]&lang.css"
+>
+<script
+  type="module"
+  src="/@visle/entry"
+  async
+>
+</script>
+<div>
+  <h1>
+    External Styled Page
+  </h1>
+  <vue-island entry="/components/ExternalStyledCounter.vue">
+    <button data-v-[scoped]>
+      Styled Count: 0
+    </button>
+  </vue-island>
+</div>
+`;
+
 exports[`Dev Server SSR > 'Component in subdirectory' 1`] = `
 <div>
   Subdirectory Page
@@ -286,6 +313,7 @@ declare module 'visle' {
     'with-island-props': ComponentProps<typeof import('./pages/with-island-props.vue')['default']>
     'with-island-alias': ComponentProps<typeof import('./pages/with-island-alias.vue')['default']>
     'with-css': ComponentProps<typeof import('./pages/with-css.vue')['default']>
+    'with-css-src': ComponentProps<typeof import('./pages/with-css-src.vue')['default']>
     'with-css-module': ComponentProps<typeof import('./pages/with-css-module.vue')['default']>
     'static': ComponentProps<typeof import('./pages/static.vue')['default']>
     'named-export': ComponentProps<typeof import('./pages/named-export.vue')['default']>

@@ -78,15 +78,17 @@ export function createDevManifest(viteConfig: {
       const componentId = generateComponentId(componentRelativePath, code, false)
 
       return descriptor.styles.map((style, i) => {
-        if (style.src) {
-          throw new Error('<style src> is not supported')
-        }
-
         const attrsQuery = attrsToQuery(style.attrs, 'css')
+        const srcQuery = style.src ? (style.scoped ? `&src=${componentId}` : '&src=true') : ''
         const scopedQuery = style.scoped ? `&scoped=${componentId}` : ''
-        const query = `?vue&type=style&index=${i}${scopedQuery}`
+        const query = `?vue&type=style&index=${i}${srcQuery}${scopedQuery}`
 
-        let styleId = `/${componentRelativePath}${query}${attrsQuery}`
+        const stylePath = style.src
+          ? '/' +
+            path.posix.normalize(path.posix.join(path.dirname(componentRelativePath), style.src))
+          : `/${componentRelativePath}`
+
+        let styleId = `${stylePath}${query}${attrsQuery}`
 
         if (style.module) {
           // inject `.module` before extension so vite handles it as css module

@@ -91,6 +91,42 @@ describe('createDevManifest', () => {
     expect(result).toEqual(['/src/foo.vue?vue&type=style&index=0&lang.module.css'])
   })
 
+  test('return ids for <style src> blocks', async () => {
+    const code = '<template><div></div></template><style src="./foo.css"></style>'
+    fs.writeFileSync(path.join(root, 'src/foo.vue'), code)
+    fs.writeFileSync(path.join(root, 'src/foo.css'), 'h1 { color: red; }')
+
+    const manifest = createDevManifest({
+      root,
+      base: '/',
+      server: {},
+    })
+
+    const result = await manifest.getDependingClientCssIds('src/foo.vue')
+
+    expect(result).toEqual(['/src/foo.css?vue&type=style&index=0&src=true&lang.css'])
+  })
+
+  test('return ids for <style src> blocks with scoped', async () => {
+    const code = '<template><div></div></template><style src="./foo.css" scoped></style>'
+    fs.writeFileSync(path.join(root, 'src/foo.vue'), code)
+    fs.writeFileSync(path.join(root, 'src/foo.css'), 'h1 { color: red; }')
+
+    const manifest = createDevManifest({
+      root,
+      base: '/',
+      server: {},
+    })
+
+    const result = await manifest.getDependingClientCssIds('src/foo.vue')
+
+    expect(result).toEqual([
+      expect.stringMatching(
+        /^\/src\/foo\.css\?vue&type=style&index=0&src=[\da-f]+&scoped=[\da-f]+&lang\.css$/,
+      ),
+    ])
+  })
+
   test('return url with path part of base', async () => {
     const manifest = createDevManifest({
       root,
