@@ -209,6 +209,13 @@ export function serverTransformPlugin(): ServerTransformPluginResult {
           map = new Map()
           islandImportMap.set(fileName, map)
         }
+        const existing = map.get(resolvedPath)
+        if (existing && existing !== strategy) {
+          this.error(
+            `Conflicting v-client strategies for "${tag}" in ${fileName}: ` +
+              `"${existing}" and "${strategy}" cannot be used on the same component.`,
+          )
+        }
         map.set(resolvedPath, strategy)
       }
     },
