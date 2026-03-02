@@ -2,6 +2,8 @@ import path from 'node:path'
 
 import { normalizePath } from 'vite'
 
+import type { ClientStrategy } from './sfc-analysis.js'
+
 export const clientVirtualEntryId = '\0@visle/client-entry'
 
 export const serverVirtualEntryId = '\0@visle/server-entry'
@@ -38,11 +40,9 @@ export const serverWrapPrefix = '\0visle:server-wrap:'
 
 export const islandWrapPrefix = '\0visle:island-wrap:'
 
-export type IslandStrategy = 'load' | 'visible'
-
 export function parseIslandWrapId(
   id: string,
-): { filePath: string; strategy: IslandStrategy } | undefined {
+): { filePath: string; strategy: ClientStrategy } | undefined {
   if (!id.startsWith(islandWrapPrefix)) {
     return undefined
   }
@@ -52,12 +52,12 @@ export function parseIslandWrapId(
     return undefined
   }
   return {
-    strategy: rest.slice(0, separatorIndex) as IslandStrategy,
+    strategy: rest.slice(0, separatorIndex) as ClientStrategy,
     filePath: rest.slice(separatorIndex + 1),
   }
 }
 
-export function buildIslandWrapId(strategy: IslandStrategy, filePath: string): string {
+export function buildIslandWrapId(strategy: ClientStrategy, filePath: string): string {
   return `${islandWrapPrefix}${strategy}:${filePath}`
 }
 
@@ -97,7 +97,7 @@ export function generateIslandWrapperCode(
   filePath: string,
   componentRelativePath: string,
   customElementEntryRelativePath: string,
-  strategy: IslandStrategy = 'load',
+  strategy: ClientStrategy = 'load',
 ): string {
   const normalizedFilePath = normalizePath(filePath)
   const normalizedRelativePath = normalizePath(componentRelativePath)

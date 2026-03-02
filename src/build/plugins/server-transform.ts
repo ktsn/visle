@@ -7,13 +7,12 @@ import {
   buildIslandWrapId,
   generateIslandWrapperCode,
   generateServerComponentCode,
-  type IslandStrategy,
   islandWrapPrefix,
   parseIslandWrapId,
   serverWrapPrefix,
 } from '../generate.js'
 import { customElementEntryPath, parseId } from '../paths.js'
-import { buildImportMap, findVClientElements } from '../sfc-analysis.js'
+import { buildImportMap, type ClientStrategy, findVClientElements } from '../sfc-analysis.js'
 
 interface ServerTransformPluginResult {
   plugin: Plugin
@@ -34,7 +33,7 @@ export function serverTransformPlugin(): ServerTransformPluginResult {
    * Map from importer file path → (absolute component path → strategy).
    * Populated by the transform hook, consumed by resolveId.
    */
-  const islandImportMap = new Map<string, Map<string, IslandStrategy>>()
+  const islandImportMap = new Map<string, Map<string, ClientStrategy>>()
 
   let viteConfig: ResolvedConfig
 

@@ -37,6 +37,7 @@ export class VueIsland extends HTMLElement {
     const strategy = this.getAttribute('strategy')
 
     if (strategy === 'visible') {
+      const rootMargin = this.getAttribute('root-margin') ?? undefined
       this.#observer = new IntersectionObserver(
         (entries) => {
           const entry = entries.find((e) => e.isIntersecting)
@@ -46,7 +47,7 @@ export class VueIsland extends HTMLElement {
             this.#hydrate(token)
           }
         },
-        { rootMargin: this.getAttribute('root-margin') ?? '0px' },
+        { rootMargin },
       )
       this.#observer.observe(this)
       return

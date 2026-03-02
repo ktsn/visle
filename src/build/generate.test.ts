@@ -1,6 +1,6 @@
 import { describe, test, expect } from 'vitest'
 
-import { generateEntryTypesCode } from './generate.ts'
+import { buildIslandWrapId, generateEntryTypesCode, parseIslandWrapId } from './generate.ts'
 
 describe('generateEntryTypesCode', () => {
   test('generates module augmentation with component entries', () => {
@@ -42,5 +42,45 @@ describe('generateEntryTypesCode', () => {
     const result = generateEntryTypesCode('/project/pages', '/project', [])
 
     expect(result).toContain('export {}')
+  })
+})
+
+describe('buildIslandWrapId', () => {
+  test('builds id with load strategy', () => {
+    const id = buildIslandWrapId('load', '/path/to/Comp.vue')
+    expect(id).toBe('\0visle:island-wrap:load:/path/to/Comp.vue')
+  })
+
+  test('builds id with visible strategy', () => {
+    const id = buildIslandWrapId('visible', '/path/to/Comp.vue')
+    expect(id).toBe('\0visle:island-wrap:visible:/path/to/Comp.vue')
+  })
+})
+
+describe('parseIslandWrapId', () => {
+  test('parses load strategy id', () => {
+    const result = parseIslandWrapId('\0visle:island-wrap:load:/path/to/Comp.vue')
+    expect(result).toEqual({ strategy: 'load', filePath: '/path/to/Comp.vue' })
+  })
+
+  test('parses visible strategy id', () => {
+    const result = parseIslandWrapId('\0visle:island-wrap:visible:/path/to/Comp.vue')
+    expect(result).toEqual({ strategy: 'visible', filePath: '/path/to/Comp.vue' })
+  })
+
+  test('returns undefined for non-island-wrap id', () => {
+    const result = parseIslandWrapId('\0visle:server-wrap:/path/to/Comp.vue')
+    expect(result).toBeUndefined()
+  })
+
+  test('returns undefined for id without strategy separator', () => {
+    const result = parseIslandWrapId('\0visle:island-wrap:')
+    expect(result).toBeUndefined()
+  })
+
+  test('roundtrips with buildIslandWrapId', () => {
+    const id = buildIslandWrapId('visible', '/project/components/Counter.vue')
+    const parsed = parseIslandWrapId(id)
+    expect(parsed).toEqual({ strategy: 'visible', filePath: '/project/components/Counter.vue' })
   })
 })
