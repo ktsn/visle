@@ -40,11 +40,14 @@ export async function loadManifest(serverOutDir: string, base: string): Promise<
 /**
  * Creates a dev-mode RuntimeManifest that resolves paths using Vite's dev server.
  */
-export function createDevManifest(viteConfig: {
-  root: string
-  base: string
-  server: { origin?: string }
-}): RuntimeManifest {
+export function createDevManifest(
+  viteConfig: {
+    root: string
+    base: string
+    server: { origin?: string }
+  },
+  resolveId: (id: string, importer: string) => Promise<string | undefined>,
+): RuntimeManifest {
   const { root, base } = viteConfig
 
   // Normalize origin value
@@ -77,16 +80,29 @@ export function createDevManifest(viteConfig: {
       const descriptor = parse(code).descriptor
       const componentId = generateComponentId(componentRelativePath, code, false)
 
-      return descriptor.styles.map((style, i) => {
+      return Promise.all(descriptor.styles.map(async (style, i) => {
         const attrsQuery = attrsToQuery(style.attrs, 'css')
         const srcQuery = style.src ? (style.scoped ? `&src=${componentId}` : '&src=true') : ''
         const scopedQuery = style.scoped ? `&scoped=${componentId}` : ''
         const query = `?vue&type=style&index=${i}${srcQuery}${scopedQuery}`
 
-        const stylePath = style.src
-          ? '/' +
-            path.posix.normalize(path.posix.join(path.dirname(componentRelativePath), style.src))
-          : `/${componentRelativePath}`
+        let stylePath: string
+        if (!style.src) {
+          stylePath = `/${componentRelativePath}`
+        } else if (style.src.startsWith('.')) {
+          stylePath =
+            '/' +
+            path.posix.normalize(
+              path.posix.join(path.dirname(componentRelativePath), style.src),
+            )
+        } else {
+          const resolved = await resolveId(style.src, absPath)
+          if (resolved) {
+            stylePath = '/' + path.relative(root, resolved)
+          } else {
+            stylePath = '/' + style.src
+          }
+        }
 
         let styleId = `${stylePath}${query}${attrsQuery}`
 
@@ -96,7 +112,7 @@ export function createDevManifest(viteConfig: {
         }
 
         return applyServeBase(styleId)
-      })
+      }))
     },
   }
 }

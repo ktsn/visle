@@ -29,6 +29,7 @@ export const renderCases: { name: string; component: string; props?: Record<stri
   { name: 'Island with options API', component: 'with-options-api' },
   { name: 'Island with options API renamed component', component: 'with-options-api-renamed' },
   { name: 'CSS with style src', component: 'with-css-src' },
+  { name: 'CSS with style src alias', component: 'with-css-src-alias' },
 ]
 
 /**
