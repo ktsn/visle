@@ -15,6 +15,28 @@ vi.mock('./load-module.ts', () => ({
   loadModule: vi.fn(() => Promise.resolve({ default: { name: 'TestComponent' } })),
 }))
 
+class MockIntersectionObserver {
+  static instances: MockIntersectionObserver[] = []
+  static lastCallback: IntersectionObserverCallback
+
+  observe = vi.fn()
+  disconnect = vi.fn()
+  unobserve = vi.fn()
+  root = null
+  rootMargin = ''
+  thresholds = [0]
+  takeRecords = vi.fn(() => [] as IntersectionObserverEntry[])
+
+  constructor(
+    callback: IntersectionObserverCallback,
+    public options?: IntersectionObserverInit,
+  ) {
+    MockIntersectionObserver.instances.push(this)
+    MockIntersectionObserver.lastCallback = callback
+  }
+}
+vi.stubGlobal('IntersectionObserver', MockIntersectionObserver)
+
 function createIsland(attrs?: Record<string, string>): VueIsland {
   const el = new VueIsland()
   if (attrs) {
@@ -32,6 +54,7 @@ function flushMicrotasks(): Promise<void> {
 describe('VueIsland custom element', () => {
   beforeEach(() => {
     vi.mocked(createSSRApp).mockClear()
+    MockIntersectionObserver.instances = []
     document.body.innerHTML = ''
   })
 
@@ -115,6 +138,66 @@ describe('VueIsland custom element', () => {
 
       expect(firstApp.unmount).toHaveBeenCalled()
       expect(createSSRApp).toHaveBeenCalledTimes(1)
+    })
+  })
+
+  describe('strategy=visible', () => {
+    test('defers hydration until element is intersecting', async () => {
+      const el = createIsland({ entry: './test-entry', strategy: 'visible' })
+      document.body.appendChild(el)
+      await flushMicrotasks()
+
+      // Should not mount immediately
+      expect(createSSRApp).not.toHaveBeenCalled()
+
+      // Simulate intersection
+      const observer = MockIntersectionObserver.instances[0]!
+      MockIntersectionObserver.lastCallback(
+        [{ isIntersecting: true, target: el } as unknown as IntersectionObserverEntry],
+        observer as unknown as IntersectionObserver,
+      )
+      await flushMicrotasks()
+
+      expect(createSSRApp).toHaveBeenCalledWith({ name: 'TestComponent' }, {})
+    })
+
+    test('does not hydrate on non-intersecting entry', async () => {
+      const el = createIsland({ entry: './test-entry', strategy: 'visible' })
+      document.body.appendChild(el)
+      await flushMicrotasks()
+
+      const observer = MockIntersectionObserver.instances[0]!
+      MockIntersectionObserver.lastCallback(
+        [{ isIntersecting: false, target: el } as unknown as IntersectionObserverEntry],
+        observer as unknown as IntersectionObserver,
+      )
+      await flushMicrotasks()
+
+      expect(createSSRApp).not.toHaveBeenCalled()
+    })
+
+    test('passes root-margin option to IntersectionObserver', async () => {
+      const el = createIsland({
+        entry: './test-entry',
+        strategy: 'visible',
+        'root-margin': '200px',
+      })
+      document.body.appendChild(el)
+      await flushMicrotasks()
+
+      const observer = MockIntersectionObserver.instances[0]!
+      expect(observer.options).toEqual({ rootMargin: '200px' })
+    })
+
+    test('disconnects observer on disconnect', async () => {
+      const el = createIsland({ entry: './test-entry', strategy: 'visible' })
+      document.body.appendChild(el)
+      await flushMicrotasks()
+
+      const observer = MockIntersectionObserver.instances[0]!
+      document.body.removeChild(el)
+
+      expect(observer.disconnect).toHaveBeenCalled()
     })
   })
 

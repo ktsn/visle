@@ -38,6 +38,29 @@ export const serverWrapPrefix = '\0visle:server-wrap:'
 
 export const islandWrapPrefix = '\0visle:island-wrap:'
 
+export type IslandStrategy = 'load' | 'visible'
+
+export function parseIslandWrapId(
+  id: string,
+): { filePath: string; strategy: IslandStrategy } | undefined {
+  if (!id.startsWith(islandWrapPrefix)) {
+    return undefined
+  }
+  const rest = id.slice(islandWrapPrefix.length)
+  const separatorIndex = rest.indexOf(':')
+  if (separatorIndex === -1) {
+    return undefined
+  }
+  return {
+    strategy: rest.slice(0, separatorIndex) as IslandStrategy,
+    filePath: rest.slice(separatorIndex + 1),
+  }
+}
+
+export function buildIslandWrapId(strategy: IslandStrategy, filePath: string): string {
+  return `${islandWrapPrefix}${strategy}:${filePath}`
+}
+
 export function generateServerComponentCode(
   filePath: string,
   componentRelativePath: string,
@@ -74,10 +97,12 @@ export function generateIslandWrapperCode(
   filePath: string,
   componentRelativePath: string,
   customElementEntryRelativePath: string,
+  strategy: IslandStrategy = 'load',
 ): string {
   const normalizedFilePath = normalizePath(filePath)
   const normalizedRelativePath = normalizePath(componentRelativePath)
   const normalizedEntryRelativePath = normalizePath(customElementEntryRelativePath)
+  const strategyAttr = strategy !== 'load' ? `\n      strategy: '${strategy}',` : ''
 
   return `import { defineComponent, h, useSSRContext, useAttrs, inject, provide, onServerPrefetch } from 'vue'
 import { islandSymbol } from '${symbolImportId}'
@@ -123,7 +148,7 @@ export default defineComponent({
 
     return () => h('${islandElementName}', {
       entry: clientImportId,
-      'serialized-props': isEmptyProps ? undefined : JSON.stringify(attrs),
+      'serialized-props': isEmptyProps ? undefined : JSON.stringify(attrs),${strategyAttr}
     }, [h(OriginalComponent, attrs, slots)])
   },
 })
