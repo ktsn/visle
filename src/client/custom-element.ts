@@ -12,6 +12,8 @@ export class VueIsland extends HTMLElement {
    */
   #connectToken = 0
 
+  #observer: IntersectionObserver | null = null
+
   constructor() {
     super()
 
@@ -32,6 +34,29 @@ export class VueIsland extends HTMLElement {
       this.#app = null
     }
 
+    const strategy = this.getAttribute('strategy')
+
+    if (strategy === 'visible') {
+      const rootMargin = this.getAttribute('root-margin') ?? undefined
+      this.#observer = new IntersectionObserver(
+        (entries) => {
+          const entry = entries.find((e) => e.isIntersecting)
+          if (entry) {
+            this.#observer?.disconnect()
+            this.#observer = null
+            this.#hydrate(token)
+          }
+        },
+        { rootMargin },
+      )
+      this.#observer.observe(this)
+      return
+    }
+
+    await this.#hydrate(token)
+  }
+
+  async #hydrate(token: number): Promise<void> {
     const entry = this.getAttribute('entry')
     if (!entry) {
       return
@@ -54,6 +79,8 @@ export class VueIsland extends HTMLElement {
 
   disconnectedCallback(): void {
     this.#connectToken++
+    this.#observer?.disconnect()
+    this.#observer = null
     this.#app?.unmount()
     this.#app = null
   }

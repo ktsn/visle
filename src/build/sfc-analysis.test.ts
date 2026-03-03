@@ -289,7 +289,16 @@ describe('findVClientElements', () => {
     const children = parseTemplate('<Counter v-client:load />')
     const results = findVClientElements(children)
     expect(results).toHaveLength(1)
-    expect(results[0]!.tag).toBe('Counter')
+    expect(results[0]!.element.tag).toBe('Counter')
+    expect(results[0]!.strategy).toBe('load')
+  })
+
+  test('finds element with v-client:visible', () => {
+    const children = parseTemplate('<Counter v-client:visible />')
+    const results = findVClientElements(children)
+    expect(results).toHaveLength(1)
+    expect(results[0]!.element.tag).toBe('Counter')
+    expect(results[0]!.strategy).toBe('visible')
   })
 
   test('finds multiple elements with v-client:load', () => {
@@ -299,10 +308,23 @@ describe('findVClientElements', () => {
     `)
     const results = findVClientElements(children)
     expect(results).toHaveLength(2)
-    expect(results.map((r) => r.tag)).toEqual(['Counter', 'Header'])
+    expect(results.map((r) => r.element.tag)).toEqual(['Counter', 'Header'])
   })
 
-  test('ignores elements without v-client:load', () => {
+  test('finds elements with mixed strategies', () => {
+    const children = parseTemplate(`
+      <Counter v-client:load />
+      <Header v-client:visible />
+    `)
+    const results = findVClientElements(children)
+    expect(results).toHaveLength(2)
+    expect(results[0]!.element.tag).toBe('Counter')
+    expect(results[0]!.strategy).toBe('load')
+    expect(results[1]!.element.tag).toBe('Header')
+    expect(results[1]!.strategy).toBe('visible')
+  })
+
+  test('ignores elements without v-client directive', () => {
     const children = parseTemplate(`
       <Counter />
       <Header v-client:load />
@@ -310,7 +332,7 @@ describe('findVClientElements', () => {
     `)
     const results = findVClientElements(children)
     expect(results).toHaveLength(1)
-    expect(results[0]!.tag).toBe('Header')
+    expect(results[0]!.element.tag).toBe('Header')
   })
 
   test('finds nested elements with v-client:load', () => {
@@ -323,7 +345,7 @@ describe('findVClientElements', () => {
     `)
     const results = findVClientElements(children)
     expect(results).toHaveLength(1)
-    expect(results[0]!.tag).toBe('Counter')
+    expect(results[0]!.element.tag).toBe('Counter')
   })
 
   test('finds deeply nested and top-level elements', () => {
@@ -335,10 +357,10 @@ describe('findVClientElements', () => {
     `)
     const results = findVClientElements(children)
     expect(results).toHaveLength(2)
-    expect(results.map((r) => r.tag)).toEqual(['Header', 'Counter'])
+    expect(results.map((r) => r.element.tag)).toEqual(['Header', 'Counter'])
   })
 
-  test('returns empty array when no v-client:load elements', () => {
+  test('returns empty array when no v-client elements', () => {
     const children = parseTemplate(`
       <div>
         <Counter />
@@ -362,13 +384,19 @@ describe('findVClientElements', () => {
     `)
     const results = findVClientElements(children)
     expect(results).toHaveLength(1)
-    expect(results[0]!.tag).toBe('Header')
+    expect(results[0]!.element.tag).toBe('Header')
+  })
+
+  test('ignores v-client with unsupported argument', () => {
+    const children = parseTemplate('<Counter v-client:unknown />')
+    const results = findVClientElements(children)
+    expect(results).toHaveLength(0)
   })
 
   test('finds v-client:load on native HTML elements', () => {
     const children = parseTemplate('<div v-client:load />')
     const results = findVClientElements(children)
     expect(results).toHaveLength(1)
-    expect(results[0]!.tag).toBe('div')
+    expect(results[0]!.element.tag).toBe('div')
   })
 })

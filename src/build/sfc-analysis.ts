@@ -127,27 +127,39 @@ export function buildImportMap(descriptor: SFCDescriptor, id: string): Map<strin
   return map
 }
 
+export type ClientStrategy = 'load' | 'visible'
+
+const clientStrategies: Set<string> = new Set<ClientStrategy>(['load', 'visible'])
+
+export interface VClientMatch {
+  element: ElementNode
+  strategy: ClientStrategy
+}
+
 /**
- * Recursively finds elements with v-client:load directive.
+ * Recursively finds elements with v-client directive (e.g. v-client:load, v-client:visible).
  */
-export function findVClientElements(children: TemplateChildNode[]): ElementNode[] {
-  const results: ElementNode[] = []
+export function findVClientElements(children: TemplateChildNode[]): VClientMatch[] {
+  const results: VClientMatch[] = []
 
   for (const child of children) {
     if (child.type !== NodeTypes.ELEMENT) {
       continue
     }
 
-    const hasVClient = child.props.some(
-      (prop) =>
+    for (const prop of child.props) {
+      if (
         prop.type === NodeTypes.DIRECTIVE &&
         prop.name === 'client' &&
         prop.arg?.type === NodeTypes.SIMPLE_EXPRESSION &&
-        prop.arg.content === 'load',
-    )
-
-    if (hasVClient) {
-      results.push(child)
+        clientStrategies.has(prop.arg.content)
+      ) {
+        results.push({
+          element: child,
+          strategy: prop.arg.content as ClientStrategy,
+        })
+        break
+      }
     }
 
     if (child.children.length > 0) {

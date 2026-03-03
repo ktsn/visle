@@ -2,6 +2,8 @@ import path from 'node:path'
 
 import { normalizePath } from 'vite'
 
+import type { ClientStrategy } from './sfc-analysis.js'
+
 export const clientVirtualEntryId = '\0@visle/client-entry'
 
 export const serverVirtualEntryId = '\0@visle/server-entry'
@@ -37,6 +39,27 @@ export function generateServerVirtualEntryCode(entryDir: string, componentIds: s
 export const serverWrapPrefix = '\0visle:server-wrap:'
 
 export const islandWrapPrefix = '\0visle:island-wrap:'
+
+export function parseIslandWrapId(
+  id: string,
+): { filePath: string; strategy: ClientStrategy } | undefined {
+  if (!id.startsWith(islandWrapPrefix)) {
+    return undefined
+  }
+  const rest = id.slice(islandWrapPrefix.length)
+  const separatorIndex = rest.indexOf(':')
+  if (separatorIndex === -1) {
+    return undefined
+  }
+  return {
+    strategy: rest.slice(0, separatorIndex) as ClientStrategy,
+    filePath: rest.slice(separatorIndex + 1),
+  }
+}
+
+export function buildIslandWrapId(strategy: ClientStrategy, filePath: string): string {
+  return `${islandWrapPrefix}${strategy}:${filePath}`
+}
 
 export function generateServerComponentCode(
   filePath: string,
@@ -74,10 +97,12 @@ export function generateIslandWrapperCode(
   filePath: string,
   componentRelativePath: string,
   customElementEntryRelativePath: string,
+  strategy: ClientStrategy = 'load',
 ): string {
   const normalizedFilePath = normalizePath(filePath)
   const normalizedRelativePath = normalizePath(componentRelativePath)
   const normalizedEntryRelativePath = normalizePath(customElementEntryRelativePath)
+  const strategyAttr = strategy !== 'load' ? `\n      strategy: '${strategy}',` : ''
 
   return `import { defineComponent, h, useSSRContext, useAttrs, inject, provide, onServerPrefetch } from 'vue'
 import { islandSymbol } from '${symbolImportId}'
@@ -123,7 +148,7 @@ export default defineComponent({
 
     return () => h('${islandElementName}', {
       entry: clientImportId,
-      'serialized-props': isEmptyProps ? undefined : JSON.stringify(attrs),
+      'serialized-props': isEmptyProps ? undefined : JSON.stringify(attrs),${strategyAttr}
     }, [h(OriginalComponent, attrs, slots)])
   },
 })

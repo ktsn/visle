@@ -4,13 +4,15 @@ import type { Plugin, ResolvedConfig } from 'vite'
 import { parse } from 'vue/compiler-sfc'
 
 import {
+  buildIslandWrapId,
   generateIslandWrapperCode,
   generateServerComponentCode,
   islandWrapPrefix,
+  parseIslandWrapId,
   serverWrapPrefix,
 } from '../generate.js'
 import { customElementEntryPath, parseId } from '../paths.js'
-import { buildImportMap, findVClientElements } from '../sfc-analysis.js'
+import { buildImportMap, type ClientStrategy, findVClientElements } from '../sfc-analysis.js'
 
 interface ServerTransformPluginResult {
   plugin: Plugin
@@ -28,11 +30,10 @@ export function serverTransformPlugin(): ServerTransformPluginResult {
   const islandPaths = new Set<string>()
 
   /**
-   * Map from importer file path → set of absolute component paths
-   * that should be resolved as island wrappers.
+   * Map from importer file path → (absolute component path → strategy).
    * Populated by the transform hook, consumed by resolveId.
    */
-  const islandImportMap = new Map<string, Set<string>>()
+  const islandImportMap = new Map<string, Map<string, ClientStrategy>>()
 
   let viteConfig: ResolvedConfig
 
@@ -73,8 +74,11 @@ export function serverTransformPlugin(): ServerTransformPluginResult {
           // Check if this import was marked as an island by the transform hook.
           // The importer may include a query (e.g. ?vue&type=script), so strip it.
           const importerPath = importer ? parseId(importer).fileName : undefined
-          if (importerPath && islandImportMap.get(importerPath)?.has(absolutePath)) {
-            return islandWrapPrefix + absolutePath
+          const strategy = importerPath
+            ? islandImportMap.get(importerPath)?.get(absolutePath)
+            : undefined
+          if (strategy) {
+            return buildIslandWrapId(strategy, absolutePath)
           }
 
           return serverWrapPrefix + absolutePath
@@ -92,8 +96,9 @@ export function serverTransformPlugin(): ServerTransformPluginResult {
         return generateServerComponentCode(filePath, componentRelativePath)
       }
 
-      if (id.startsWith(islandWrapPrefix)) {
-        const filePath = id.slice(islandWrapPrefix.length)
+      const islandWrap = parseIslandWrapId(id)
+      if (islandWrap) {
+        const { filePath, strategy } = islandWrap
         const componentRelativePath = path.relative(viteConfig.root, filePath)
         const customElementEntryRelativePath = path.relative(
           viteConfig.root,
@@ -103,6 +108,7 @@ export function serverTransformPlugin(): ServerTransformPluginResult {
           filePath,
           componentRelativePath,
           customElementEntryRelativePath,
+          strategy,
         )
       }
     },
@@ -128,7 +134,7 @@ export function serverTransformPlugin(): ServerTransformPluginResult {
       // Build tag-name-to-import-source map from <script setup>
       const importMap = buildImportMap(descriptor, id)
 
-      // Find elements with v-client:load
+      // Find elements with v-client directives
       const matches = findVClientElements(descriptor.template.ast.children)
 
       if (matches.length === 0) {
@@ -137,11 +143,12 @@ export function serverTransformPlugin(): ServerTransformPluginResult {
 
       // Resolve alias import sources in parallel
       const resolveResults = await Promise.all(
-        matches.map(async (node) => {
+        matches.map(async ({ element: node, strategy }) => {
           const importInfo = importMap.get(node.tag)
           if (!importInfo) {
             return {
               tag: node.tag,
+              strategy,
               importInfo: undefined,
               resolvedPath: undefined,
             }
@@ -158,25 +165,29 @@ export function serverTransformPlugin(): ServerTransformPluginResult {
             const resolvedId = resolved.id
             if (resolvedId.startsWith(serverWrapPrefix)) {
               resolvedPath = resolvedId.slice(serverWrapPrefix.length)
-            } else if (resolvedId.startsWith(islandWrapPrefix)) {
-              resolvedPath = resolvedId.slice(islandWrapPrefix.length)
             } else {
-              resolvedPath = resolvedId
+              const islandWrap = parseIslandWrapId(resolvedId)
+              if (islandWrap) {
+                resolvedPath = islandWrap.filePath
+              } else {
+                resolvedPath = resolvedId
+              }
             }
           }
 
           return {
             tag: node.tag,
+            strategy,
             importInfo,
             resolvedPath,
           }
         }),
       )
 
-      for (const { tag, importInfo, resolvedPath } of resolveResults) {
+      for (const { tag, strategy, importInfo, resolvedPath } of resolveResults) {
         if (!importInfo) {
           this.warn(
-            `v-client:load on "${tag}" is not supported. ` +
+            `v-client:${strategy} on "${tag}" is not supported. ` +
               'Only statically imported Vue components are supported.',
           )
           continue
@@ -184,7 +195,7 @@ export function serverTransformPlugin(): ServerTransformPluginResult {
 
         if (!resolvedPath) {
           this.warn(
-            `Could not resolve import "${importInfo.source}" for v-client:load component "${tag}" in ${fileName}`,
+            `Could not resolve import "${importInfo.source}" for v-client:${strategy} component "${tag}" in ${fileName}`,
           )
           continue
         }
@@ -193,12 +204,19 @@ export function serverTransformPlugin(): ServerTransformPluginResult {
 
         // Record in the island import map so resolveId can redirect this import
         // to the island wrapper virtual module
-        let set = islandImportMap.get(fileName)
-        if (!set) {
-          set = new Set()
-          islandImportMap.set(fileName, set)
+        let map = islandImportMap.get(fileName)
+        if (!map) {
+          map = new Map()
+          islandImportMap.set(fileName, map)
         }
-        set.add(resolvedPath)
+        const existing = map.get(resolvedPath)
+        if (existing && existing !== strategy) {
+          this.error(
+            `Conflicting v-client strategies for "${tag}" in ${fileName}: ` +
+              `"${existing}" and "${strategy}" cannot be used on the same component.`,
+          )
+        }
+        map.set(resolvedPath, strategy)
       }
     },
   }
