@@ -5,7 +5,7 @@ import { parse } from 'vue/compiler-sfc'
 
 import {
   generateIslandWrapperCode,
-  generateServerComponentCode,
+  generateServerWrapperCode,
   islandWrapPrefix,
   serverWrapPrefix,
 } from '../generate.js'
@@ -89,7 +89,7 @@ export function serverTransformPlugin(): ServerTransformPluginResult {
       if (id.startsWith(serverWrapPrefix)) {
         const filePath = id.slice(serverWrapPrefix.length)
         const componentRelativePath = path.relative(viteConfig.root, filePath)
-        return generateServerComponentCode(filePath, componentRelativePath)
+        return generateServerWrapperCode(filePath, componentRelativePath)
       }
 
       if (id.startsWith(islandWrapPrefix)) {

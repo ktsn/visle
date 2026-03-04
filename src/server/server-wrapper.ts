@@ -3,10 +3,7 @@ import { defineComponent, h, useSSRContext, onServerPrefetch } from 'vue'
 
 import type { RenderContext } from './render.js'
 
-export function createServerComponent(
-  normalizedRelativePath: string,
-  OriginalComponent: Component,
-) {
+export function createServerWrapper(normalizedRelativePath: string, OriginalComponent: Component) {
   return defineComponent({
     setup(_props, { slots }) {
       const context: RenderContext = useSSRContext()!

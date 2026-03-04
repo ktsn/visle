@@ -34,20 +34,17 @@ export function generateServerVirtualEntryCode(entryDir: string, componentIds: s
   return `${imports}\nexport default {\n${entries}\n}`
 }
 
-export function generateServerComponentCode(
-  filePath: string,
-  componentRelativePath: string,
-): string {
+export function generateServerWrapperCode(filePath: string, componentRelativePath: string): string {
   const normalizedFilePath = normalizePath(filePath)
   const normalizedRelativePath = normalizePath(componentRelativePath)
 
   const serializedFilePath = JSON.stringify(normalizedFilePath)
   const serializedRelativePath = JSON.stringify(normalizedRelativePath)
 
-  return `import { createServerComponent } from 'visle/internal'
+  return `import { createServerWrapper } from 'visle/internal'
 import OriginalComponent from ${serializedFilePath}
 export * from ${serializedFilePath}
-export default createServerComponent(${serializedRelativePath}, OriginalComponent)
+export default createServerWrapper(${serializedRelativePath}, OriginalComponent)
 `
 }
 
