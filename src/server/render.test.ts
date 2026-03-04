@@ -1,5 +1,6 @@
 import fs from 'node:fs/promises'
 import path from 'node:path'
+import { fileURLToPath } from 'node:url'
 
 import { describe, test, expect, beforeEach } from 'vitest'
 
@@ -153,6 +154,14 @@ describe('createRender', () => {
         createDevLoader({
           root,
           plugins: [visle()],
+          resolve: {
+            alias: {
+              'visle/internal': path.resolve(
+                path.dirname(fileURLToPath(import.meta.url)),
+                'internal.ts',
+              ),
+            },
+          },
         }),
       )
 

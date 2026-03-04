@@ -10,6 +10,7 @@ import { createRender } from '../src/server/render.ts'
 
 const tmpDir = path.resolve('test/__generated__/integration')
 const fixturesDir = path.resolve(path.dirname(fileURLToPath(import.meta.url)), 'fixtures')
+const srcDir = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../src')
 
 export const renderCases: { name: string; component: string; props?: Record<string, unknown> }[] = [
   { name: 'Static component rendering', component: 'static' },
@@ -59,7 +60,10 @@ export function devRender(root: string) {
     root,
     plugins: [visle()],
     resolve: {
-      alias: { '@': root },
+      alias: {
+        '@': root,
+        'visle/internal': path.join(srcDir, 'server/internal.ts'),
+      },
     },
   })
 
@@ -76,7 +80,10 @@ export async function prodBuild(root: string): Promise<void> {
     root,
     plugins: [visle()],
     resolve: {
-      alias: { '@': root },
+      alias: {
+        '@': root,
+        'visle/internal': path.join(srcDir, 'server/internal.ts'),
+      },
     },
     logLevel: 'silent',
   })
