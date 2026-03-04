@@ -9,8 +9,6 @@ import {
   generateServerVirtualEntryCode,
   clientVirtualEntryId,
   serverVirtualEntryId,
-  symbolCode,
-  symbolImportId,
 } from '../generate.js'
 import {
   customElementEntryPath,
@@ -37,7 +35,6 @@ export function virtualFilePlugin(config: ResolvedVisleConfig): Plugin {
         clientVirtualEntryId,
         serverVirtualEntryId,
         virtualCustomElementEntryPath,
-        symbolImportId,
       ]
 
       if (virtuals.includes(id)) {
@@ -46,10 +43,6 @@ export function virtualFilePlugin(config: ResolvedVisleConfig): Plugin {
     },
 
     load(id) {
-      if (id === symbolImportId) {
-        return symbolCode
-      }
-
       if (id === serverVirtualEntryId) {
         return generateServerVirtualEntryCode(entryRoot, resolveServerComponentIds(entryRoot))
       }
