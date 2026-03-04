@@ -1,7 +1,7 @@
 import type { Component } from 'vue'
 import { defineComponent, h, useSSRContext, useAttrs, inject, provide, onServerPrefetch } from 'vue'
 
-import { RenderContext } from './render.js'
+import type { RenderContext } from './render.js'
 import { islandSymbol } from './symbol.js'
 
 const islandElementName = 'vue-island'

@@ -41,10 +41,13 @@ export function generateServerComponentCode(
   const normalizedFilePath = normalizePath(filePath)
   const normalizedRelativePath = normalizePath(componentRelativePath)
 
+  const serializedFilePath = JSON.stringify(normalizedFilePath)
+  const serializedRelativePath = JSON.stringify(normalizedRelativePath)
+
   return `import { createServerComponent } from 'visle/internal'
-import OriginalComponent from '${normalizedFilePath}'
-export * from '${normalizedFilePath}'
-export default createServerComponent('${normalizedRelativePath}', OriginalComponent)
+import OriginalComponent from ${serializedFilePath}
+export * from ${serializedFilePath}
+export default createServerComponent(${serializedRelativePath}, OriginalComponent)
 `
 }
 
@@ -57,10 +60,14 @@ export function generateIslandWrapperCode(
   const normalizedRelativePath = normalizePath(componentRelativePath)
   const normalizedEntryRelativePath = normalizePath(customElementEntryRelativePath)
 
+  const serializedFilePath = JSON.stringify(normalizedFilePath)
+  const serializedRelativePath = JSON.stringify(normalizedRelativePath)
+  const serializedEntryRelativePath = JSON.stringify(normalizedEntryRelativePath)
+
   return `import { createIslandWrapper } from 'visle/internal'
-import OriginalComponent from '${normalizedFilePath}'
-export * from '${normalizedFilePath}'
-export default createIslandWrapper('${normalizedRelativePath}', '${normalizedEntryRelativePath}', OriginalComponent)
+import OriginalComponent from ${serializedFilePath}
+export * from ${serializedFilePath}
+export default createIslandWrapper(${serializedRelativePath}, ${serializedEntryRelativePath}, OriginalComponent)
 `
 }
 

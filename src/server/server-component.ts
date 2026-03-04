@@ -1,7 +1,7 @@
 import type { Component } from 'vue'
 import { defineComponent, h, useSSRContext, onServerPrefetch } from 'vue'
 
-import { RenderContext } from './render.js'
+import type { RenderContext } from './render.js'
 
 export function createServerComponent(
   normalizedRelativePath: string,
