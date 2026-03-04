@@ -31,11 +31,7 @@ export function virtualFilePlugin(config: ResolvedVisleConfig): Plugin {
     },
 
     resolveId(id) {
-      const virtuals = [
-        clientVirtualEntryId,
-        serverVirtualEntryId,
-        virtualCustomElementEntryPath,
-      ]
+      const virtuals = [clientVirtualEntryId, serverVirtualEntryId, virtualCustomElementEntryPath]
 
       if (virtuals.includes(id)) {
         return id
