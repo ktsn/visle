@@ -4,6 +4,13 @@ import { defineComponent, h, useSSRContext, useAttrs, inject, provide, onServerP
 import type { RenderContext } from './render.js'
 import { islandSymbol } from './symbol.js'
 
+function addCssIdsToContext(context: RenderContext, cssIds: string[]) {
+  context.loadCss ??= new Set()
+  for (const cssId of cssIds) {
+    context.loadCss.add(cssId)
+  }
+}
+
 export function createComponentWrapper(
   normalizedRelativePath: string,
   normalizedEntryRelativePath: string,
@@ -13,7 +20,7 @@ export function createComponentWrapper(
     inheritAttrs: false,
 
     props: {
-      visleClient: Boolean,
+      __visle_client__: Boolean,
     },
 
     setup(props, { slots }) {
@@ -21,7 +28,7 @@ export function createComponentWrapper(
       const context: RenderContext = useSSRContext()!
       const manifest = context.manifest!
 
-      const isIsland = props.visleClient
+      const isIsland = props.__visle_client__
 
       if (isIsland) {
         const inIsland = inject(islandSymbol, false)
@@ -41,10 +48,7 @@ export function createComponentWrapper(
           context.loadJs ??= new Set()
           context.loadJs.add(entryImportId)
 
-          context.loadCss ??= new Set()
-          for (const cssId of cssIds) {
-            context.loadCss.add(cssId)
-          }
+          addCssIdsToContext(context, cssIds)
         })
 
         if (inIsland) {
@@ -69,10 +73,7 @@ export function createComponentWrapper(
       onServerPrefetch(async () => {
         const cssIds = await manifest.getDependingClientCssIds(normalizedRelativePath)
 
-        context.loadCss ??= new Set()
-        for (const cssId of cssIds) {
-          context.loadCss.add(cssId)
-        }
+        addCssIdsToContext(context, cssIds)
       })
 
       return () => h(OriginalComponent, attrs, slots)

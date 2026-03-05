@@ -156,7 +156,7 @@ export function visle(config: VisleConfig = {}): Plugin[] {
             client: () => ({
               props: [
                 createObjectProperty(
-                  createSimpleExpression('visleClient', true),
+                  createSimpleExpression('__visle_client__', true),
                   createSimpleExpression('true', false),
                 ),
               ],
