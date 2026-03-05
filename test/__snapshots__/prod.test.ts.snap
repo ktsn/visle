@@ -175,6 +175,52 @@ exports[`Production Build SSR > 'Island with alias import' 1`] = `
 </div>
 `;
 
+exports[`Production Build SSR > 'Island with barrel import' 1`] = `
+<link
+  rel="stylesheet"
+  href="/assets/client-entry-[hash].css"
+>
+<script
+  type="module"
+  src="/assets/custom-element-[hash].js"
+  async
+>
+</script>
+<div>
+  <h1>
+    Page
+  </h1>
+  <vue-island entry="/assets/Counter-[hash].js">
+    <button>
+      Count: 0
+    </button>
+  </vue-island>
+</div>
+`;
+
+exports[`Production Build SSR > 'Island with named import' 1`] = `
+<link
+  rel="stylesheet"
+  href="/assets/client-entry-[hash].css"
+>
+<script
+  type="module"
+  src="/assets/custom-element-[hash].js"
+  async
+>
+</script>
+<div>
+  <h1>
+    Page
+  </h1>
+  <vue-island entry="/assets/named-import-[hash].js">
+    <button>
+      Count: 0
+    </button>
+  </vue-island>
+</div>
+`;
+
 exports[`Production Build SSR > 'Island with options API renamed compo…' 1`] = `
 <link
   rel="stylesheet"
@@ -404,6 +450,7 @@ exports[`Production Build SSR > Build output files 1`] = `
   "assets/_plugin-vue_export-helper-[hash].js",
   "assets/client-entry-[hash].css",
   "assets/custom-element-[hash].js",
+  "assets/named-import-[hash].js",
   "assets/vue.runtime.esm-bundler-[hash].js",
 ]
 `;
@@ -426,6 +473,8 @@ exports[`Production Build SSR > Build output files 2`] = `
     "components/OptionsCounter.vue": "assets/OptionsCounter-[hash].js",
     "components/Outer.vue": "assets/Outer-[hash].js",
     "components/StyledCounter.vue": "assets/StyledCounter-[hash].js",
+    "components/barrel.ts": "assets/Counter-[hash].js",
+    "components/named-import.ts": "assets/named-import-[hash].js",
   },
 }
 `;
@@ -446,6 +495,7 @@ declare module 'visle' {
     'with-options-api': ComponentProps<typeof import('./pages/with-options-api.vue')['default']>
     'with-options-api-renamed': ComponentProps<typeof import('./pages/with-options-api-renamed.vue')['default']>
     'with-nested-island': ComponentProps<typeof import('./pages/with-nested-island.vue')['default']>
+    'with-named-import': ComponentProps<typeof import('./pages/with-named-import.vue')['default']>
     'with-multiple-islands': ComponentProps<typeof import('./pages/with-multiple-islands.vue')['default']>
     'with-mount-variation': ComponentProps<typeof import('./pages/with-mount-variation.vue')['default']>
     'with-island': ComponentProps<typeof import('./pages/with-island.vue')['default']>
@@ -455,6 +505,7 @@ declare module 'visle' {
     'with-css-src': ComponentProps<typeof import('./pages/with-css-src.vue')['default']>
     'with-css-src-alias': ComponentProps<typeof import('./pages/with-css-src-alias.vue')['default']>
     'with-css-module': ComponentProps<typeof import('./pages/with-css-module.vue')['default']>
+    'with-barrel-import': ComponentProps<typeof import('./pages/with-barrel-import.vue')['default']>
     'static': ComponentProps<typeof import('./pages/static.vue')['default']>
     'named-export': ComponentProps<typeof import('./pages/named-export.vue')['default']>
     'document': ComponentProps<typeof import('./pages/document.vue')['default']>
