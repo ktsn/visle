@@ -6,11 +6,7 @@ export const clientVirtualEntryId = '\0@visle/client-entry'
 
 export const serverVirtualEntryId = '\0@visle/server-entry'
 
-export const serverWrapPrefix = '\0visle:server-wrap:'
-
-export const islandWrapPrefix = '\0visle:island-wrap:'
-
-export const islandElementName = 'vue-island'
+export const componentWrapPrefix = '\0visle:wrap:'
 
 export function generateClientVirtualEntryCode(componentIds: string[]): string {
   return (
@@ -34,21 +30,7 @@ export function generateServerVirtualEntryCode(entryDir: string, componentIds: s
   return `${imports}\nexport default {\n${entries}\n}`
 }
 
-export function generateServerWrapperCode(filePath: string, componentRelativePath: string): string {
-  const normalizedFilePath = normalizePath(filePath)
-  const normalizedRelativePath = normalizePath(componentRelativePath)
-
-  const serializedFilePath = JSON.stringify(normalizedFilePath)
-  const serializedRelativePath = JSON.stringify(normalizedRelativePath)
-
-  return `import { createServerWrapper } from 'visle/internal'
-import OriginalComponent from ${serializedFilePath}
-export * from ${serializedFilePath}
-export default createServerWrapper(${serializedRelativePath}, OriginalComponent)
-`
-}
-
-export function generateIslandWrapperCode(
+export function generateComponentWrapperCode(
   filePath: string,
   componentRelativePath: string,
   customElementEntryRelativePath: string,
@@ -61,10 +43,10 @@ export function generateIslandWrapperCode(
   const serializedRelativePath = JSON.stringify(normalizedRelativePath)
   const serializedEntryRelativePath = JSON.stringify(normalizedEntryRelativePath)
 
-  return `import { createIslandWrapper } from 'visle/internal'
+  return `import { createComponentWrapper } from 'visle/internal'
 import OriginalComponent from ${serializedFilePath}
 export * from ${serializedFilePath}
-export default createIslandWrapper(${serializedRelativePath}, ${serializedEntryRelativePath}, OriginalComponent)
+export default createComponentWrapper(${serializedRelativePath}, ${serializedEntryRelativePath}, OriginalComponent)
 `
 }
 

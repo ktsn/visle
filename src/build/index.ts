@@ -2,11 +2,12 @@ import fs from 'node:fs/promises'
 import path from 'node:path'
 
 import vue from '@vitejs/plugin-vue'
+import { createObjectProperty, createSimpleExpression } from '@vue/compiler-core'
 import type { Plugin } from 'vite'
 
 import { generateComponentId } from './component-id.js'
 import { VisleConfig, defaultConfig, setVisleConfig } from './config.js'
-import { clientVirtualEntryId, islandElementName, serverVirtualEntryId } from './generate.js'
+import { clientVirtualEntryId, serverVirtualEntryId } from './generate.js'
 import { customElementEntryPath } from './paths.js'
 import { devStyleSSRPlugin } from './plugins/dev-style-ssr.js'
 import { entryTypesPlugin } from './plugins/entry-types.js'
@@ -147,12 +148,19 @@ export function visle(config: VisleConfig = {}): Plugin[] {
       },
       template: {
         compilerOptions: {
-          isCustomElement: (tag) => tag === islandElementName,
+          isCustomElement: (tag) => tag === 'vue-island',
           directiveTransforms: {
             // server-transform plugin searches v-client directive to detect
             // island component. Strip v-client directive here to make sure to
             // remove it in all environment.
-            client: () => ({ props: [] }),
+            client: () => ({
+              props: [
+                createObjectProperty(
+                  createSimpleExpression('__visle_client__', true),
+                  createSimpleExpression('true', false),
+                ),
+              ],
+            }),
           },
         },
       },

@@ -332,6 +332,32 @@ exports[`Production Build SSR > 'Non-ascii file name' 1`] = `
 </p>
 `;
 
+exports[`Production Build SSR > 'Same component as island and server' 1`] = `
+<link
+  rel="stylesheet"
+  href="/assets/client-entry-[hash].css"
+>
+<script
+  type="module"
+  src="/assets/custom-element-[hash].js"
+  async
+>
+</script>
+<div>
+  <vue-island
+    entry="/assets/Counter-[hash].js"
+    serialized-props="{&quot;count&quot;:1}"
+  >
+    <button>
+      Count: 1
+    </button>
+  </vue-island>
+  <button>
+    Count: 2
+  </button>
+</div>
+`;
+
 exports[`Production Build SSR > 'Server component with slot' 1`] = `
 <link
   rel="stylesheet"
@@ -421,6 +447,7 @@ declare module 'visle' {
     'with-options-api-renamed': ComponentProps<typeof import('./pages/with-options-api-renamed.vue')['default']>
     'with-nested-island': ComponentProps<typeof import('./pages/with-nested-island.vue')['default']>
     'with-multiple-islands': ComponentProps<typeof import('./pages/with-multiple-islands.vue')['default']>
+    'with-mount-variation': ComponentProps<typeof import('./pages/with-mount-variation.vue')['default']>
     'with-island': ComponentProps<typeof import('./pages/with-island.vue')['default']>
     'with-island-props': ComponentProps<typeof import('./pages/with-island-props.vue')['default']>
     'with-island-alias': ComponentProps<typeof import('./pages/with-island-alias.vue')['default']>

@@ -31,6 +31,7 @@ export const renderCases: { name: string; component: string; props?: Record<stri
   { name: 'Island with options API renamed component', component: 'with-options-api-renamed' },
   { name: 'CSS with style src', component: 'with-css-src' },
   { name: 'CSS with style src alias', component: 'with-css-src-alias' },
+  { name: 'Same component as island and server', component: 'with-mount-variation' },
 ]
 
 /**
