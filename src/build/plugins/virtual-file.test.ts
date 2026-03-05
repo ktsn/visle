@@ -23,9 +23,7 @@ describe('virtualFilePlugin', () => {
       logLevel: 'silent',
     })
 
-    const result = await server.environments.client.transformRequest(
-      virtualCustomElementEntryPath,
-    )
+    const result = await server.environments.client.transformRequest(virtualCustomElementEntryPath)
 
     expect(result).not.toBeNull()
     expect(result!.code).toContain('vue-island')
