@@ -1,4 +1,3 @@
-import { readFile } from 'node:fs/promises'
 import path from 'node:path'
 
 import { Plugin } from 'vite'
@@ -31,7 +30,11 @@ export function virtualFilePlugin(config: ResolvedVisleConfig): Plugin {
     },
 
     resolveId(id) {
-      const virtuals = [clientVirtualEntryId, serverVirtualEntryId, virtualCustomElementEntryPath]
+      if (id === virtualCustomElementEntryPath) {
+        return customElementEntryPath
+      }
+
+      const virtuals = [clientVirtualEntryId, serverVirtualEntryId]
 
       if (virtuals.includes(id)) {
         return id
@@ -45,10 +48,6 @@ export function virtualFilePlugin(config: ResolvedVisleConfig): Plugin {
 
       if (id === clientVirtualEntryId) {
         return generateClientVirtualEntryCode(resolveServerComponentIds(entryRoot))
-      }
-
-      if (id === virtualCustomElementEntryPath) {
-        return readFile(customElementEntryPath, 'utf-8')
       }
 
       return null
