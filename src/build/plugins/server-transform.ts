@@ -69,7 +69,11 @@ export function serverTransformPlugin(): ServerTransformPluginResult {
           viteConfig.root,
           customElementEntryPath,
         )
-        return generateComponentWrapperCode(filePath, componentRelativePath, customElementEntryRelativePath)
+        return generateComponentWrapperCode(
+          filePath,
+          componentRelativePath,
+          customElementEntryRelativePath,
+        )
       }
     },
 

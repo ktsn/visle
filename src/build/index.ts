@@ -2,9 +2,8 @@ import fs from 'node:fs/promises'
 import path from 'node:path'
 
 import vue from '@vitejs/plugin-vue'
-import type { Plugin } from 'vite'
-
 import { createObjectProperty, createSimpleExpression } from '@vue/compiler-core'
+import type { Plugin } from 'vite'
 
 import { generateComponentId } from './component-id.js'
 import { VisleConfig, defaultConfig, setVisleConfig } from './config.js'

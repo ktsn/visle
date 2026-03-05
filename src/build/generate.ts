@@ -8,7 +8,6 @@ export const serverVirtualEntryId = '\0@visle/server-entry'
 
 export const componentWrapPrefix = '\0visle:wrap:'
 
-
 export function generateClientVirtualEntryCode(componentIds: string[]): string {
   return (
     componentIds
