@@ -3,12 +3,7 @@ import path from 'node:path'
 import type { Plugin, ResolvedConfig } from 'vite'
 import { parse } from 'vue/compiler-sfc'
 
-import {
-  generateIslandWrapperCode,
-  generateServerWrapperCode,
-  islandWrapPrefix,
-  serverWrapPrefix,
-} from '../generate.js'
+import { generateComponentWrapperCode, componentWrapPrefix } from '../generate.js'
 import { customElementEntryPath, parseId } from '../paths.js'
 import { buildImportMap, findVClientElements } from '../sfc-analysis.js'
 
@@ -19,20 +14,12 @@ interface ServerTransformPluginResult {
 
 /**
  * Vite plugin that transforms Vue SFC imports on the server environment.
- * - Redirects `.vue` imports to server component wrapper virtual modules
- * - Loads server/island wrapper virtual modules with generated code
- * - Detects `v-client:load` directives and redirects imports to island wrappers
- * - Collects island component paths for the islands build
+ * - Redirects `.vue` imports to component wrapper virtual modules
+ * - Loads wrapper virtual modules with generated code
+ * - Detects `v-client:load` directives and collects island component paths for the islands build
  */
 export function serverTransformPlugin(): ServerTransformPluginResult {
   const islandPaths = new Set<string>()
-
-  /**
-   * Map from importer file path → set of absolute component paths
-   * that should be resolved as island wrappers.
-   * Populated by the transform hook, consumed by resolveId.
-   */
-  const islandImportMap = new Map<string, Set<string>>()
 
   let viteConfig: ResolvedConfig
 
@@ -51,59 +38,38 @@ export function serverTransformPlugin(): ServerTransformPluginResult {
 
     buildStart() {
       islandPaths.clear()
-      islandImportMap.clear()
     },
 
     async resolveId(id, importer) {
-      // Redirect .vue imports to server wrapper virtual modules.
+      // Redirect .vue imports to wrapper virtual modules.
       // Skip when the importer is a wrapper module to avoid infinite recursion.
       const { fileName, query } = parseId(id)
 
       if (fileName.endsWith('.vue') && !query.vue) {
-        const isFromWrapper =
-          importer?.startsWith(serverWrapPrefix) || importer?.startsWith(islandWrapPrefix)
+        const isFromWrapper = importer?.startsWith(componentWrapPrefix)
         if (!isFromWrapper) {
           const resolved = await this.resolve(id, importer, { skipSelf: true })
           if (!resolved) {
             return null
           }
 
-          const absolutePath = resolved.id
-
-          // Check if this import was marked as an island by the transform hook.
-          // The importer may include a query (e.g. ?vue&type=script), so strip it.
-          const importerPath = importer ? parseId(importer).fileName : undefined
-          if (importerPath && islandImportMap.get(importerPath)?.has(absolutePath)) {
-            return islandWrapPrefix + absolutePath
-          }
-
-          return serverWrapPrefix + absolutePath
+          return componentWrapPrefix + resolved.id
         }
       }
     },
 
     load(id) {
-      // Handle virtual JS modules for server wrapping.
+      // Handle virtual JS modules for component wrapping.
       // These use non-.vue IDs to prevent the Vue plugin from processing them
       // and corrupting its shared descriptor cache.
-      if (id.startsWith(serverWrapPrefix)) {
-        const filePath = id.slice(serverWrapPrefix.length)
-        const componentRelativePath = path.relative(viteConfig.root, filePath)
-        return generateServerWrapperCode(filePath, componentRelativePath)
-      }
-
-      if (id.startsWith(islandWrapPrefix)) {
-        const filePath = id.slice(islandWrapPrefix.length)
+      if (id.startsWith(componentWrapPrefix)) {
+        const filePath = id.slice(componentWrapPrefix.length)
         const componentRelativePath = path.relative(viteConfig.root, filePath)
         const customElementEntryRelativePath = path.relative(
           viteConfig.root,
           customElementEntryPath,
         )
-        return generateIslandWrapperCode(
-          filePath,
-          componentRelativePath,
-          customElementEntryRelativePath,
-        )
+        return generateComponentWrapperCode(filePath, componentRelativePath, customElementEntryRelativePath)
       }
     },
 
@@ -156,10 +122,8 @@ export function serverTransformPlugin(): ServerTransformPluginResult {
           const resolved = await this.resolve(source, id)
           if (resolved) {
             const resolvedId = resolved.id
-            if (resolvedId.startsWith(serverWrapPrefix)) {
-              resolvedPath = resolvedId.slice(serverWrapPrefix.length)
-            } else if (resolvedId.startsWith(islandWrapPrefix)) {
-              resolvedPath = resolvedId.slice(islandWrapPrefix.length)
+            if (resolvedId.startsWith(componentWrapPrefix)) {
+              resolvedPath = resolvedId.slice(componentWrapPrefix.length)
             } else {
               resolvedPath = resolvedId
             }
@@ -190,15 +154,6 @@ export function serverTransformPlugin(): ServerTransformPluginResult {
         }
 
         islandPaths.add(resolvedPath)
-
-        // Record in the island import map so resolveId can redirect this import
-        // to the island wrapper virtual module
-        let set = islandImportMap.get(fileName)
-        if (!set) {
-          set = new Set()
-          islandImportMap.set(fileName, set)
-        }
-        set.add(resolvedPath)
       }
     },
   }
