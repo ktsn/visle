@@ -1,5 +1,37 @@
 // Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
 
+exports[`Client-side Hydration > 'Island with barrel import' 1`] = `
+<div>
+  <h1>
+    Page
+  </h1>
+  <vue-island
+    entry="/assets/Counter-[hash].js"
+    imported-name="Counter"
+  >
+    <button>
+      Count: 0
+    </button>
+  </vue-island>
+</div>
+`;
+
+exports[`Client-side Hydration > 'Island with named import' 1`] = `
+<div>
+  <h1>
+    Page
+  </h1>
+  <vue-island
+    entry="/assets/named-import-[hash].js"
+    imported-name="Counter"
+  >
+    <button>
+      Count: 0
+    </button>
+  </vue-island>
+</div>
+`;
+
 exports[`Client-side Hydration > 'Island with props' 1`] = `
 <div>
   <vue-island

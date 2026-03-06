@@ -190,7 +190,10 @@ exports[`Production Build SSR > 'Island with barrel import' 1`] = `
   <h1>
     Page
   </h1>
-  <vue-island entry="/assets/Counter-[hash].js">
+  <vue-island
+    entry="/assets/Counter-[hash].js"
+    imported-name="Counter"
+  >
     <button>
       Count: 0
     </button>
@@ -213,7 +216,10 @@ exports[`Production Build SSR > 'Island with named import' 1`] = `
   <h1>
     Page
   </h1>
-  <vue-island entry="/assets/named-import-[hash].js">
+  <vue-island
+    entry="/assets/named-import-[hash].js"
+    imported-name="Counter"
+  >
     <button>
       Count: 0
     </button>

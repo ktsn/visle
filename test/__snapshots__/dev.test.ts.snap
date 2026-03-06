@@ -178,7 +178,10 @@ exports[`Dev Server SSR > 'Island with barrel import' 1`] = `
   <h1>
     Page
   </h1>
-  <vue-island entry="/components/barrel.ts">
+  <vue-island
+    entry="/components/barrel.ts"
+    imported-name="Counter"
+  >
     <button>
       Count: 0
     </button>
@@ -197,7 +200,10 @@ exports[`Dev Server SSR > 'Island with named import' 1`] = `
   <h1>
     Page
   </h1>
-  <vue-island entry="/components/named-import.ts">
+  <vue-island
+    entry="/components/named-import.ts"
+    imported-name="Counter"
+  >
     <button>
       Count: 0
     </button>
