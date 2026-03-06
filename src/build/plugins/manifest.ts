@@ -84,9 +84,14 @@ export function manifestPlugin(): ManifestPluginResult {
             continue
           }
 
-          if (chunk.facadeModuleId) {
-            const relativePath = path.relative(root, chunk.facadeModuleId)
-            envJsMap.set(relativePath, chunk.fileName)
+          // Map entry modules paths to output chunk path.
+          // Using moduleIds rather than facadeModuleId because it can be disappeared.
+          // (e.g., barrel files merged with their re-export targets by Rollup)
+          for (const moduleId of chunk.moduleIds) {
+            if (this.getModuleInfo(moduleId)?.isEntry) {
+              const moduleRelativePath = path.relative(root, moduleId)
+              envJsMap.set(moduleRelativePath, chunk.fileName)
+            }
           }
         }
 
