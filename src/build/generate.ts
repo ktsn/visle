@@ -44,13 +44,9 @@ export function generateComponentWrapperCode(
   const serializedRelativePath = JSON.stringify(normalizedRelativePath)
   const serializedEntryRelativePath = JSON.stringify(normalizedEntryRelativePath)
 
-  const imports = importedNames
-    .map((name, i) =>
-      name === 'default'
-        ? `import __visle_${i} from ${serializedFilePath}`
-        : `import { ${name} as __visle_${i} } from ${serializedFilePath}`,
-    )
-    .join('\n')
+  const specifiers = importedNames.map((name, i) => `${name} as __visle_${i}`).join(', ')
+  const imports = `import { ${specifiers} } from ${serializedFilePath}`
+
   const exports = importedNames
     .map((name, i) =>
       name === 'default'
