@@ -14,6 +14,7 @@ function addCssIdsToContext(context: RenderContext, cssIds: string[]) {
 export function createComponentWrapper(
   normalizedRelativePath: string,
   normalizedEntryRelativePath: string,
+  importedName: string,
   OriginalComponent: Component,
 ) {
   return defineComponent({
@@ -63,6 +64,7 @@ export function createComponentWrapper(
             {
               entry: clientImportId,
               'serialized-props': isEmptyProps ? undefined : JSON.stringify(attrs),
+              'imported-name': importedName === 'default' ? undefined : importedName,
             },
             [h(OriginalComponent, attrs, slots)],
           )

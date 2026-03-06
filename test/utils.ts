@@ -32,6 +32,8 @@ export const renderCases: { name: string; component: string; props?: Record<stri
   { name: 'CSS with style src', component: 'with-css-src' },
   { name: 'CSS with style src alias', component: 'with-css-src-alias' },
   { name: 'Same component as island and server', component: 'with-mount-variation' },
+  { name: 'Island with named import', component: 'with-named-import' },
+  { name: 'Island with barrel import', component: 'with-barrel-import' },
 ]
 
 /**

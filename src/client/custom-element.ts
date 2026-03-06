@@ -38,6 +38,7 @@ export class VueIsland extends HTMLElement {
     }
 
     const serializedProps = this.getAttribute('serialized-props') ?? '{}'
+    const importedName = this.getAttribute('imported-name') ?? 'default'
 
     const module = await loadModule(entry)
 
@@ -45,7 +46,12 @@ export class VueIsland extends HTMLElement {
       return
     }
 
-    const entryComponent = module.default
+    const entryComponent = module[importedName]
+    if (!entryComponent) {
+      console.error(`[visle] Export "${importedName}" not found in module "${entry}"`)
+      return
+    }
+
     const parsedProps = tryParseProps(serializedProps)
 
     this.#app = createSSRApp(entryComponent, parsedProps)
