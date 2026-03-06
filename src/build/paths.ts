@@ -65,7 +65,7 @@ export function parseId(id: string): {
   }
   const names = parsed.get('names')
   if (names) {
-    query.names = names.split(',')
+    query.names = names.split(',').filter(Boolean)
   }
 
   return {

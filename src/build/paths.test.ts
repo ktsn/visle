@@ -43,4 +43,12 @@ describe('parseId', () => {
       prefix: undefined,
     })
   })
+
+  test('filters empty name segments', () => {
+    expect(parseId('/foo/bar.vue?names=A,,B')).toEqual({
+      fileName: '/foo/bar.vue',
+      query: { names: ['A', 'B'] },
+      prefix: undefined,
+    })
+  })
 })
