@@ -44,22 +44,25 @@ export function generateComponentWrapperCode(
   const serializedRelativePath = JSON.stringify(normalizedRelativePath)
   const serializedEntryRelativePath = JSON.stringify(normalizedEntryRelativePath)
 
-  const specifiers = importedNames.map((name, i) => `${name} as __visle_${i}`).join(', ')
-  const imports = `import { ${specifiers} } from ${serializedFilePath}`
+  const lines = [
+    `import { createComponentWrapper } from 'visle/internal'`,
+    `export * from ${serializedFilePath}`,
+  ]
 
-  const exports = importedNames
-    .map((name, i) =>
-      name === 'default'
-        ? `export default createComponentWrapper(${serializedRelativePath}, ${serializedEntryRelativePath}, ${JSON.stringify(name)}, __visle_${i})`
-        : `export const ${name} = createComponentWrapper(${serializedRelativePath}, ${serializedEntryRelativePath}, ${JSON.stringify(name)}, __visle_${i})`,
-    )
-    .join('\n')
+  if (importedNames.length > 0) {
+    const specifiers = importedNames.map((name, i) => `${name} as __visle_${i}`).join(', ')
+    lines.push(`import { ${specifiers} } from ${serializedFilePath}`)
 
-  return `import { createComponentWrapper } from 'visle/internal'
-export * from ${serializedFilePath}
-${imports}
-${exports}
-`
+    for (const [i, name] of importedNames.entries()) {
+      lines.push(
+        name === 'default'
+          ? `export default createComponentWrapper(${serializedRelativePath}, ${serializedEntryRelativePath}, ${JSON.stringify(name)}, __visle_${i})`
+          : `export const ${name} = createComponentWrapper(${serializedRelativePath}, ${serializedEntryRelativePath}, ${JSON.stringify(name)}, __visle_${i})`,
+      )
+    }
+  }
+
+  return lines.join('\n') + '\n'
 }
 
 export function generateEntryTypesCode(
