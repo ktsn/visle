@@ -3,6 +3,8 @@ import path from 'node:path'
 
 import { globSync } from 'glob'
 
+import { componentWrapPrefix } from './generate.js'
+
 // -----------------------------
 // Custom Element Paths
 // -----------------------------
@@ -34,25 +36,42 @@ export function resolvePattern(pattern: string | string[], root: string): string
 
 export interface ParsedIdQuery {
   vue?: boolean
+  names?: string[]
 }
 
 /**
- * Parses a file ID into filename and query parts
+ * Parses a file ID into filename and query parts.
+ * Handles the `\0visle:wrap:` prefix and `names` query param.
  */
 export function parseId(id: string): {
   fileName: string
   query: ParsedIdQuery
+  prefix?: string
 } {
-  const [fileName, searchParams] = id.split('?')
+  let prefix: string | undefined
+  let raw = id
+
+  if (raw.startsWith(componentWrapPrefix)) {
+    prefix = componentWrapPrefix
+    raw = raw.slice(componentWrapPrefix.length)
+  }
+
+  const [fileName, searchParams] = raw.split('?')
   const parsed = new URLSearchParams(searchParams)
 
   const query: ParsedIdQuery = {}
   if (parsed.has('vue')) {
     query.vue = true
   }
+  const names = parsed.get('names')
+  if (names) {
+    query.names = names.split(',')
+  }
+
   return {
     fileName: fileName!,
     query,
+    prefix,
   }
 }
 

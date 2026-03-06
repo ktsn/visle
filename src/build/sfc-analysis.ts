@@ -6,6 +6,7 @@ import { babelParse, compileScript, type SFCDescriptor } from 'vue/compiler-sfc'
 
 export interface ImportInfo {
   source: string
+  importedName: string // 'default' for default imports, or the named export name
 }
 
 /**
@@ -20,11 +21,10 @@ export function buildImportMap(descriptor: SFCDescriptor, id: string): Map<strin
 
     if (imports) {
       for (const [name, binding] of Object.entries(imports)) {
-        if (binding.source.endsWith('.vue')) {
-          map.set(name, {
-            source: binding.source,
-          })
-        }
+        map.set(name, {
+          source: binding.source,
+          importedName: binding.imported,
+        })
       }
     }
 
@@ -46,15 +46,19 @@ export function buildImportMap(descriptor: SFCDescriptor, id: string): Map<strin
       plugins,
     })
 
-    // Step 1: Build importName → source map from import declarations
-    const importSources = new Map<string, string>()
+    // Step 1: Build importName → ImportInfo map from import declarations
+    const importSources = new Map<string, ImportInfo>()
     for (const node of ast.program.body) {
       if (node.type === 'ImportDeclaration') {
         const source = node.source.value
-        if (typeof source === 'string' && source.endsWith('.vue')) {
+        if (typeof source === 'string') {
           for (const specifier of node.specifiers) {
             if (specifier.type === 'ImportDefaultSpecifier') {
-              importSources.set(specifier.local.name, source)
+              importSources.set(specifier.local.name, { source, importedName: 'default' })
+            } else if (specifier.type === 'ImportSpecifier') {
+              const imported = specifier.imported
+              const importedName = imported.type === 'Identifier' ? imported.name : imported.value
+              importSources.set(specifier.local.name, { source, importedName })
             }
           }
         }
@@ -112,14 +116,14 @@ export function buildImportMap(descriptor: SFCDescriptor, id: string): Map<strin
     // Step 4: Combine — use componentMap if available, otherwise fall back to import names
     if (componentMap.size > 0) {
       for (const [tagName, importName] of componentMap) {
-        const source = importSources.get(importName)
-        if (source) {
-          map.set(tagName, { source })
+        const info = importSources.get(importName)
+        if (info) {
+          map.set(tagName, info)
         }
       }
     } else {
-      for (const [importName, source] of importSources) {
-        map.set(importName, { source })
+      for (const [importName, info] of importSources) {
+        map.set(importName, info)
       }
     }
   }

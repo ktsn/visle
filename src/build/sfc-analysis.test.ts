@@ -17,7 +17,7 @@ describe('buildImportMap', () => {
         <template><div /></template>
       `)
       const map = buildImportMap(descriptor, 'test.vue')
-      expect(map.get('Counter')).toEqual({ source: './Counter.vue' })
+      expect(map.get('Counter')).toEqual({ source: './Counter.vue', importedName: 'default' })
     })
 
     test('extracts multiple .vue imports', () => {
@@ -30,11 +30,14 @@ describe('buildImportMap', () => {
       `)
       const map = buildImportMap(descriptor, 'test.vue')
       expect(map.size).toBe(2)
-      expect(map.get('Counter')).toEqual({ source: './Counter.vue' })
-      expect(map.get('Header')).toEqual({ source: '../components/Header.vue' })
+      expect(map.get('Counter')).toEqual({ source: './Counter.vue', importedName: 'default' })
+      expect(map.get('Header')).toEqual({
+        source: '../components/Header.vue',
+        importedName: 'default',
+      })
     })
 
-    test('ignores non-.vue imports', () => {
+    test('includes all imports regardless of extension', () => {
       const descriptor = parseSfc(`
         <script setup>
         import { ref } from 'vue'
@@ -44,14 +47,14 @@ describe('buildImportMap', () => {
         <template><div /></template>
       `)
       const map = buildImportMap(descriptor, 'test.vue')
-      expect(map.size).toBe(1)
-      expect(map.get('Counter')).toEqual({ source: './Counter.vue' })
+      expect(map.get('Counter')).toEqual({ source: './Counter.vue', importedName: 'default' })
+      expect(map.get('ref')).toEqual({ source: 'vue', importedName: 'ref' })
+      expect(map.get('utils')).toEqual({ source: './utils.ts', importedName: 'default' })
     })
 
-    test('returns empty map when no .vue imports', () => {
+    test('returns empty map when no imports', () => {
       const descriptor = parseSfc(`
         <script setup>
-        import { ref } from 'vue'
         </script>
         <template><div /></template>
       `)
@@ -74,7 +77,7 @@ describe('buildImportMap', () => {
         <template><div /></template>
       `)
       const map = buildImportMap(descriptor, 'test.vue')
-      expect(map.get('Counter')).toEqual({ source: './Counter.vue' })
+      expect(map.get('Counter')).toEqual({ source: './Counter.vue', importedName: 'default' })
     })
 
     test('supports renamed components', () => {
@@ -91,7 +94,10 @@ describe('buildImportMap', () => {
       `)
       const map = buildImportMap(descriptor, 'test.vue')
       expect(map.size).toBe(1)
-      expect(map.get('RenamedCounter')).toEqual({ source: './OptionsCounter.vue' })
+      expect(map.get('RenamedCounter')).toEqual({
+        source: './OptionsCounter.vue',
+        importedName: 'default',
+      })
       expect(map.has('OptionsCounter')).toBe(false)
     })
 
@@ -108,7 +114,7 @@ describe('buildImportMap', () => {
         <template><div /></template>
       `)
       const map = buildImportMap(descriptor, 'test.vue')
-      expect(map.get('my-counter')).toEqual({ source: './Counter.vue' })
+      expect(map.get('my-counter')).toEqual({ source: './Counter.vue', importedName: 'default' })
     })
 
     test('supports string-literal "components" key', () => {
@@ -124,7 +130,7 @@ describe('buildImportMap', () => {
         <template><div /></template>
       `)
       const map = buildImportMap(descriptor, 'test.vue')
-      expect(map.get('Counter')).toEqual({ source: './Counter.vue' })
+      expect(map.get('Counter')).toEqual({ source: './Counter.vue', importedName: 'default' })
     })
 
     test('falls back to import names without components option', () => {
@@ -138,7 +144,7 @@ describe('buildImportMap', () => {
         <template><div /></template>
       `)
       const map = buildImportMap(descriptor, 'test.vue')
-      expect(map.get('Counter')).toEqual({ source: './Counter.vue' })
+      expect(map.get('Counter')).toEqual({ source: './Counter.vue', importedName: 'default' })
     })
 
     test('falls back to import names without export default', () => {
@@ -149,7 +155,7 @@ describe('buildImportMap', () => {
         <template><div /></template>
       `)
       const map = buildImportMap(descriptor, 'test.vue')
-      expect(map.get('Counter')).toEqual({ source: './Counter.vue' })
+      expect(map.get('Counter')).toEqual({ source: './Counter.vue', importedName: 'default' })
     })
 
     test('supports export default fn({ ... }) pattern', () => {
@@ -166,7 +172,7 @@ describe('buildImportMap', () => {
         <template><div /></template>
       `)
       const map = buildImportMap(descriptor, 'test.vue')
-      expect(map.get('Counter')).toEqual({ source: './Counter.vue' })
+      expect(map.get('Counter')).toEqual({ source: './Counter.vue', importedName: 'default' })
     })
 
     test('supports TypeScript lang', () => {
@@ -182,7 +188,7 @@ describe('buildImportMap', () => {
         <template><div /></template>
       `)
       const map = buildImportMap(descriptor, 'test.vue')
-      expect(map.get('Counter')).toEqual({ source: './Counter.vue' })
+      expect(map.get('Counter')).toEqual({ source: './Counter.vue', importedName: 'default' })
     })
 
     test('supports JSX lang', () => {
@@ -198,7 +204,7 @@ describe('buildImportMap', () => {
         <template><div /></template>
       `)
       const map = buildImportMap(descriptor, 'test.vue')
-      expect(map.get('Counter')).toEqual({ source: './Counter.vue' })
+      expect(map.get('Counter')).toEqual({ source: './Counter.vue', importedName: 'default' })
     })
 
     test('supports TSX lang', () => {
@@ -214,19 +220,7 @@ describe('buildImportMap', () => {
         <template><div /></template>
       `)
       const map = buildImportMap(descriptor, 'test.vue')
-      expect(map.get('Counter')).toEqual({ source: './Counter.vue' })
-    })
-
-    test('ignores named imports (non-default)', () => {
-      const descriptor = parseSfc(`
-        <script>
-        import { Counter } from './Counter.vue'
-        export default {}
-        </script>
-        <template><div /></template>
-      `)
-      const map = buildImportMap(descriptor, 'test.vue')
-      expect(map.size).toBe(0)
+      expect(map.get('Counter')).toEqual({ source: './Counter.vue', importedName: 'default' })
     })
 
     test('handles multiple imports with components mapping', () => {
@@ -245,8 +239,8 @@ describe('buildImportMap', () => {
       `)
       const map = buildImportMap(descriptor, 'test.vue')
       expect(map.size).toBe(2)
-      expect(map.get('Counter')).toEqual({ source: './Counter.vue' })
-      expect(map.get('MyHeader')).toEqual({ source: './Header.vue' })
+      expect(map.get('Counter')).toEqual({ source: './Counter.vue', importedName: 'default' })
+      expect(map.get('MyHeader')).toEqual({ source: './Header.vue', importedName: 'default' })
     })
 
     test('ignores components entry referencing unknown import', () => {
@@ -264,7 +258,7 @@ describe('buildImportMap', () => {
       `)
       const map = buildImportMap(descriptor, 'test.vue')
       expect(map.size).toBe(1)
-      expect(map.get('Counter')).toEqual({ source: './Counter.vue' })
+      expect(map.get('Counter')).toEqual({ source: './Counter.vue', importedName: 'default' })
     })
   })
 
