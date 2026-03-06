@@ -48,9 +48,7 @@ export class VueIsland extends HTMLElement {
 
     const entryComponent = module[importedName]
     if (!entryComponent) {
-      console.error(
-        `[visle] Export "${importedName}" not found in module "${entry}"`,
-      )
+      console.error(`[visle] Export "${importedName}" not found in module "${entry}"`)
       return
     }
 
