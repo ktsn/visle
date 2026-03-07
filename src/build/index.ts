@@ -98,7 +98,7 @@ export function visle(config: VisleConfig = {}): Plugin[] {
             await Promise.all([
               fs.writeFile(
                 path.join(serverOutDir, manifestFileName),
-                JSON.stringify(getManifestData()),
+                JSON.stringify(getManifestData(), null, 2),
               ),
               generateEntryTypes(),
             ])
