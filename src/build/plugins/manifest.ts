@@ -1,6 +1,6 @@
 import path from 'node:path'
 
-import { Plugin, ResolvedConfig } from 'vite'
+import { normalizePath, Plugin, ResolvedConfig } from 'vite'
 
 export const manifestFileName = 'visle-manifest.json'
 
@@ -85,7 +85,7 @@ export function manifestPlugin(): ManifestPluginResult {
 
           for (const moduleId of chunk.moduleIds) {
             if (this.getModuleInfo(moduleId)?.isEntry) {
-              const relativePath = path.relative(root, moduleId)
+              const relativePath = normalizePath(path.relative(root, moduleId))
               const collected = collectCss(chunk.fileName)
               envCssMap.set(relativePath, Array.from(collected))
             }
@@ -120,7 +120,7 @@ export function manifestPlugin(): ManifestPluginResult {
           // (e.g., barrel files merged with their re-export targets by Rollup)
           for (const moduleId of chunk.moduleIds) {
             if (this.getModuleInfo(moduleId)?.isEntry) {
-              const moduleRelativePath = path.relative(root, moduleId)
+              const moduleRelativePath = normalizePath(path.relative(root, moduleId))
               envJsMap.set(moduleRelativePath, chunk.fileName)
             }
           }
