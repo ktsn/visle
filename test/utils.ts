@@ -34,6 +34,7 @@ export const renderCases: { name: string; component: string; props?: Record<stri
   { name: 'Same component as island and server', component: 'with-mount-variation' },
   { name: 'Island with named import', component: 'with-named-import' },
   { name: 'Island with barrel import', component: 'with-barrel-import' },
+  { name: 'Shared CSS common chunk', component: 'with-shared-css' },
 ]
 
 /**

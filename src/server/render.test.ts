@@ -40,7 +40,7 @@ describe('createRender', () => {
   })
 
   describe('isDev = false', () => {
-    const emptyManifest = JSON.stringify({ cssMap: {}, entryCss: [], jsMap: {} })
+    const emptyManifest = JSON.stringify({ cssMap: {}, jsMap: {} })
 
     test('renders vue component with props', async () => {
       const render = createRender({

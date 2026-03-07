@@ -3,7 +3,7 @@
 exports[`Production Build SSR > 'CSS modules' 1`] = `
 <link
   rel="stylesheet"
-  href="/assets/client-entry-[hash].css"
+  href="/assets/with-css-module-[hash].css"
 >
 <div class="_container_[css-module-hash]_2">
   CSS Module
@@ -13,7 +13,7 @@ exports[`Production Build SSR > 'CSS modules' 1`] = `
 exports[`Production Build SSR > 'CSS with style src alias' 1`] = `
 <link
   rel="stylesheet"
-  href="/assets/client-entry-[hash].css"
+  href="/assets/with-css-src-alias-[hash].css"
 >
 <script
   type="module"
@@ -36,7 +36,7 @@ exports[`Production Build SSR > 'CSS with style src alias' 1`] = `
 exports[`Production Build SSR > 'CSS with style src' 1`] = `
 <link
   rel="stylesheet"
-  href="/assets/client-entry-[hash].css"
+  href="/assets/with-css-src-[hash].css"
 >
 <script
   type="module"
@@ -57,10 +57,6 @@ exports[`Production Build SSR > 'CSS with style src' 1`] = `
 `;
 
 exports[`Production Build SSR > 'Component in subdirectory' 1`] = `
-<link
-  rel="stylesheet"
-  href="/assets/client-entry-[hash].css"
->
 <div>
   Subdirectory Page
 </div>
@@ -69,7 +65,11 @@ exports[`Production Build SSR > 'Component in subdirectory' 1`] = `
 exports[`Production Build SSR > 'Component with CSS' 1`] = `
 <link
   rel="stylesheet"
-  href="/assets/client-entry-[hash].css"
+  href="/assets/StyledCounter-[hash].css"
+>
+<link
+  rel="stylesheet"
+  href="/assets/with-css-[hash].css"
 >
 <script
   type="module"
@@ -90,10 +90,6 @@ exports[`Production Build SSR > 'Component with CSS' 1`] = `
 `;
 
 exports[`Production Build SSR > 'Component with island' 1`] = `
-<link
-  rel="stylesheet"
-  href="/assets/client-entry-[hash].css"
->
 <script
   type="module"
   src="/assets/custom-element-[hash].js"
@@ -113,10 +109,6 @@ exports[`Production Build SSR > 'Component with island' 1`] = `
 `;
 
 exports[`Production Build SSR > 'Component with props' 1`] = `
-<link
-  rel="stylesheet"
-  href="/assets/client-entry-[hash].css"
->
 <div>
   Hello Props
 </div>
@@ -128,10 +120,6 @@ exports[`Production Build SSR > 'Full HTML document with head/body' 1`] = `
     <title>
       Test Document
     </title>
-    <link
-      rel="stylesheet"
-      href="/assets/client-entry-[hash].css"
-    >
     <script
       type="module"
       src="/assets/custom-element-[hash].js"
@@ -153,10 +141,6 @@ exports[`Production Build SSR > 'Full HTML document with head/body' 1`] = `
 `;
 
 exports[`Production Build SSR > 'Island with alias import' 1`] = `
-<link
-  rel="stylesheet"
-  href="/assets/client-entry-[hash].css"
->
 <script
   type="module"
   src="/assets/custom-element-[hash].js"
@@ -176,10 +160,6 @@ exports[`Production Build SSR > 'Island with alias import' 1`] = `
 `;
 
 exports[`Production Build SSR > 'Island with barrel import' 1`] = `
-<link
-  rel="stylesheet"
-  href="/assets/client-entry-[hash].css"
->
 <script
   type="module"
   src="/assets/custom-element-[hash].js"
@@ -202,10 +182,6 @@ exports[`Production Build SSR > 'Island with barrel import' 1`] = `
 `;
 
 exports[`Production Build SSR > 'Island with named import' 1`] = `
-<link
-  rel="stylesheet"
-  href="/assets/client-entry-[hash].css"
->
 <script
   type="module"
   src="/assets/custom-element-[hash].js"
@@ -228,10 +204,6 @@ exports[`Production Build SSR > 'Island with named import' 1`] = `
 `;
 
 exports[`Production Build SSR > 'Island with options API renamed compo…' 1`] = `
-<link
-  rel="stylesheet"
-  href="/assets/client-entry-[hash].css"
->
 <script
   type="module"
   src="/assets/custom-element-[hash].js"
@@ -251,10 +223,6 @@ exports[`Production Build SSR > 'Island with options API renamed compo…' 1`] =
 `;
 
 exports[`Production Build SSR > 'Island with options API' 1`] = `
-<link
-  rel="stylesheet"
-  href="/assets/client-entry-[hash].css"
->
 <script
   type="module"
   src="/assets/custom-element-[hash].js"
@@ -274,10 +242,6 @@ exports[`Production Build SSR > 'Island with options API' 1`] = `
 `;
 
 exports[`Production Build SSR > 'Island with props' 1`] = `
-<link
-  rel="stylesheet"
-  href="/assets/client-entry-[hash].css"
->
 <script
   type="module"
   src="/assets/custom-element-[hash].js"
@@ -297,10 +261,6 @@ exports[`Production Build SSR > 'Island with props' 1`] = `
 `;
 
 exports[`Production Build SSR > 'Multiple islands on the same page' 1`] = `
-<link
-  rel="stylesheet"
-  href="/assets/client-entry-[hash].css"
->
 <script
   type="module"
   src="/assets/custom-element-[hash].js"
@@ -322,10 +282,6 @@ exports[`Production Build SSR > 'Multiple islands on the same page' 1`] = `
 `;
 
 exports[`Production Build SSR > 'Named export' 1`] = `
-<link
-  rel="stylesheet"
-  href="/assets/client-entry-[hash].css"
->
 <script
   type="module"
   src="/assets/custom-element-[hash].js"
@@ -350,10 +306,6 @@ exports[`Production Build SSR > 'Named export' 1`] = `
 `;
 
 exports[`Production Build SSR > 'Nested island' 1`] = `
-<link
-  rel="stylesheet"
-  href="/assets/client-entry-[hash].css"
->
 <script
   type="module"
   src="/assets/custom-element-[hash].js"
@@ -375,20 +327,12 @@ exports[`Production Build SSR > 'Nested island' 1`] = `
 `;
 
 exports[`Production Build SSR > 'Non-ascii file name' 1`] = `
-<link
-  rel="stylesheet"
-  href="/assets/client-entry-[hash].css"
->
 <p>
   Non-ascii file name
 </p>
 `;
 
 exports[`Production Build SSR > 'Same component as island and server' 1`] = `
-<link
-  rel="stylesheet"
-  href="/assets/client-entry-[hash].css"
->
 <script
   type="module"
   src="/assets/custom-element-[hash].js"
@@ -411,10 +355,6 @@ exports[`Production Build SSR > 'Same component as island and server' 1`] = `
 `;
 
 exports[`Production Build SSR > 'Server component with slot' 1`] = `
-<link
-  rel="stylesheet"
-  href="/assets/client-entry-[hash].css"
->
 <div class="layout">
   <header>
     Header
@@ -431,11 +371,34 @@ exports[`Production Build SSR > 'Server component with slot' 1`] = `
 </div>
 `;
 
-exports[`Production Build SSR > 'Static component rendering' 1`] = `
+exports[`Production Build SSR > 'Shared CSS common chunk' 1`] = `
 <link
   rel="stylesheet"
-  href="/assets/client-entry-[hash].css"
+  href="/assets/StyledCounter-[hash].css"
 >
+<link
+  rel="stylesheet"
+  href="/assets/with-shared-css-[hash].css"
+>
+<script
+  type="module"
+  src="/assets/custom-element-[hash].js"
+  async
+>
+</script>
+<div>
+  <h1>
+    Shared Styled Page
+  </h1>
+  <vue-island entry="/assets/StyledCounter-[hash].js">
+    <button data-v-[scoped]>
+      Styled Count: 0
+    </button>
+  </vue-island>
+</div>
+`;
+
+exports[`Production Build SSR > 'Static component rendering' 1`] = `
 <div>
   Hello World
 </div>
@@ -452,21 +415,58 @@ exports[`Production Build SSR > Build output files 1`] = `
   "assets/NamedExportIsland-[hash].js",
   "assets/OptionsCounter-[hash].js",
   "assets/Outer-[hash].js",
+  "assets/StyledCounter-[hash].css",
   "assets/StyledCounter-[hash].js",
   "assets/_plugin-vue_export-helper-[hash].js",
-  "assets/client-entry-[hash].css",
   "assets/custom-element-[hash].js",
   "assets/named-import-[hash].js",
   "assets/vue.runtime.esm-bundler-[hash].js",
+  "assets/with-css-[hash].css",
+  "assets/with-css-module-[hash].css",
+  "assets/with-css-src-[hash].css",
+  "assets/with-css-src-alias-[hash].css",
+  "assets/with-shared-css-[hash].css",
 ]
 `;
 
 exports[`Production Build SSR > Build output files 2`] = `
 {
-  "cssMap": {},
-  "entryCss": [
-    "assets/client-entry-[hash].css",
-  ],
+  "cssMap": {
+    "pages/document.vue": [],
+    "pages/named-export.vue": [],
+    "pages/nested/index.vue": [],
+    "pages/static.vue": [],
+    "pages/with-barrel-import.vue": [],
+    "pages/with-css-module.vue": [
+      "assets/with-css-module-[hash].css",
+    ],
+    "pages/with-css-src-alias.vue": [
+      "assets/with-css-src-alias-[hash].css",
+    ],
+    "pages/with-css-src.vue": [
+      "assets/with-css-src-[hash].css",
+    ],
+    "pages/with-css.vue": [
+      "assets/StyledCounter-[hash].css",
+      "assets/with-css-[hash].css",
+    ],
+    "pages/with-island-alias.vue": [],
+    "pages/with-island-props.vue": [],
+    "pages/with-island.vue": [],
+    "pages/with-mount-variation.vue": [],
+    "pages/with-multiple-islands.vue": [],
+    "pages/with-named-import.vue": [],
+    "pages/with-nested-island.vue": [],
+    "pages/with-options-api-renamed.vue": [],
+    "pages/with-options-api.vue": [],
+    "pages/with-props.vue": [],
+    "pages/with-shared-css.vue": [
+      "assets/StyledCounter-[hash].css",
+      "assets/with-shared-css-[hash].css",
+    ],
+    "pages/with-slot.vue": [],
+    "pages/テスト.vue": [],
+  },
   "jsMap": {
     "../../../../src/client/custom-element.ts": "assets/custom-element-[hash].js",
     "components/AliasStyledCounter.vue": "assets/AliasStyledCounter-[hash].js",
@@ -497,6 +497,7 @@ declare module 'visle' {
   interface VisleEntries {
     'テスト': ComponentProps<typeof import('./pages/テスト.vue')['default']>
     'with-slot': ComponentProps<typeof import('./pages/with-slot.vue')['default']>
+    'with-shared-css': ComponentProps<typeof import('./pages/with-shared-css.vue')['default']>
     'with-props': ComponentProps<typeof import('./pages/with-props.vue')['default']>
     'with-options-api': ComponentProps<typeof import('./pages/with-options-api.vue')['default']>
     'with-options-api-renamed': ComponentProps<typeof import('./pages/with-options-api-renamed.vue')['default']>

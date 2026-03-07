@@ -7,8 +7,8 @@ import type { Plugin } from 'vite'
 
 import { generateComponentId } from './component-id.js'
 import { VisleConfig, defaultConfig, setVisleConfig } from './config.js'
-import { clientVirtualEntryId, serverVirtualEntryId } from './generate.js'
-import { customElementEntryPath } from './paths.js'
+import { serverVirtualEntryId } from './generate.js'
+import { customElementEntryPath, resolveServerComponentIds } from './paths.js'
 import { devStyleSSRPlugin } from './plugins/dev-style-ssr.js'
 import { entryTypesPlugin } from './plugins/entry-types.js'
 import { manifestFileName, manifestPlugin } from './plugins/manifest.js'
@@ -40,6 +40,7 @@ export function visle(config: VisleConfig = {}): Plugin[] {
     config(userConfig) {
       // Get root from user config or default to cwd
       const root = path.resolve(userConfig.root ?? process.cwd())
+      const entryDir = path.resolve(root, resolvedConfig.entryDir)
 
       return {
         environments: {
@@ -48,7 +49,7 @@ export function visle(config: VisleConfig = {}): Plugin[] {
             build: {
               outDir: resolvedConfig.clientOutDir,
               rollupOptions: {
-                input: [clientVirtualEntryId],
+                input: [...resolveServerComponentIds(entryDir)],
                 preserveEntrySignatures: 'allow-extension',
               },
             },

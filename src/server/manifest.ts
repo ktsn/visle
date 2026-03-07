@@ -31,7 +31,7 @@ export async function loadManifest(serverOutDir: string, base: string): Promise<
     },
 
     async getDependingClientCssIds(componentRelativePath: string): Promise<string[]> {
-      const cssIds = data.cssMap[componentRelativePath] ?? data.entryCss
+      const cssIds = data.cssMap[componentRelativePath] ?? []
       return cssIds.map((cssId) => `${basePath}/${cssId}`)
     },
   }
