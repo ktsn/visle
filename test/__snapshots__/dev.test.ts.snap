@@ -122,6 +122,33 @@ exports[`Dev Server SSR > 'Component with props' 1`] = `
 </div>
 `;
 
+exports[`Dev Server SSR > 'Dynamic import shared CSS' 1`] = `
+<link
+  rel="stylesheet"
+  href="/pages/with-dynamic-shared-css.vue?vue&type=style&index=0&lang.css"
+>
+<link
+  rel="stylesheet"
+  href="/components/StyledCounter.vue?vue&type=style&index=0&scoped=[scoped]&lang.css"
+>
+<script
+  type="module"
+  src="/@visle/entry"
+  async
+>
+</script>
+<div>
+  <h1>
+    Dynamic Shared Styled Page
+  </h1>
+  <vue-island entry="/components/StyledCounter.vue">
+    <button data-v-[scoped]>
+      Styled Count: 0
+    </button>
+  </vue-island>
+</div>
+`;
+
 exports[`Dev Server SSR > 'Full HTML document with head/body' 1`] = `
 <html>
   <head>
@@ -435,6 +462,7 @@ declare module 'visle' {
     'with-island': ComponentProps<typeof import('./pages/with-island.vue')['default']>
     'with-island-props': ComponentProps<typeof import('./pages/with-island-props.vue')['default']>
     'with-island-alias': ComponentProps<typeof import('./pages/with-island-alias.vue')['default']>
+    'with-dynamic-shared-css': ComponentProps<typeof import('./pages/with-dynamic-shared-css.vue')['default']>
     'with-css': ComponentProps<typeof import('./pages/with-css.vue')['default']>
     'with-css-src': ComponentProps<typeof import('./pages/with-css-src.vue')['default']>
     'with-css-src-alias': ComponentProps<typeof import('./pages/with-css-src-alias.vue')['default']>

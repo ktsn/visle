@@ -114,6 +114,33 @@ exports[`Production Build SSR > 'Component with props' 1`] = `
 </div>
 `;
 
+exports[`Production Build SSR > 'Dynamic import shared CSS' 1`] = `
+<link
+  rel="stylesheet"
+  href="/assets/StyledCounter-[hash].css"
+>
+<link
+  rel="stylesheet"
+  href="/assets/with-dynamic-shared-css-[hash].css"
+>
+<script
+  type="module"
+  src="/assets/custom-element-[hash].js"
+  async
+>
+</script>
+<div>
+  <h1>
+    Dynamic Shared Styled Page
+  </h1>
+  <vue-island entry="/assets/StyledCounter-[hash].js">
+    <button data-v-[scoped]>
+      Styled Count: 0
+    </button>
+  </vue-island>
+</div>
+`;
+
 exports[`Production Build SSR > 'Full HTML document with head/body' 1`] = `
 <html>
   <head>
@@ -425,6 +452,7 @@ exports[`Production Build SSR > Build output files 1`] = `
   "assets/with-css-module-[hash].css",
   "assets/with-css-src-[hash].css",
   "assets/with-css-src-alias-[hash].css",
+  "assets/with-dynamic-shared-css-[hash].css",
   "assets/with-shared-css-[hash].css",
 ]
 `;
@@ -449,6 +477,10 @@ exports[`Production Build SSR > Build output files 2`] = `
     "pages/with-css.vue": [
       "assets/StyledCounter-[hash].css",
       "assets/with-css-[hash].css",
+    ],
+    "pages/with-dynamic-shared-css.vue": [
+      "assets/StyledCounter-[hash].css",
+      "assets/with-dynamic-shared-css-[hash].css",
     ],
     "pages/with-island-alias.vue": [],
     "pages/with-island-props.vue": [],
@@ -508,6 +540,7 @@ declare module 'visle' {
     'with-island': ComponentProps<typeof import('./pages/with-island.vue')['default']>
     'with-island-props': ComponentProps<typeof import('./pages/with-island-props.vue')['default']>
     'with-island-alias': ComponentProps<typeof import('./pages/with-island-alias.vue')['default']>
+    'with-dynamic-shared-css': ComponentProps<typeof import('./pages/with-dynamic-shared-css.vue')['default']>
     'with-css': ComponentProps<typeof import('./pages/with-css.vue')['default']>
     'with-css-src': ComponentProps<typeof import('./pages/with-css-src.vue')['default']>
     'with-css-src-alias': ComponentProps<typeof import('./pages/with-css-src-alias.vue')['default']>

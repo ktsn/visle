@@ -43,16 +43,19 @@ export function manifestPlugin(): ManifestPluginResult {
         const chunkCssMap = new Map<string, Set<string>>()
         for (const chunk of Object.values(bundle)) {
           if (chunk.type === 'chunk') {
-            chunkImportsMap.set(chunk.fileName, chunk.imports)
+            chunkImportsMap.set(chunk.fileName, [
+              ...chunk.imports,
+              ...chunk.dynamicImports,
+            ])
             chunkCssMap.set(chunk.fileName, chunk.viteMetadata?.importedCss ?? new Set())
           }
         }
 
         /**
          * Collect CSS transitively through chunk imports.
-         * Recursively traverse dependencies and write visited state and result
-         * in the map passed through arguments. The value is shared and mutated
-         * during recursive calls.
+         * Recursively traverse static and dynamic dependencies, writing
+         * visited state and result in the sets passed through arguments.
+         * The values are shared and mutated during recursive calls.
          */
         function collectCss(
           fileName: string,
