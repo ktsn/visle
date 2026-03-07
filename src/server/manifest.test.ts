@@ -235,14 +235,12 @@ describe('loadManifest', () => {
 
   function writeManifest(data: {
     cssMap?: Record<string, string[]>
-    entryCss?: string[]
     jsMap?: Record<string, string>
   }): void {
     fs.writeFileSync(
       path.join(serverOutDir, manifestFileName),
       JSON.stringify({
         cssMap: {},
-        entryCss: [],
         jsMap: {},
         ...data,
       }),
@@ -281,18 +279,6 @@ describe('loadManifest', () => {
     const result = await manifest.getDependingClientCssIds('src/foo.vue')
 
     expect(result).toEqual(['/foo-1234.css'])
-  })
-
-  test('return entry css when css map does not have the component', async () => {
-    writeManifest({
-      cssMap: {},
-      entryCss: ['entry-1234.css'],
-    })
-
-    const manifest = await loadManifest(serverOutDir, '/')
-    const result = await manifest.getDependingClientCssIds('src/foo.vue')
-
-    expect(result).toEqual(['/entry-1234.css'])
   })
 
   test.for([

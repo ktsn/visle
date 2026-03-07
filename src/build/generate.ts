@@ -2,20 +2,9 @@ import path from 'node:path'
 
 import { normalizePath } from 'vite'
 
-export const clientVirtualEntryId = '\0@visle/client-entry'
-
 export const serverVirtualEntryId = '\0@visle/server-entry'
 
 export const componentWrapPrefix = '\0visle:wrap:'
-
-export function generateClientVirtualEntryCode(componentIds: string[]): string {
-  return (
-    componentIds
-      // Export each component to avoid being tree-shaken
-      .map((id, i) => `export { default as _${i} } from '${id}'`)
-      .join('\n')
-  )
-}
 
 export function generateServerVirtualEntryCode(entryDir: string, componentIds: string[]): string {
   const imports = componentIds.map((id, i) => `import _${i} from '${id}'`).join('\n')

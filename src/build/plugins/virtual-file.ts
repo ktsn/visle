@@ -3,12 +3,7 @@ import path from 'node:path'
 import { Plugin } from 'vite'
 
 import { ResolvedVisleConfig } from '../config.js'
-import {
-  generateClientVirtualEntryCode,
-  generateServerVirtualEntryCode,
-  clientVirtualEntryId,
-  serverVirtualEntryId,
-} from '../generate.js'
+import { generateServerVirtualEntryCode, serverVirtualEntryId } from '../generate.js'
 import {
   customElementEntryPath,
   virtualCustomElementEntryPath,
@@ -34,9 +29,7 @@ export function virtualFilePlugin(config: ResolvedVisleConfig): Plugin {
         return customElementEntryPath
       }
 
-      const virtuals = [clientVirtualEntryId, serverVirtualEntryId]
-
-      if (virtuals.includes(id)) {
+      if (id === serverVirtualEntryId) {
         return id
       }
     },
@@ -44,10 +37,6 @@ export function virtualFilePlugin(config: ResolvedVisleConfig): Plugin {
     load(id) {
       if (id === serverVirtualEntryId) {
         return generateServerVirtualEntryCode(entryRoot, resolveServerComponentIds(entryRoot))
-      }
-
-      if (id === clientVirtualEntryId) {
-        return generateClientVirtualEntryCode(resolveServerComponentIds(entryRoot))
       }
 
       return null

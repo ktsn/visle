@@ -122,6 +122,33 @@ exports[`Dev Server SSR > 'Component with props' 1`] = `
 </div>
 `;
 
+exports[`Dev Server SSR > 'Dynamic import shared CSS' 1`] = `
+<link
+  rel="stylesheet"
+  href="/pages/with-dynamic-shared-css.vue?vue&type=style&index=0&lang.css"
+>
+<link
+  rel="stylesheet"
+  href="/components/StyledCounter.vue?vue&type=style&index=0&scoped=[scoped]&lang.css"
+>
+<script
+  type="module"
+  src="/@visle/entry"
+  async
+>
+</script>
+<div>
+  <h1>
+    Dynamic Shared Styled Page
+  </h1>
+  <vue-island entry="/components/StyledCounter.vue">
+    <button data-v-[scoped]>
+      Styled Count: 0
+    </button>
+  </vue-island>
+</div>
+`;
+
 exports[`Dev Server SSR > 'Full HTML document with head/body' 1`] = `
 <html>
   <head>
@@ -379,6 +406,33 @@ exports[`Dev Server SSR > 'Server component with slot' 1`] = `
 </div>
 `;
 
+exports[`Dev Server SSR > 'Shared CSS common chunk' 1`] = `
+<link
+  rel="stylesheet"
+  href="/pages/with-shared-css.vue?vue&type=style&index=0&lang.css"
+>
+<link
+  rel="stylesheet"
+  href="/components/StyledCounter.vue?vue&type=style&index=0&scoped=[scoped]&lang.css"
+>
+<script
+  type="module"
+  src="/@visle/entry"
+  async
+>
+</script>
+<div>
+  <h1>
+    Shared Styled Page
+  </h1>
+  <vue-island entry="/components/StyledCounter.vue">
+    <button data-v-[scoped]>
+      Styled Count: 0
+    </button>
+  </vue-island>
+</div>
+`;
+
 exports[`Dev Server SSR > 'Static component rendering' 1`] = `
 <div>
   Hello World
@@ -395,8 +449,8 @@ declare module 'visle' {
   import type { ComponentProps } from 'visle'
 
   interface VisleEntries {
-    'テスト': ComponentProps<typeof import('./pages/テスト.vue')['default']>
     'with-slot': ComponentProps<typeof import('./pages/with-slot.vue')['default']>
+    'with-shared-css': ComponentProps<typeof import('./pages/with-shared-css.vue')['default']>
     'with-props': ComponentProps<typeof import('./pages/with-props.vue')['default']>
     'with-options-api': ComponentProps<typeof import('./pages/with-options-api.vue')['default']>
     'with-options-api-renamed': ComponentProps<typeof import('./pages/with-options-api-renamed.vue')['default']>
@@ -407,12 +461,14 @@ declare module 'visle' {
     'with-island': ComponentProps<typeof import('./pages/with-island.vue')['default']>
     'with-island-props': ComponentProps<typeof import('./pages/with-island-props.vue')['default']>
     'with-island-alias': ComponentProps<typeof import('./pages/with-island-alias.vue')['default']>
+    'with-dynamic-shared-css': ComponentProps<typeof import('./pages/with-dynamic-shared-css.vue')['default']>
     'with-css': ComponentProps<typeof import('./pages/with-css.vue')['default']>
     'with-css-src': ComponentProps<typeof import('./pages/with-css-src.vue')['default']>
     'with-css-src-alias': ComponentProps<typeof import('./pages/with-css-src-alias.vue')['default']>
     'with-css-module': ComponentProps<typeof import('./pages/with-css-module.vue')['default']>
     'with-barrel-import': ComponentProps<typeof import('./pages/with-barrel-import.vue')['default']>
     'static': ComponentProps<typeof import('./pages/static.vue')['default']>
+    'non-ascii-テスト': ComponentProps<typeof import('./pages/non-ascii-テスト.vue')['default']>
     'named-export': ComponentProps<typeof import('./pages/named-export.vue')['default']>
     'document': ComponentProps<typeof import('./pages/document.vue')['default']>
     'nested/index': ComponentProps<typeof import('./pages/nested/index.vue')['default']>

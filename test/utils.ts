@@ -2,7 +2,7 @@ import fs from 'node:fs/promises'
 import path from 'node:path'
 import { fileURLToPath } from 'node:url'
 
-import { createBuilder } from 'vite'
+import { createBuilder, mergeConfig, type UserConfig } from 'vite'
 
 import { visle } from '../src/build/index.ts'
 import { createDevLoader } from '../src/server/dev.ts'
@@ -24,7 +24,7 @@ export const renderCases: { name: string; component: string; props?: Record<stri
   { name: 'CSS modules', component: 'with-css-module' },
   { name: 'Nested island', component: 'with-nested-island' },
   { name: 'Multiple islands on the same page', component: 'with-multiple-islands' },
-  { name: 'Non-ascii file name', component: 'テスト' },
+  { name: 'Non-ascii file name', component: 'non-ascii-テスト' },
   { name: 'Island with alias import', component: 'with-island-alias' },
   { name: 'Named export', component: 'named-export' },
   { name: 'Island with options API', component: 'with-options-api' },
@@ -34,6 +34,8 @@ export const renderCases: { name: string; component: string; props?: Record<stri
   { name: 'Same component as island and server', component: 'with-mount-variation' },
   { name: 'Island with named import', component: 'with-named-import' },
   { name: 'Island with barrel import', component: 'with-barrel-import' },
+  { name: 'Shared CSS common chunk', component: 'with-shared-css' },
+  { name: 'Dynamic import shared CSS', component: 'with-dynamic-shared-css' },
 ]
 
 /**
@@ -76,20 +78,25 @@ export function devRender(root: string) {
 }
 
 /**
- * Run a production Vite build.
+ * Run a production Vite build with additional config options.
  */
-export async function prodBuild(root: string): Promise<void> {
-  const builder = await createBuilder({
-    root,
-    plugins: [visle()],
-    resolve: {
-      alias: {
-        '@': root,
-        'visle/internal': path.join(srcDir, 'server/internal.ts'),
+export async function prodBuild(root: string, options: UserConfig = {}): Promise<void> {
+  const builder = await createBuilder(
+    mergeConfig(
+      {
+        root,
+        plugins: [visle()],
+        resolve: {
+          alias: {
+            '@': root,
+            'visle/internal': path.join(srcDir, 'server/internal.ts'),
+          },
+        },
+        logLevel: 'silent',
       },
-    },
-    logLevel: 'silent',
-  })
+      options,
+    ),
+  )
 
   await builder.buildApp()
 }
