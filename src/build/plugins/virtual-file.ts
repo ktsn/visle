@@ -3,10 +3,7 @@ import path from 'node:path'
 import { Plugin } from 'vite'
 
 import { ResolvedVisleConfig } from '../config.js'
-import {
-  generateServerVirtualEntryCode,
-  serverVirtualEntryId,
-} from '../generate.js'
+import { generateServerVirtualEntryCode, serverVirtualEntryId } from '../generate.js'
 import {
   customElementEntryPath,
   virtualCustomElementEntryPath,

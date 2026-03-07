@@ -1,9 +1,7 @@
 <script setup>
 import { defineAsyncComponent } from 'vue'
 
-const StyledCounter = defineAsyncComponent(
-  () => import('../components/StyledCounter.vue'),
-)
+const StyledCounter = defineAsyncComponent(() => import('../components/StyledCounter.vue'))
 </script>
 
 <template>

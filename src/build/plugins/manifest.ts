@@ -43,10 +43,7 @@ export function manifestPlugin(): ManifestPluginResult {
         const chunkCssMap = new Map<string, Set<string>>()
         for (const chunk of Object.values(bundle)) {
           if (chunk.type === 'chunk') {
-            chunkImportsMap.set(chunk.fileName, [
-              ...chunk.imports,
-              ...chunk.dynamicImports,
-            ])
+            chunkImportsMap.set(chunk.fileName, [...chunk.imports, ...chunk.dynamicImports])
             chunkCssMap.set(chunk.fileName, chunk.viteMetadata?.importedCss ?? new Set())
           }
         }
