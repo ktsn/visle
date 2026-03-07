@@ -463,6 +463,7 @@ exports[`Production Build SSR > Build output files 2`] = `
     "pages/document.vue": [],
     "pages/named-export.vue": [],
     "pages/nested/index.vue": [],
+    "pages/non-ascii-テスト.vue": [],
     "pages/static.vue": [],
     "pages/with-barrel-import.vue": [],
     "pages/with-css-module.vue": [
@@ -497,7 +498,6 @@ exports[`Production Build SSR > Build output files 2`] = `
       "assets/with-shared-css-[hash].css",
     ],
     "pages/with-slot.vue": [],
-    "pages/テスト.vue": [],
   },
   "jsMap": {
     "../../../../src/client/custom-element.ts": "assets/custom-element-[hash].js",
@@ -527,7 +527,6 @@ declare module 'visle' {
   import type { ComponentProps } from 'visle'
 
   interface VisleEntries {
-    'テスト': ComponentProps<typeof import('./pages/テスト.vue')['default']>
     'with-slot': ComponentProps<typeof import('./pages/with-slot.vue')['default']>
     'with-shared-css': ComponentProps<typeof import('./pages/with-shared-css.vue')['default']>
     'with-props': ComponentProps<typeof import('./pages/with-props.vue')['default']>
@@ -547,6 +546,7 @@ declare module 'visle' {
     'with-css-module': ComponentProps<typeof import('./pages/with-css-module.vue')['default']>
     'with-barrel-import': ComponentProps<typeof import('./pages/with-barrel-import.vue')['default']>
     'static': ComponentProps<typeof import('./pages/static.vue')['default']>
+    'non-ascii-テスト': ComponentProps<typeof import('./pages/non-ascii-テスト.vue')['default']>
     'named-export': ComponentProps<typeof import('./pages/named-export.vue')['default']>
     'document': ComponentProps<typeof import('./pages/document.vue')['default']>
     'nested/index': ComponentProps<typeof import('./pages/nested/index.vue')['default']>
@@ -554,4 +554,50 @@ declare module 'visle' {
 }
 export {}
 "
+`;
+
+exports[`Production Build SSR with manual chunks > dynamic import shared CSS page includes the merged CSS 1`] = `
+<link
+  rel="stylesheet"
+  href="/assets/with-slot-[hash].css"
+>
+<script
+  type="module"
+  src="/assets/custom-element-[hash].js"
+  async
+>
+</script>
+<div>
+  <h1>
+    Dynamic Shared Styled Page
+  </h1>
+  <vue-island entry="/assets/StyledCounter-[hash].js">
+    <button data-v-[scoped]>
+      Styled Count: 0
+    </button>
+  </vue-island>
+</div>
+`;
+
+exports[`Production Build SSR with manual chunks > shared CSS page includes the merged CSS 1`] = `
+<link
+  rel="stylesheet"
+  href="/assets/with-slot-[hash].css"
+>
+<script
+  type="module"
+  src="/assets/custom-element-[hash].js"
+  async
+>
+</script>
+<div>
+  <h1>
+    Shared Styled Page
+  </h1>
+  <vue-island entry="/assets/StyledCounter-[hash].js">
+    <button data-v-[scoped]>
+      Styled Count: 0
+    </button>
+  </vue-island>
+</div>
 `;

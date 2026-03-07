@@ -52,3 +52,47 @@ describe('Production Build SSR', () => {
     expect(normalizeHashes(result)).toMatchSnapshot()
   })
 })
+
+describe('Production Build SSR with manual chunks', () => {
+  let root: string
+  let render: RenderFunction
+
+  beforeAll(async () => {
+    root = await createTmpDir('prod-manual-chunks')
+    await copyFixtures(root)
+    await prodBuild(root, {
+      environments: {
+        style: {
+          build: {
+            rollupOptions: {
+              output: {
+                manualChunks: () => 'style',
+              },
+            },
+          },
+        },
+      },
+    })
+    render = prodRender(root)
+  })
+
+  test('all styles are merged into one CSS file', async () => {
+    const clientDir = path.join(root, 'dist/client')
+    const files = await listFiles(clientDir)
+    const cssFiles = files.filter((f) => f.endsWith('.css'))
+
+    expect(cssFiles).toHaveLength(1)
+  })
+
+  test('shared CSS page includes the merged CSS', async () => {
+    const result = await render('with-shared-css')
+
+    expect(normalizeHashes(result)).toMatchSnapshot()
+  })
+
+  test('dynamic import shared CSS page includes the merged CSS', async () => {
+    const result = await render('with-dynamic-shared-css')
+
+    expect(normalizeHashes(result)).toMatchSnapshot()
+  })
+})

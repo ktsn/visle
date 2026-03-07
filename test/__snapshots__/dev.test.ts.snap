@@ -449,7 +449,6 @@ declare module 'visle' {
   import type { ComponentProps } from 'visle'
 
   interface VisleEntries {
-    'テスト': ComponentProps<typeof import('./pages/テスト.vue')['default']>
     'with-slot': ComponentProps<typeof import('./pages/with-slot.vue')['default']>
     'with-shared-css': ComponentProps<typeof import('./pages/with-shared-css.vue')['default']>
     'with-props': ComponentProps<typeof import('./pages/with-props.vue')['default']>
@@ -469,6 +468,7 @@ declare module 'visle' {
     'with-css-module': ComponentProps<typeof import('./pages/with-css-module.vue')['default']>
     'with-barrel-import': ComponentProps<typeof import('./pages/with-barrel-import.vue')['default']>
     'static': ComponentProps<typeof import('./pages/static.vue')['default']>
+    'non-ascii-テスト': ComponentProps<typeof import('./pages/non-ascii-テスト.vue')['default']>
     'named-export': ComponentProps<typeof import('./pages/named-export.vue')['default']>
     'document': ComponentProps<typeof import('./pages/document.vue')['default']>
     'nested/index': ComponentProps<typeof import('./pages/nested/index.vue')['default']>
