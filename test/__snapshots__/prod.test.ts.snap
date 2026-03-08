@@ -505,8 +505,8 @@ exports[`Production Build SSR > Build output files 2`] = `
     ],
     "pages/with-slot.vue": [],
   },
-  "customElementEntry": "assets/custom-element-[hash].js",
   "entryDir": "pages",
+  "islandsBootstrap": "assets/custom-element-[hash].js",
   "jsMap": {
     "../../../../src/client/custom-element.ts": "assets/custom-element-[hash].js",
     "components/AliasStyledCounter.vue": "assets/AliasStyledCounter-[hash].js",

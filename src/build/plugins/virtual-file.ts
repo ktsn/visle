@@ -5,8 +5,8 @@ import { Plugin } from 'vite'
 import { ResolvedVisleConfig } from '../config.js'
 import { generateServerVirtualEntryCode, serverVirtualEntryId } from '../generate.js'
 import {
-  customElementEntryPath,
-  virtualCustomElementEntryPath,
+  islandsBootstrapPath,
+  virtualIslandsBootstrapPath,
   resolveServerComponentIds,
 } from '../paths.js'
 
@@ -25,8 +25,8 @@ export function virtualFilePlugin(config: ResolvedVisleConfig): Plugin {
     },
 
     resolveId(id) {
-      if (id === virtualCustomElementEntryPath) {
-        return customElementEntryPath
+      if (id === virtualIslandsBootstrapPath) {
+        return islandsBootstrapPath
       }
 
       if (id === serverVirtualEntryId) {

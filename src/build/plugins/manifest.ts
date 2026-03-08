@@ -3,7 +3,7 @@ import path from 'node:path'
 import { normalizePath, Plugin } from 'vite'
 
 import type { ResolvedVisleConfig } from '../config.js'
-import { customElementEntryPath } from '../paths.js'
+import { islandsBootstrapPath } from '../paths.js'
 
 export const manifestFileName = 'visle-manifest.json'
 
@@ -12,7 +12,7 @@ export interface ManifestData {
   entryDir: string
   cssMap: Record<string, string[]>
   jsMap: Record<string, string>
-  customElementEntry: string
+  islandsBootstrap: string
 }
 
 interface ManifestPluginResult {
@@ -27,7 +27,7 @@ export function manifestPlugin(visleConfig: ResolvedVisleConfig): ManifestPlugin
   let base: string
   let cssMap: Map<string, string[]> | undefined
   let jsMap: Map<string, string> | undefined
-  let customElementEntry: string | undefined
+  let islandsBootstrap: string | undefined
 
   const plugin: Plugin = {
     name: 'visle:manifest',
@@ -135,8 +135,8 @@ export function manifestPlugin(visleConfig: ResolvedVisleConfig): ManifestPlugin
 
         jsMap = envJsMap
 
-        const entryKey = normalizePath(path.relative(root, customElementEntryPath))
-        customElementEntry = envJsMap.get(entryKey)
+        const entryKey = normalizePath(path.relative(root, islandsBootstrapPath))
+        islandsBootstrap = envJsMap.get(entryKey)
       }
     },
   }
@@ -150,7 +150,7 @@ export function manifestPlugin(visleConfig: ResolvedVisleConfig): ManifestPlugin
         entryDir: visleConfig.entryDir,
         cssMap: Object.fromEntries(cssMap ?? new Map()),
         jsMap: Object.fromEntries(jsMap ?? new Map()),
-        customElementEntry: customElementEntry ?? '',
+        islandsBootstrap: islandsBootstrap ?? '',
       }
     },
   }

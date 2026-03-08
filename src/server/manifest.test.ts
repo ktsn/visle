@@ -5,7 +5,7 @@ import { createServer, type RunnableDevEnvironment, type ViteDevServer } from 'v
 import { afterEach, beforeEach, describe, expect, test } from 'vitest'
 
 import { visle } from '../build/index.ts'
-import { customElementEntryPath, virtualCustomElementEntryPath } from '../build/paths.ts'
+import { islandsBootstrapPath, virtualIslandsBootstrapPath } from '../build/paths.ts'
 import { manifestFileName } from '../build/plugins/manifest.ts'
 import { createDevManifest, loadManifest } from './manifest.ts'
 
@@ -55,14 +55,14 @@ describe('createDevManifest', () => {
     return server
   }
 
-  test('get custom element entry path as virtual path', async () => {
+  test('get islands bootstrap path as virtual path', async () => {
     const s = await createTestServer()
     const manifest = createDevManifest(s)
 
-    const relativePath = path.relative(root, customElementEntryPath)
+    const relativePath = path.relative(root, islandsBootstrapPath)
     const result = await manifest.getClientImportId(relativePath)
 
-    expect(result).toBe(virtualCustomElementEntryPath)
+    expect(result).toBe(virtualIslandsBootstrapPath)
   })
 
   test('get a relative path from the root directory', async () => {

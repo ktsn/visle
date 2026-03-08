@@ -75,10 +75,10 @@ export function createRender<T extends Record<string, any> = Record<string, any>
     // Collect CSS for the page entry after rendering so module graph is populated
     const css = await manifest.getEntryCssIds(componentPath)
 
-    // Collect JS for custom element entry if any island component was rendered
+    // Collect JS for islands bootstrap if any island component was rendered
     const js: string[] = []
     if (context.hasIsland) {
-      js.push(await manifest.getCustomElementEntryId())
+      js.push(await manifest.getIslandsBootstrapId())
     }
 
     return transformWithRenderContext(rendered, { css, js })

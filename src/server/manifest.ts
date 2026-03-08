@@ -6,13 +6,13 @@ import { parse, SFCBlock } from 'vue/compiler-sfc'
 
 import { generateComponentId } from '../build/component-id.js'
 import { getVisleConfig } from '../build/config.js'
-import { virtualCustomElementEntryPath, customElementEntryPath } from '../build/paths.js'
+import { virtualIslandsBootstrapPath, islandsBootstrapPath } from '../build/paths.js'
 import { manifestFileName, type ManifestData } from '../build/plugins/manifest.js'
 
 export interface RuntimeManifest {
   getClientImportId(componentRelativePath: string): Promise<string>
   getEntryCssIds(componentPath: string): Promise<string[]>
-  getCustomElementEntryId(): Promise<string>
+  getIslandsBootstrapId(): Promise<string>
 }
 
 /**
@@ -39,8 +39,8 @@ export async function loadManifest(serverOutDir: string): Promise<RuntimeManifes
       return cssIds.map((cssId) => `${basePath}/${cssId}`)
     },
 
-    async getCustomElementEntryId(): Promise<string> {
-      return `${basePath}/${data.customElementEntry}`
+    async getIslandsBootstrapId(): Promise<string> {
+      return `${basePath}/${data.islandsBootstrap}`
     },
   }
 }
@@ -112,15 +112,15 @@ export function createDevManifest(devServer: ViteDevServer): RuntimeManifest {
     async getClientImportId(componentRelativePath: string): Promise<string> {
       const absPath = path.resolve(root, componentRelativePath)
 
-      if (absPath === customElementEntryPath) {
-        return applyServeBase(virtualCustomElementEntryPath)
+      if (absPath === islandsBootstrapPath) {
+        return applyServeBase(virtualIslandsBootstrapPath)
       }
 
       return applyServeBase(`/${componentRelativePath}`)
     },
 
-    async getCustomElementEntryId(): Promise<string> {
-      return applyServeBase(virtualCustomElementEntryPath)
+    async getIslandsBootstrapId(): Promise<string> {
+      return applyServeBase(virtualIslandsBootstrapPath)
     },
 
     async getEntryCssIds(componentPath: string): Promise<string[]> {
