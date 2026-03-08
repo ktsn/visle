@@ -2,7 +2,7 @@ import { createServer, type ViteDevServer } from 'vite'
 import { describe, test, expect, afterEach } from 'vitest'
 
 import { defaultConfig } from '../config.ts'
-import { virtualCustomElementEntryPath } from '../paths.ts'
+import { virtualIslandsBootstrapPath } from '../paths.ts'
 import { virtualFilePlugin } from './virtual-file.ts'
 
 describe('virtualFilePlugin', () => {
@@ -13,7 +13,7 @@ describe('virtualFilePlugin', () => {
     server = undefined
   })
 
-  test('custom element entry is transformable in client environment', async () => {
+  test('islands bootstrap is transformable in client environment', async () => {
     server = await createServer({
       configFile: false,
       plugins: [virtualFilePlugin(defaultConfig)],
@@ -23,7 +23,7 @@ describe('virtualFilePlugin', () => {
       logLevel: 'silent',
     })
 
-    const result = await server.environments.client.transformRequest(virtualCustomElementEntryPath)
+    const result = await server.environments.client.transformRequest(virtualIslandsBootstrapPath)
 
     expect(result).not.toBeNull()
     expect(result!.code).toContain('vue-island')

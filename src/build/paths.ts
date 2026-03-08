@@ -8,8 +8,8 @@ import { componentWrapPrefix } from './generate.js'
 // -----------------------------
 // Custom Element Paths
 // -----------------------------
-export const virtualCustomElementEntryPath = '/@visle/entry'
-export const customElementEntryPath = path.resolve(
+export const virtualIslandsBootstrapPath = '/@visle/bootstrap'
+export const islandsBootstrapPath = path.resolve(
   // In Deno, import.meta.dirname can be undefined (in https module).
   // Just casting it to string for now.
   import.meta.dirname as string,

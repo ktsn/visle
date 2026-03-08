@@ -8,7 +8,7 @@ import type { Plugin } from 'vite'
 import { generateComponentId } from './component-id.js'
 import { VisleConfig, defaultConfig, setVisleConfig } from './config.js'
 import { serverVirtualEntryId } from './generate.js'
-import { customElementEntryPath, resolveServerComponentIds } from './paths.js'
+import { islandsBootstrapPath, resolveServerComponentIds } from './paths.js'
 import { devStyleSSRPlugin } from './plugins/dev-style-ssr.js'
 import { entryTypesPlugin } from './plugins/entry-types.js'
 import { manifestFileName, manifestPlugin } from './plugins/manifest.js'
@@ -60,9 +60,9 @@ export function visle(config: VisleConfig = {}): Plugin[] {
               outDir: resolvedConfig.clientOutDir,
               emptyOutDir: false,
               rollupOptions: {
-                // Start with custom element entry;
+                // Start with islands bootstrap;
                 // v-client island paths are added after server build
-                input: [customElementEntryPath],
+                input: [islandsBootstrapPath],
                 preserveEntrySignatures: 'allow-extension',
               },
             },
