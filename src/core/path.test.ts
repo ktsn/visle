@@ -63,6 +63,16 @@ describe('resolve', () => {
     const result = resolve(asAbs('/foo'), 'bar', 'baz')
     expect(result).toBe('/foo/bar/baz')
   })
+
+  it.skipIf(process.platform !== 'win32')('preserves drive letter from base', () => {
+    const result = resolve(asAbs('C:/foo'), 'bar')
+    expect(result).toBe('C:/foo/bar')
+  })
+
+  it.skipIf(process.platform !== 'win32')('preserves drive letter from segment', () => {
+    const result = resolve(asAbs('/foo'), 'D:/bar')
+    expect(result).toBe('D:/bar')
+  })
 })
 
 describe('join', () => {

@@ -11,6 +11,12 @@ function normalizePosix(p: string): string {
   return p.replace(/\\/g, '/')
 }
 
+const driveLetterRE = /^[a-zA-Z]:/
+
+function hasDriveLetter(p: string): boolean {
+  return driveLetterRE.test(p)
+}
+
 /**
  * Matches `/` or drive letter like `C:/`
  */
@@ -35,7 +41,19 @@ export function asRel(value: string): RelativePath {
 }
 
 export function resolve(base: AbsolutePath, ...segments: string[]): AbsolutePath {
-  return normalizePosix(path.resolve(base, ...segments)) as AbsolutePath
+  const result = normalizePosix(path.resolve(base, ...segments))
+
+  // On Windows, path.resolve prepends the current drive letter when inputs
+  // don't include one. Strip it to keep results consistent with inputs.
+  if (
+    process.platform === 'win32' &&
+    hasDriveLetter(result) &&
+    [base, ...segments].every((s) => !hasDriveLetter(s))
+  ) {
+    return result.replace(driveLetterRE, '') as AbsolutePath
+  }
+
+  return result as AbsolutePath
 }
 
 export function join(base: AbsolutePath, ...segments: string[]): AbsolutePath

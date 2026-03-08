@@ -3,7 +3,7 @@ import path from 'node:path'
 
 import { globSync } from 'glob'
 
-import { type AbsolutePath, asAbs, asRel, resolve } from '../core/path.js'
+import { type AbsolutePath, asAbs, asRel, join, resolve } from '../core/path.js'
 import { componentWrapPrefix } from './generate.js'
 
 // -----------------------------
@@ -29,7 +29,7 @@ export const islandsBootstrapPath = resolve(
  */
 export function resolvePattern(pattern: string | string[], root: AbsolutePath): AbsolutePath[] {
   if (typeof pattern === 'string') {
-    return globSync(path.join(root, pattern)).map(asAbs)
+    return globSync(join(root, pattern)).map(asAbs)
   }
 
   return pattern.flatMap((p) => resolvePattern(p, root))
