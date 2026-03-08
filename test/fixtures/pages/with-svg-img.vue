@@ -12,7 +12,7 @@ import Counter from '../components/Counter.vue'
 </template>
 
 <style>
-.wrapper{
+.wrapper {
   background-image: url(../assets/icon.svg);
 }
 </style>
