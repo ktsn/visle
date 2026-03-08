@@ -74,7 +74,27 @@ jobs:
 
       - run: pnpm install
 
+      - name: Get Playwright version
+        id: playwright-version
+        shell: bash
+        run: echo "version=$(pnpm exec playwright --version | awk '{print $2}')" >> "$GITHUB_OUTPUT"
+
+      # Cache Playwright browser binaries to avoid downloading them on every run.
+      # This significantly speeds up CI, especially on Windows where install takes several minutes.
+      - name: Cache Playwright browsers
+        id: playwright-cache
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.cache/ms-playwright
+            ~/AppData/Local/ms-playwright
+          key: playwright-${{ matrix.os }}-${{ steps.playwright-version.outputs.version }}
+
+      # Install Playwright browsers and system deps.
+      # On cache hit, browser download is a no-op but Linux still needs system deps installed.
+      # Windows bundles its own deps, so it can skip this step entirely on cache hit.
       - name: Install Playwright
+        if: steps.playwright-cache.outputs.cache-hit != 'true' || runner.os == 'Linux'
         run: pnpm exec playwright install --with-deps chromium
 
       - name: Test
