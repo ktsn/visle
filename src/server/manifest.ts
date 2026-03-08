@@ -8,6 +8,7 @@ import { generateComponentId } from '../build/component-id.js'
 import { getVisleConfig } from '../build/config.js'
 import { virtualIslandsBootstrapPath } from '../build/paths.js'
 import { manifestFileName, type ManifestData } from '../build/plugins/manifest.js'
+import { isCSS } from '../core/path.js'
 
 export interface RuntimeManifest {
   getClientImportId(componentRelativePath: string): Promise<string>
@@ -140,7 +141,7 @@ export function createDevManifest(devServer: ViteDevServer): RuntimeManifest {
 
         if (mod.id.endsWith('.vue')) {
           discovered.push({ type: 'vue', relativePath: path.relative(root, mod.id) })
-        } else if (!mod.id.includes('?vue') && cssRE.test(mod.id)) {
+        } else if (!mod.id.includes('?vue') && isCSS(mod.id)) {
           discovered.push({ type: 'css', id: applyServeBase('/' + path.relative(root, mod.id)) })
         }
 
@@ -165,8 +166,6 @@ function basePathForDev(base: string): string {
   const baseUrl = new URL(base, 'https://example.com')
   return baseUrl.pathname.replace(/\/$/, '')
 }
-
-const cssRE = /\.(?:css|scss|sass|less|styl|stylus|pcss|postcss)$/
 
 // these are built-in query parameters so should be ignored
 // if the user happen to add them as attrs
