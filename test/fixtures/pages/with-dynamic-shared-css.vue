@@ -1,13 +1,11 @@
 <script setup>
-import { defineAsyncComponent } from 'vue'
-
-const StyledCounter = defineAsyncComponent(() => import('../components/StyledCounter.vue'))
+import DynamicImport from '../components/DynamicImport.vue'
 </script>
 
 <template>
   <div>
     <h1>Dynamic Shared Styled Page</h1>
-    <StyledCounter v-client:load />
+    <DynamicImport v-client:load />
   </div>
 </template>
 
