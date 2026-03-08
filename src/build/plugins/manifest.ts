@@ -1,7 +1,6 @@
-import path from 'node:path'
+import type { Plugin } from 'vite'
 
-import { normalizePath, Plugin } from 'vite'
-
+import { asAbs, relative } from '../../core/path.js'
 import type { ResolvedVisleConfig } from '../config.js'
 import { islandsBootstrapPath } from '../paths.js'
 
@@ -39,8 +38,8 @@ export function manifestPlugin(visleConfig: ResolvedVisleConfig): ManifestPlugin
     },
 
     generateBundle(_options, bundle) {
-      const envName = this.environment?.name
-      const root = this.environment?.config.root ?? ''
+      const envName = this.environment.name
+      const root = asAbs(this.environment.config.root)
 
       if (envName === 'style') {
         const envCssMap = new Map<string, string[]>()
@@ -93,7 +92,7 @@ export function manifestPlugin(visleConfig: ResolvedVisleConfig): ManifestPlugin
 
           for (const moduleId of chunk.moduleIds) {
             if (this.getModuleInfo(moduleId)?.isEntry) {
-              const relativePath = normalizePath(path.relative(root, moduleId))
+              const relativePath = relative(root, asAbs(moduleId))
               const collected = collectCss(chunk.fileName)
               envCssMap.set(relativePath, Array.from(collected))
             }
@@ -134,7 +133,7 @@ export function manifestPlugin(visleConfig: ResolvedVisleConfig): ManifestPlugin
           // (e.g., barrel files merged with their re-export targets by Rollup)
           for (const moduleId of chunk.moduleIds) {
             if (this.getModuleInfo(moduleId)?.isEntry) {
-              const moduleRelativePath = normalizePath(path.relative(root, moduleId))
+              const moduleRelativePath = relative(root, asAbs(moduleId))
               envJsMap.set(moduleRelativePath, chunk.fileName)
             }
           }

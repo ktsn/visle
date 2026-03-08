@@ -1,5 +1,4 @@
 import fs from 'node:fs/promises'
-import path from 'node:path'
 
 import type { EnvironmentModuleNode, RunnableDevEnvironment, ViteDevServer } from 'vite'
 import { parse, SFCBlock } from 'vue/compiler-sfc'
@@ -8,7 +7,8 @@ import { generateComponentId } from '../build/component-id.js'
 import { getVisleConfig } from '../build/config.js'
 import { virtualIslandsBootstrapPath } from '../build/paths.js'
 import { manifestFileName, type ManifestData } from '../build/plugins/manifest.js'
-import { isCSS } from '../core/path.js'
+import { isCSS } from '../core/module-id.js'
+import { type AbsolutePath, asAbs, dirname, join, resolve, relative, asRel } from '../core/path.js'
 
 export interface RuntimeManifest {
   getClientImportId(componentRelativePath: string): Promise<string>
@@ -19,8 +19,8 @@ export interface RuntimeManifest {
 /**
  * Loads the manifest file from serverOutDir for production SSR.
  */
-export async function loadManifest(serverOutDir: string): Promise<RuntimeManifest> {
-  const manifestPath = path.join(serverOutDir, manifestFileName)
+export async function loadManifest(serverOutDir: AbsolutePath): Promise<RuntimeManifest> {
+  const manifestPath = join(serverOutDir, manifestFileName)
 
   const data: ManifestData = JSON.parse(await fs.readFile(manifestPath, 'utf-8'))
   const basePath = data.base.replace(/\/$/, '')
@@ -51,7 +51,8 @@ export async function loadManifest(serverOutDir: string): Promise<RuntimeManifes
  */
 export function createDevManifest(devServer: ViteDevServer): RuntimeManifest {
   const serverEnv = devServer.environments.server as RunnableDevEnvironment
-  const { root, base } = devServer.config
+  const root = asAbs(devServer.config.root)
+  const { base } = devServer.config
   const { entryDir } = getVisleConfig(devServer.config)
 
   // Normalize origin value
@@ -63,7 +64,7 @@ export function createDevManifest(devServer: ViteDevServer): RuntimeManifest {
   }
 
   async function getComponentCssIds(componentRelativePath: string): Promise<string[]> {
-    const absPath = path.resolve(root, componentRelativePath)
+    const absPath = resolve(root, componentRelativePath)
 
     if (!absPath.endsWith('.vue')) {
       return []
@@ -84,14 +85,13 @@ export function createDevManifest(devServer: ViteDevServer): RuntimeManifest {
         if (!style.src) {
           stylePath = `/${componentRelativePath}`
         } else if (style.src.startsWith('.')) {
-          stylePath =
-            '/' +
-            path.posix.normalize(path.posix.join(path.dirname(componentRelativePath), style.src))
+          const componentDir = dirname(asRel(componentRelativePath))
+          stylePath = '/' + join(componentDir, style.src)
         } else {
           const result = await serverEnv.pluginContainer.resolveId(style.src, absPath)
           const resolved = result?.id
           if (resolved) {
-            stylePath = '/' + path.relative(root, resolved)
+            stylePath = '/' + relative(root, asAbs(resolved))
           } else {
             stylePath = '/' + style.src
           }
@@ -120,7 +120,7 @@ export function createDevManifest(devServer: ViteDevServer): RuntimeManifest {
 
     async getEntryCssIds(componentPath: string): Promise<string[]> {
       const entryRelativePath = `${entryDir}/${componentPath}.vue`
-      const entryAbsPath = path.resolve(root, entryRelativePath)
+      const entryAbsPath = resolve(root, entryRelativePath)
 
       const entryMod = serverEnv.moduleGraph.getModuleById(entryAbsPath)
       if (!entryMod) {
@@ -140,9 +140,15 @@ export function createDevManifest(devServer: ViteDevServer): RuntimeManifest {
         visited.add(mod.id)
 
         if (mod.id.endsWith('.vue')) {
-          discovered.push({ type: 'vue', relativePath: path.relative(root, mod.id) })
+          discovered.push({
+            type: 'vue',
+            relativePath: relative(root, asAbs(mod.id)),
+          })
         } else if (!mod.id.includes('?vue') && isCSS(mod.id)) {
-          discovered.push({ type: 'css', id: applyServeBase('/' + path.relative(root, mod.id)) })
+          discovered.push({
+            type: 'css',
+            id: applyServeBase('/' + relative(root, asAbs(mod.id))),
+          })
         }
 
         for (const imported of mod.importedModules) {

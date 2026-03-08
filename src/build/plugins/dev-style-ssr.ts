@@ -5,7 +5,8 @@
 
 import type { Plugin } from 'vite'
 
-import { isCSS } from '../../core/path.js'
+import { isCSS } from '../../core/module-id.js'
+import { type AbsolutePath, asAbs } from '../../core/path.js'
 
 /**
  * Development-only plugin that removes server-rendered `<link>` style tags
@@ -13,7 +14,7 @@ import { isCSS } from '../../core/path.js'
  * preventing duplicate styles during development.
  */
 export function devStyleSSRPlugin(): Plugin {
-  let root: string
+  let root: AbsolutePath
 
   return {
     name: 'visle:dev-style-ssr',
@@ -21,7 +22,7 @@ export function devStyleSSRPlugin(): Plugin {
     enforce: 'post',
 
     configResolved(config) {
-      root = config.root
+      root = asAbs(config.root)
     },
 
     transform(code, id) {

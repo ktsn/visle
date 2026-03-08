@@ -5,6 +5,7 @@ import vue from '@vitejs/plugin-vue'
 import { createObjectProperty, createSimpleExpression } from '@vue/compiler-core'
 import type { Plugin } from 'vite'
 
+import { asAbs, join, resolve } from '../core/path.js'
 import { generateComponentId } from './component-id.js'
 import { VisleConfig, defaultConfig, setVisleConfig } from './config.js'
 import { serverVirtualEntryId } from './generate.js'
@@ -39,8 +40,8 @@ export function visle(config: VisleConfig = {}): Plugin[] {
 
     config(userConfig) {
       // Get root from user config or default to cwd
-      const root = path.resolve(userConfig.root ?? process.cwd())
-      const entryDir = path.resolve(root, resolvedConfig.entryDir)
+      const root = asAbs(path.resolve(userConfig.root ?? process.cwd()))
+      const entryDir = resolve(root, resolvedConfig.entryDir)
 
       return {
         environments: {
@@ -92,12 +93,12 @@ export function visle(config: VisleConfig = {}): Plugin[] {
             await builder.build(builder.environments.islands!)
 
             // Write manifest and type definition files after all builds
-            const serverOutDir = path.resolve(root, resolvedConfig.serverOutDir)
+            const serverOutDir = resolve(root, resolvedConfig.serverOutDir)
             await fs.mkdir(serverOutDir, { recursive: true })
 
             await Promise.all([
               fs.writeFile(
-                path.join(serverOutDir, manifestFileName),
+                join(serverOutDir, manifestFileName),
                 JSON.stringify(getManifestData(), null, 2),
               ),
               generateEntryTypes(),
