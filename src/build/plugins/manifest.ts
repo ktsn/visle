@@ -1,18 +1,9 @@
 import type { Plugin } from 'vite'
 
+import type { ResolvedVisleConfig } from '../../core/config.js'
+import type { ManifestData } from '../../core/manifest.js'
 import { asAbs, relative } from '../../core/path.js'
-import type { ResolvedVisleConfig } from '../config.js'
 import { islandsBootstrapPath } from '../paths.js'
-
-export const manifestFileName = 'visle-manifest.json'
-
-export interface ManifestData {
-  base: string
-  entryDir: string
-  cssMap: Record<string, string[]>
-  jsMap: Record<string, string>
-  islandsBootstrap: string
-}
 
 interface ManifestPluginResult {
   plugin: Plugin

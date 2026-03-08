@@ -5,9 +5,8 @@ export type RelativePath = string & { readonly __brand: 'RelativePath' }
 
 /**
  * Normalize backslashes to forward slashes
- * @internal
  */
-function normalizePosix(p: string): string {
+export function normalizePath(p: string): string {
   return p.replace(/\\/g, '/')
 }
 
@@ -25,7 +24,7 @@ function isAbsolute(p: string): boolean {
 }
 
 export function asAbs(value: string): AbsolutePath {
-  const normalized = normalizePosix(value)
+  const normalized = normalizePath(value)
   if (!isAbsolute(normalized)) {
     throw new Error(`Expected absolute path, got: ${value}`)
   }
@@ -33,7 +32,7 @@ export function asAbs(value: string): AbsolutePath {
 }
 
 export function asRel(value: string): RelativePath {
-  const normalized = normalizePosix(value)
+  const normalized = normalizePath(value)
   if (isAbsolute(normalized)) {
     throw new Error(`Expected relative path, got: ${value}`)
   }
@@ -41,7 +40,7 @@ export function asRel(value: string): RelativePath {
 }
 
 export function resolve(base: AbsolutePath, ...segments: string[]): AbsolutePath {
-  const result = normalizePosix(path.resolve(base, ...segments))
+  const result = normalizePath(path.resolve(base, ...segments))
 
   // On Windows, path.resolve prepends the current drive letter when inputs
   // don't include one. Strip it to keep results consistent with inputs.
@@ -59,15 +58,15 @@ export function resolve(base: AbsolutePath, ...segments: string[]): AbsolutePath
 export function join(base: AbsolutePath, ...segments: string[]): AbsolutePath
 export function join(base: RelativePath, ...segments: string[]): RelativePath
 export function join(base: string, ...segments: string[]): string {
-  return normalizePosix(path.join(base, ...segments))
+  return normalizePath(path.join(base, ...segments))
 }
 
 export function relative(from: AbsolutePath, to: AbsolutePath): RelativePath {
-  return normalizePosix(path.relative(from, to)) as RelativePath
+  return normalizePath(path.relative(from, to)) as RelativePath
 }
 
 export function dirname(p: AbsolutePath): AbsolutePath
 export function dirname(p: RelativePath): RelativePath
 export function dirname(p: string): string {
-  return normalizePosix(path.dirname(p))
+  return normalizePath(path.dirname(p))
 }

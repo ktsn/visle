@@ -1,8 +1,7 @@
 import connect from 'connect'
 import { Connect, createServer, InlineConfig, RunnableDevEnvironment, ViteDevServer } from 'vite'
 
-import { getVisleConfig } from '../build/config.js'
-import { resolveDevComponentPath } from '../build/paths.js'
+import { getVisleConfig } from '../core/config.js'
 import { asAbs, resolve } from '../core/path.js'
 import { createDevManifest, RuntimeManifest } from './manifest.js'
 import { RenderLoader } from './render.js'
@@ -59,9 +58,10 @@ export function createDevLoader(viteConfig: InlineConfig = {}): DevRenderLoader 
 
       const visleConfig = getVisleConfig(devServer.config)
 
-      const modulePath = resolveDevComponentPath(
-        resolve(asAbs(devServer.config.root), visleConfig.entryDir),
-        componentPath,
+      const modulePath = resolve(
+        asAbs(devServer.config.root),
+        visleConfig.entryDir,
+        `${componentPath}.vue`,
       )
 
       try {

@@ -5,8 +5,8 @@ import { createServer, type RunnableDevEnvironment, type ViteDevServer } from 'v
 import { afterEach, beforeEach, describe, expect, test } from 'vitest'
 
 import { visle } from '../build/index.ts'
-import { virtualIslandsBootstrapPath } from '../build/paths.ts'
-import { manifestFileName } from '../build/plugins/manifest.ts'
+import { virtualIslandsBootstrapPath } from '../core/entry.ts'
+import { manifestFileName } from '../core/manifest.ts'
 import { asAbs } from '../core/path.ts'
 import { createDevManifest, loadManifest } from './manifest.ts'
 

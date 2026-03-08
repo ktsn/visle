@@ -1,8 +1,8 @@
 import { createServer, type ViteDevServer } from 'vite'
 import { describe, test, expect, afterEach } from 'vitest'
 
-import { defaultConfig } from '../config.ts'
-import { virtualIslandsBootstrapPath } from '../paths.ts'
+import { defaultConfig } from '../../core/config.ts'
+import { virtualIslandsBootstrapPath } from '../../core/entry.ts'
 import { virtualFilePlugin } from './virtual-file.ts'
 
 describe('virtualFilePlugin', () => {

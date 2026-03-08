@@ -1,4 +1,3 @@
-import fs from 'node:fs'
 import path from 'node:path'
 
 import { globSync } from 'glob'
@@ -9,7 +8,6 @@ import { componentWrapPrefix } from './generate.js'
 // -----------------------------
 // Custom Element Paths
 // -----------------------------
-export const virtualIslandsBootstrapPath = '/@visle/bootstrap'
 export const islandsBootstrapPath = resolve(
   // In Deno, import.meta.dirname can be undefined (in https module).
   // Just casting it to string for now.
@@ -81,27 +79,4 @@ export function parseId(id: string): {
  */
 export function resolveServerComponentIds(entryDir: AbsolutePath): AbsolutePath[] {
   return resolvePattern('/**/*.vue', entryDir)
-}
-
-/**
- * Resolves the path for a component in development mode
- */
-export function resolveDevComponentPath(
-  entryDir: AbsolutePath,
-  componentPath: string,
-): AbsolutePath {
-  return resolve(entryDir, `${componentPath}.vue`)
-}
-
-/**
- * Resolves the path to the server dist directory
- */
-export function resolveServerDistPath(serverOutDir: AbsolutePath): AbsolutePath {
-  const mjsPath = resolve(serverOutDir, 'server-entry.mjs')
-  const jsPath = resolve(serverOutDir, 'server-entry.js')
-
-  if (fs.existsSync(mjsPath)) {
-    return mjsPath
-  }
-  return jsPath
 }
