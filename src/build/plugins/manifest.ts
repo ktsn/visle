@@ -122,6 +122,12 @@ export function manifestPlugin(visleConfig: ResolvedVisleConfig): ManifestPlugin
             continue
           }
 
+          // The chunk is islands bootstrap that is Visle-provided
+          if (chunk.facadeModuleId === islandsBootstrapPath) {
+            islandsBootstrap = chunk.fileName
+            continue
+          }
+
           // Map entry modules paths to output chunk path.
           // Using moduleIds rather than facadeModuleId because it can be disappeared.
           // (e.g., barrel files merged with their re-export targets by Rollup)
@@ -134,9 +140,6 @@ export function manifestPlugin(visleConfig: ResolvedVisleConfig): ManifestPlugin
         }
 
         jsMap = envJsMap
-
-        const entryKey = normalizePath(path.relative(root, islandsBootstrapPath))
-        islandsBootstrap = envJsMap.get(entryKey)
       }
     },
   }

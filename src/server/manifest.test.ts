@@ -5,7 +5,7 @@ import { createServer, type RunnableDevEnvironment, type ViteDevServer } from 'v
 import { afterEach, beforeEach, describe, expect, test } from 'vitest'
 
 import { visle } from '../build/index.ts'
-import { islandsBootstrapPath, virtualIslandsBootstrapPath } from '../build/paths.ts'
+import { virtualIslandsBootstrapPath } from '../build/paths.ts'
 import { manifestFileName } from '../build/plugins/manifest.ts'
 import { createDevManifest, loadManifest } from './manifest.ts'
 
@@ -59,8 +59,7 @@ describe('createDevManifest', () => {
     const s = await createTestServer()
     const manifest = createDevManifest(s)
 
-    const relativePath = path.relative(root, islandsBootstrapPath)
-    const result = await manifest.getClientImportId(relativePath)
+    const result = await manifest.getIslandsBootstrapId()
 
     expect(result).toBe(virtualIslandsBootstrapPath)
   })

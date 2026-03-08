@@ -6,7 +6,7 @@ import { parse, SFCBlock } from 'vue/compiler-sfc'
 
 import { generateComponentId } from '../build/component-id.js'
 import { getVisleConfig } from '../build/config.js'
-import { virtualIslandsBootstrapPath, islandsBootstrapPath } from '../build/paths.js'
+import { virtualIslandsBootstrapPath } from '../build/paths.js'
 import { manifestFileName, type ManifestData } from '../build/plugins/manifest.js'
 
 export interface RuntimeManifest {
@@ -110,12 +110,6 @@ export function createDevManifest(devServer: ViteDevServer): RuntimeManifest {
 
   return {
     async getClientImportId(componentRelativePath: string): Promise<string> {
-      const absPath = path.resolve(root, componentRelativePath)
-
-      if (absPath === islandsBootstrapPath) {
-        return applyServeBase(virtualIslandsBootstrapPath)
-      }
-
       return applyServeBase(`/${componentRelativePath}`)
     },
 

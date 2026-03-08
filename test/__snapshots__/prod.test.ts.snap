@@ -508,7 +508,6 @@ exports[`Production Build SSR > Build output files 2`] = `
   "entryDir": "pages",
   "islandsBootstrap": "assets/custom-element-[hash].js",
   "jsMap": {
-    "../../../../src/client/custom-element.ts": "assets/custom-element-[hash].js",
     "components/AliasStyledCounter.vue": "assets/AliasStyledCounter-[hash].js",
     "components/Counter.vue": "assets/Counter-[hash].js",
     "components/CounterA.vue": "assets/CounterA-[hash].js",
