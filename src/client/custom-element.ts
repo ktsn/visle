@@ -4,6 +4,7 @@ import { loadModule } from './load-module.js'
 
 export class VueIsland extends HTMLElement {
   #app: App | null = null
+  #visibilityObserver: IntersectionObserver | null = null
 
   /**
    * Monotonic counter to invalidate stale async work in connectedCallback.
@@ -37,7 +38,15 @@ export class VueIsland extends HTMLElement {
       return
     }
 
-    const serializedProps = this.getAttribute('serialized-props') ?? '{}'
+    const strategy = this.getAttribute('strategy') ?? 'load'
+
+    if (strategy === 'visible') {
+      await this.#waitForVisible()
+      if (token !== this.#connectToken || !this.isConnected) {
+        return
+      }
+    }
+
     const importedName = this.getAttribute('imported-name') ?? 'default'
 
     const module = await loadModule(entry)
@@ -52,26 +61,54 @@ export class VueIsland extends HTMLElement {
       return
     }
 
-    const parsedProps = tryParseProps(serializedProps)
+    const parsedProps = safeParseObject(this.getAttribute('serialized-props'))
 
     this.#app = createSSRApp(entryComponent, parsedProps)
     this.#app.mount(this)
   }
 
+  #waitForVisible(): Promise<void> {
+    const rootMargin = safeParseObject(this.getAttribute('options'))?.rootMargin as
+      | string
+      | undefined
+    return new Promise((resolve) => {
+      const observer = new IntersectionObserver(
+        (entries) => {
+          if (entries.some((e) => e.isIntersecting)) {
+            this.#visibilityObserver = null
+            observer.disconnect()
+            resolve()
+          }
+        },
+        rootMargin ? { rootMargin } : undefined,
+      )
+      this.#visibilityObserver = observer
+      // The host element uses display:contents and has no layout box,
+      // so observe the first light-DOM child which has actual dimensions.
+      observer.observe(this.firstElementChild ?? this)
+    })
+  }
+
   disconnectedCallback(): void {
     this.#connectToken++
+    this.#visibilityObserver?.disconnect()
+    this.#visibilityObserver = null
     this.#app?.unmount()
     this.#app = null
   }
 }
 
 /**
- * Parse serialized props.
- * Return empty object if parsing is failed or parsed value is not an object.
+ * Parse a JSON string as an object, returning an empty object if
+ * parsing fails or the parsed value is not an object.
  */
-function tryParseProps(serialized: string): Record<string, unknown> {
+function safeParseObject(value: string | null): Record<string, unknown> {
+  if (!value) {
+    return {}
+  }
+
   try {
-    const parsed = JSON.parse(serialized)
+    const parsed = JSON.parse(value)
     return typeof parsed === 'object' && parsed != null ? parsed : {}
   } catch {
     return {}

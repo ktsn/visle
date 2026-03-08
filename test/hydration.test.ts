@@ -17,6 +17,7 @@ const hydrationCases: { name: string; component: string; props?: Record<string, 
   { name: 'Island with named import', component: 'with-named-import' },
   { name: 'Island with barrel import', component: 'with-barrel-import' },
   { name: 'SVG image asset', component: 'with-svg-img' },
+  { name: 'Island with visible strategy', component: 'with-visible-island' },
 ]
 
 /**
@@ -85,10 +86,10 @@ describe('Client-side Hydration', () => {
   })
 
   /**
-   * Opens a page, waits for island hydration to complete,
+   * Opens a page, waits for the custom element to be defined,
    * and collects any page errors.
    */
-  async function openAndHydrate(
+  async function openPage(
     component: string,
   ): Promise<{ page: Page; errors: string[]; warnings: string[] }> {
     const page = await browser.newPage()
@@ -115,13 +116,31 @@ describe('Client-side Hydration', () => {
   }
 
   test.for(hydrationCases)('$name', async ({ component }) => {
-    const { page, errors, warnings } = await openAndHydrate(component)
+    const { page, errors, warnings } = await openPage(component)
 
     const html = await page.innerHTML('body')
     expect(normalizeHashes(html)).toMatchSnapshot()
     expect(warnings).toEqual([])
     expect(errors).toEqual([])
 
+    await page.close()
+  })
+
+  test('visible strategy defers hydration until scrolled into view', async () => {
+    const { page, warnings, errors } = await openPage('with-visible-island')
+
+    // Island should not be hydrated yet (it's below the viewport)
+    const isHydratedBefore = await page.evaluate(
+      () => '_vnode' in document.querySelector('vue-island')!,
+    )
+    expect(isHydratedBefore).toBe(false)
+
+    // Scroll to the bottom so the island enters the viewport
+    await page.evaluate(() => window.scrollTo(0, document.body.scrollHeight))
+    await page.waitForFunction(() => '_vnode' in document.querySelector('vue-island')!)
+
+    expect(warnings).toEqual([])
+    expect(errors).toEqual([])
     await page.close()
   })
 })

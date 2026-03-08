@@ -120,7 +120,7 @@ export function buildImportMap(descriptor: SFCDescriptor, id: string): Map<strin
 }
 
 /**
- * Recursively finds elements with v-client:load directive.
+ * Recursively finds elements with v-client:* directive.
  */
 export function findVClientElements(children: TemplateChildNode[]): ElementNode[] {
   const results: ElementNode[] = []
@@ -135,7 +135,7 @@ export function findVClientElements(children: TemplateChildNode[]): ElementNode[
         prop.type === NodeTypes.DIRECTIVE &&
         prop.name === 'client' &&
         prop.arg?.type === NodeTypes.SIMPLE_EXPRESSION &&
-        prop.arg.content === 'load',
+        (prop.arg.content === 'load' || prop.arg.content === 'visible'),
     )
 
     if (hasVClient) {

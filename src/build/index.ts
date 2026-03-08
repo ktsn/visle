@@ -2,7 +2,7 @@ import fs from 'node:fs/promises'
 import path from 'node:path'
 
 import vue from '@vitejs/plugin-vue'
-import { createObjectProperty, createSimpleExpression } from '@vue/compiler-core'
+import { createObjectProperty, createSimpleExpression, NodeTypes } from '@vue/compiler-core'
 import type { Plugin } from 'vite'
 
 import { generateComponentId } from '../core/component-id.js'
@@ -156,14 +156,27 @@ export function visle(config: VisleConfig = {}): Plugin[] {
             // server-transform plugin searches v-client directive to detect
             // island component. Strip v-client directive here to make sure to
             // remove it in all environment.
-            client: () => ({
-              props: [
+            client: (dir) => {
+              const props = [
                 createObjectProperty(
-                  createSimpleExpression('__visle_client__', true),
-                  createSimpleExpression('true', false),
+                  createSimpleExpression('__visle_strategy__', true),
+                  createSimpleExpression(
+                    JSON.stringify(
+                      dir.arg?.type === NodeTypes.SIMPLE_EXPRESSION ? dir.arg.content : 'load',
+                    ),
+                    false,
+                  ),
                 ),
-              ],
-            }),
+              ]
+
+              if (dir.exp) {
+                props.push(
+                  createObjectProperty(createSimpleExpression('__visle_options__', true), dir.exp),
+                )
+              }
+
+              return { props }
+            },
           },
         },
       },

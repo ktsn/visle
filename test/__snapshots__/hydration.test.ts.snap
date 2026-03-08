@@ -45,6 +45,23 @@ exports[`Client-side Hydration > 'Island with props' 1`] = `
 </div>
 `;
 
+exports[`Client-side Hydration > 'Island with visible strategy' 1`] = `
+<div>
+  <div style="height:2000px;">
+    Spacer
+  </div>
+  <vue-island
+    entry="/assets/Counter-[hash].js"
+    serialized-props="{&quot;count&quot;:10}"
+    strategy="visible"
+  >
+    <button>
+      Count: 10
+    </button>
+  </vue-island>
+</div>
+`;
+
 exports[`Client-side Hydration > 'Multiple islands on the same page' 1`] = `
 <div>
   <vue-island entry="/assets/CounterA-[hash].js">
