@@ -5,6 +5,7 @@ import { fileURLToPath } from 'node:url'
 import { createBuilder, mergeConfig, type UserConfig } from 'vite'
 
 import { visle } from '../src/build/index.ts'
+import { asRel } from '../src/core/path.ts'
 import { createDevLoader } from '../src/server/dev.ts'
 import { createRender } from '../src/server/render.ts'
 
@@ -115,14 +116,14 @@ export function prodRender(root: string) {
 /**
  * Replace unstable hashes with stable placeholders for snapshot matching.
  * - Vite content hash: "Counter-Cv0abcde.js" -> "Counter-[hash].js"
- * - CSS module class: "_container_184t0_2" -> "_container_[css-module-hash]_2"
+ * - CSS module class: "_container_184t0_2" -> "_container_[css-module-hash]"
  * - Vue scoped attr: "data-v-aa4849be" -> "data-v-[scoped]"
  * - Vue scoped in URL: "scoped=aa4849be" -> "scoped=[scoped]"
  */
 export function normalizeHashes(html: string): string {
   return html
     .replace(/-[A-Za-z0-9_-]{8}\.(js|css|svg)/g, '-[hash].$1')
-    .replace(/(_\w+)_[a-z0-9]{5}_(\d+)/g, '$1_[css-module-hash]_$2')
+    .replace(/(_\w+)_[a-z0-9]{5}_\d+/g, '$1_[css-module-hash]')
     .replace(/(data-v-)[a-f0-9]{8}/g, '$1[scoped]')
     .replace(/(scoped=)[a-f0-9]{8}/g, '$1[scoped]')
     .replace(/(src=)[a-f0-9]{8}/g, '$1[src]')
@@ -135,5 +136,5 @@ export async function listFiles(dir: string): Promise<string[]> {
   const entries = await fs.readdir(dir, { withFileTypes: true, recursive: true })
   return entries
     .filter((e) => e.isFile())
-    .map((e) => path.relative(dir, path.join(e.parentPath, e.name)))
+    .map((e) => asRel(path.relative(dir, path.join(e.parentPath, e.name))))
 }

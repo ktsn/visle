@@ -17,7 +17,7 @@ exports[`Dev Server SSR > 'CSS modules' 1`] = `
   rel="stylesheet"
   href="/pages/with-css-module.vue?vue&type=style&index=0&lang.module.css"
 >
-<div class="_container_[css-module-hash]_2">
+<div class="_container_[css-module-hash]">
   CSS Module
 </div>
 `;

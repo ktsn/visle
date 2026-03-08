@@ -1,8 +1,8 @@
 import fs from 'node:fs/promises'
-import path from 'node:path'
 
 import type { Plugin } from 'vite'
 
+import { type AbsolutePath, asAbs, resolve } from '../../core/path.js'
 import type { ResolvedVisleConfig } from '../config.js'
 import { generateEntryTypesCode } from '../generate.js'
 import { resolveServerComponentIds } from '../paths.js'
@@ -23,9 +23,9 @@ export function entryTypesPlugin(config: ResolvedVisleConfig): {
     }
   }
 
-  let root: string
-  let entryRoot: string
-  let dtsPath: string
+  let root: AbsolutePath
+  let entryRoot: AbsolutePath
+  let dtsPath: AbsolutePath
   let lastContent: string | undefined
 
   async function generateAndWrite(): Promise<void> {
@@ -53,9 +53,9 @@ export function entryTypesPlugin(config: ResolvedVisleConfig): {
     name: 'visle:entry-types',
 
     configResolved(viteConfig) {
-      root = viteConfig.root
-      entryRoot = path.resolve(root, config.entryDir)
-      dtsPath = path.resolve(root, config.dts!)
+      root = asAbs(viteConfig.root)
+      entryRoot = resolve(root, config.entryDir)
+      dtsPath = resolve(root, config.dts!)
     },
 
     async configureServer(server) {

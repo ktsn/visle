@@ -7,6 +7,7 @@ import { afterEach, beforeEach, describe, expect, test } from 'vitest'
 import { visle } from '../build/index.ts'
 import { virtualIslandsBootstrapPath } from '../build/paths.ts'
 import { manifestFileName } from '../build/plugins/manifest.ts'
+import { asAbs } from '../core/path.ts'
 import { createDevManifest, loadManifest } from './manifest.ts'
 
 const generatedDir = path.resolve(import.meta.dirname, '../../test/__generated__/server')
@@ -300,7 +301,7 @@ describe('loadManifest', () => {
       jsMap: { 'src/foo.vue': 'foo-1234.js' },
     })
 
-    const manifest = await loadManifest(root)
+    const manifest = await loadManifest(asAbs(root))
     const result = await manifest.getClientImportId('src/foo.vue')
 
     expect(result).toBe('/foo-1234.js')
@@ -311,7 +312,7 @@ describe('loadManifest', () => {
       jsMap: {},
     })
 
-    const manifest = await loadManifest(root)
+    const manifest = await loadManifest(asAbs(root))
 
     await expect(manifest.getClientImportId('src/foo.vue')).rejects.toThrow(
       'src/foo.vue not found in manifest JS map',
@@ -323,7 +324,7 @@ describe('loadManifest', () => {
       cssMap: { 'pages/foo.vue': ['foo-1234.css'] },
     })
 
-    const manifest = await loadManifest(root)
+    const manifest = await loadManifest(asAbs(root))
     const result = await manifest.getEntryCssIds('foo')
 
     expect(result).toEqual(['/foo-1234.css'])
@@ -338,7 +339,7 @@ describe('loadManifest', () => {
       jsMap: { 'src/foo.vue': 'foo-1234.js' },
     })
 
-    const manifest = await loadManifest(root)
+    const manifest = await loadManifest(asAbs(root))
     const result = await manifest.getClientImportId('src/foo.vue')
 
     expect(result).toBe(expected)
@@ -350,7 +351,7 @@ describe('loadManifest', () => {
       cssMap: { 'views/index.vue': ['index-1234.css'] },
     })
 
-    const manifest = await loadManifest(root)
+    const manifest = await loadManifest(asAbs(root))
     const result = await manifest.getEntryCssIds('index')
 
     expect(result).toEqual(['/index-1234.css'])

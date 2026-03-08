@@ -1,10 +1,9 @@
-import path from 'node:path'
-
 import connect from 'connect'
 import { Connect, createServer, InlineConfig, RunnableDevEnvironment, ViteDevServer } from 'vite'
 
 import { getVisleConfig } from '../build/config.js'
 import { resolveDevComponentPath } from '../build/paths.js'
+import { asAbs, resolve } from '../core/path.js'
 import { createDevManifest, RuntimeManifest } from './manifest.js'
 import { RenderLoader } from './render.js'
 
@@ -61,7 +60,7 @@ export function createDevLoader(viteConfig: InlineConfig = {}): DevRenderLoader 
       const visleConfig = getVisleConfig(devServer.config)
 
       const modulePath = resolveDevComponentPath(
-        path.join(devServer.config.root, visleConfig.entryDir),
+        resolve(asAbs(devServer.config.root), visleConfig.entryDir),
         componentPath,
       )
 

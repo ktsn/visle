@@ -4,6 +4,7 @@ import fs from 'node:fs/promises'
 import type { ResolvedConfig, ViteDevServer } from 'vite'
 import { describe, test, expect, vi, beforeEach, afterEach } from 'vitest'
 
+import { asAbs } from '../../core/path.ts'
 import { defaultConfig } from '../config.ts'
 import { resolveServerComponentIds } from '../paths.ts'
 import { entryTypesPlugin } from './entry-types.ts'
@@ -53,7 +54,7 @@ describe('entryTypesPlugin', () => {
     const { plugin } = createPlugin()
     const watcher = createWatcher()
 
-    vi.mocked(resolveServerComponentIds).mockReturnValue(['/project/pages/Index.vue'])
+    vi.mocked(resolveServerComponentIds).mockReturnValue([asAbs('/project/pages/Index.vue')])
 
     const hook = plugin.configureServer as (server: ViteDevServer) => Promise<void>
     await hook(createServer(watcher))
@@ -68,7 +69,7 @@ describe('entryTypesPlugin', () => {
   test('generates dts via generate() for build', async () => {
     const { generate } = createPlugin()
 
-    vi.mocked(resolveServerComponentIds).mockReturnValue(['/project/pages/Index.vue'])
+    vi.mocked(resolveServerComponentIds).mockReturnValue([asAbs('/project/pages/Index.vue')])
 
     await generate()
 
@@ -83,7 +84,7 @@ describe('entryTypesPlugin', () => {
     const { plugin } = createPlugin()
     const watcher = createWatcher()
 
-    vi.mocked(resolveServerComponentIds).mockReturnValue(['/project/pages/New.vue'])
+    vi.mocked(resolveServerComponentIds).mockReturnValue([asAbs('/project/pages/New.vue')])
 
     const hook = plugin.configureServer as (server: ViteDevServer) => Promise<void>
     await hook(createServer(watcher))
@@ -103,8 +104,8 @@ describe('entryTypesPlugin', () => {
     const watcher = createWatcher()
 
     vi.mocked(resolveServerComponentIds)
-      .mockReturnValueOnce(['/project/pages/Index.vue'])
-      .mockReturnValueOnce(['/project/pages/Index.vue', '/project/pages/New.vue'])
+      .mockReturnValueOnce([asAbs('/project/pages/Index.vue')])
+      .mockReturnValueOnce([asAbs('/project/pages/Index.vue'), asAbs('/project/pages/New.vue')])
 
     const hook = plugin.configureServer as (server: ViteDevServer) => Promise<void>
     await hook(createServer(watcher))
@@ -126,8 +127,8 @@ describe('entryTypesPlugin', () => {
     const watcher = createWatcher()
 
     vi.mocked(resolveServerComponentIds)
-      .mockReturnValueOnce(['/project/pages/Index.vue', '/project/pages/Old.vue'])
-      .mockReturnValueOnce(['/project/pages/Index.vue'])
+      .mockReturnValueOnce([asAbs('/project/pages/Index.vue'), asAbs('/project/pages/Old.vue')])
+      .mockReturnValueOnce([asAbs('/project/pages/Index.vue')])
 
     const hook = plugin.configureServer as (server: ViteDevServer) => Promise<void>
     await hook(createServer(watcher))
@@ -143,8 +144,8 @@ describe('entryTypesPlugin', () => {
     const watcher = createWatcher()
 
     vi.mocked(resolveServerComponentIds)
-      .mockReturnValueOnce(['/project/pages/Index.vue', '/project/pages/Old.vue'])
-      .mockReturnValueOnce(['/project/pages/Index.vue', '/project/pages/New.vue'])
+      .mockReturnValueOnce([asAbs('/project/pages/Index.vue'), asAbs('/project/pages/Old.vue')])
+      .mockReturnValueOnce([asAbs('/project/pages/Index.vue'), asAbs('/project/pages/New.vue')])
 
     const hook = plugin.configureServer as (server: ViteDevServer) => Promise<void>
     await hook(createServer(watcher))
@@ -163,8 +164,8 @@ describe('entryTypesPlugin', () => {
     const watcher = createWatcher()
 
     vi.mocked(resolveServerComponentIds)
-      .mockReturnValueOnce(['/project/pages/Index.vue'])
-      .mockReturnValueOnce(['/project/pages/Index.vue'])
+      .mockReturnValueOnce([asAbs('/project/pages/Index.vue')])
+      .mockReturnValueOnce([asAbs('/project/pages/Index.vue')])
 
     const hook = plugin.configureServer as (server: ViteDevServer) => Promise<void>
     await hook(createServer(watcher))
@@ -181,8 +182,8 @@ describe('entryTypesPlugin', () => {
     const watcher = createWatcher()
 
     vi.mocked(resolveServerComponentIds)
-      .mockReturnValueOnce(['/project/pages/Index.vue'])
-      .mockReturnValueOnce(['/project/pages/Index.vue'])
+      .mockReturnValueOnce([asAbs('/project/pages/Index.vue')])
+      .mockReturnValueOnce([asAbs('/project/pages/Index.vue')])
 
     const hook = plugin.configureServer as (server: ViteDevServer) => Promise<void>
     await hook(createServer(watcher))
@@ -208,7 +209,7 @@ describe('entryTypesPlugin', () => {
   test('uses custom dts path', async () => {
     const { generate } = createPlugin('types/visle.d.ts')
 
-    vi.mocked(resolveServerComponentIds).mockReturnValue(['/project/pages/Index.vue'])
+    vi.mocked(resolveServerComponentIds).mockReturnValue([asAbs('/project/pages/Index.vue')])
 
     await generate()
 

@@ -1,17 +1,18 @@
-import path from 'node:path'
-
-import { normalizePath } from 'vite'
+import { type AbsolutePath, type RelativePath, relative } from '../core/path.js'
 
 export const serverVirtualEntryId = '\0@visle/server-entry'
 
 export const componentWrapPrefix = '\0visle:wrap:'
 
-export function generateServerVirtualEntryCode(entryDir: string, componentIds: string[]): string {
+export function generateServerVirtualEntryCode(
+  entryDir: AbsolutePath,
+  componentIds: AbsolutePath[],
+): string {
   const imports = componentIds.map((id, i) => `import _${i} from '${id}'`).join('\n')
 
   const entries = componentIds
     .map((id, i) => {
-      const key = normalizePath(path.relative(entryDir, id).replace(/\.vue$/, ''))
+      const key = relative(entryDir, id).replace(/\.vue$/, '')
       return `  '${key}': _${i}`
     })
     .join(',\n')
@@ -20,15 +21,12 @@ export function generateServerVirtualEntryCode(entryDir: string, componentIds: s
 }
 
 export function generateComponentWrapperCode(
-  filePath: string,
-  componentRelativePath: string,
+  filePath: AbsolutePath,
+  componentRelativePath: RelativePath,
   importedNames: string[],
 ): string {
-  const normalizedFilePath = normalizePath(filePath)
-  const normalizedRelativePath = normalizePath(componentRelativePath)
-
-  const serializedFilePath = JSON.stringify(normalizedFilePath)
-  const serializedRelativePath = JSON.stringify(normalizedRelativePath)
+  const serializedFilePath = JSON.stringify(filePath)
+  const serializedRelativePath = JSON.stringify(componentRelativePath)
 
   const lines = [
     `import { createComponentWrapper } from 'visle/internal'`,
@@ -52,14 +50,14 @@ export function generateComponentWrapperCode(
 }
 
 export function generateEntryTypesCode(
-  entryDir: string,
-  root: string,
-  componentIds: string[],
+  entryDir: AbsolutePath,
+  root: AbsolutePath,
+  componentIds: AbsolutePath[],
 ): string {
   const entries = componentIds
     .map((id) => {
-      const key = normalizePath(path.relative(entryDir, id).replace(/\.vue$/, ''))
-      const importPath = normalizePath(path.relative(root, id))
+      const key = relative(entryDir, id).replace(/\.vue$/, '')
+      const importPath = relative(root, id)
       return `    '${key}': ComponentProps<typeof import('./${importPath}')['default']>`
     })
     .join('\n')

@@ -1,8 +1,11 @@
+import path from 'node:path'
+
 import { Component, createApp } from 'vue'
 import { renderToString } from 'vue/server-renderer'
 
 import { defaultConfig } from '../build/config.js'
 import { resolveServerDistPath } from '../build/paths.js'
+import { asAbs } from '../core/path.js'
 import { RuntimeManifest, loadManifest } from './manifest.js'
 import { transformWithRenderContext } from './transform.js'
 
@@ -44,7 +47,7 @@ export function createRender<T extends Record<string, any> = Record<string, any>
 
   let loader: RenderLoader = {
     loadEntry(componentPath) {
-      const serverOutDir = options.serverOutDir ?? defaultConfig.serverOutDir
+      const serverOutDir = asAbs(path.resolve(options.serverOutDir ?? defaultConfig.serverOutDir))
 
       return import(/* @vite-ignore */ resolveServerDistPath(serverOutDir)).then(
         (m) => m.default[componentPath],
@@ -53,7 +56,7 @@ export function createRender<T extends Record<string, any> = Record<string, any>
 
     async getManifest() {
       if (!cachedManifest) {
-        const serverOutDir = options.serverOutDir ?? defaultConfig.serverOutDir
+        const serverOutDir = asAbs(path.resolve(options.serverOutDir ?? defaultConfig.serverOutDir))
         cachedManifest = await loadManifest(serverOutDir)
       }
       return cachedManifest
