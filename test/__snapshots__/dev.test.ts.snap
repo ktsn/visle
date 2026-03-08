@@ -1,5 +1,17 @@
 // Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
 
+exports[`Dev Server SSR > 'CSS import in script' 1`] = `
+<link
+  rel="stylesheet"
+  href="/styles/imported.css"
+>
+<div>
+  <h2>
+    CSS Import Page
+  </h2>
+</div>
+`;
+
 exports[`Dev Server SSR > 'CSS modules' 1`] = `
 <link
   rel="stylesheet"
@@ -470,6 +482,7 @@ declare module 'visle' {
     'with-css-src': ComponentProps<typeof import('./pages/with-css-src.vue')['default']>
     'with-css-src-alias': ComponentProps<typeof import('./pages/with-css-src-alias.vue')['default']>
     'with-css-module': ComponentProps<typeof import('./pages/with-css-module.vue')['default']>
+    'with-css-import': ComponentProps<typeof import('./pages/with-css-import.vue')['default']>
     'with-barrel-import': ComponentProps<typeof import('./pages/with-barrel-import.vue')['default']>
     'static': ComponentProps<typeof import('./pages/static.vue')['default']>
     'non-ascii-テスト': ComponentProps<typeof import('./pages/non-ascii-テスト.vue')['default']>

@@ -211,6 +211,23 @@ describe('createDevManifest', () => {
     expect(result).toEqual(['/pages/child.vue?vue&type=style&index=0&lang.css'])
   })
 
+  test('getEntryCssIds collects CSS imported in <script setup>', async () => {
+    const code = '<template><div></div></template><script setup>import "./foo.css"</script>'
+    fs.writeFileSync(path.join(root, 'pages/foo.vue'), code)
+    fs.writeFileSync(path.join(root, 'pages/foo.css'), 'h1 { color: red; }')
+
+    const s = await createTestServer()
+    const serverEnv = s.environments.server as RunnableDevEnvironment
+
+    // Load the module via SSR runner to populate the server module graph
+    await serverEnv.runner.import(path.join(root, 'pages/foo.vue'))
+
+    const manifest = createDevManifest(s)
+    const result = await manifest.getEntryCssIds('foo')
+
+    expect(result).toEqual(['/pages/foo.css'])
+  })
+
   test('getEntryCssIds falls back to file parsing when entry is not in module graph', async () => {
     fs.writeFileSync(
       path.join(root, 'pages/foo.vue'),

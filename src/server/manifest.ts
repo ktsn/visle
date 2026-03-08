@@ -127,8 +127,9 @@ export function createDevManifest(devServer: ViteDevServer): RuntimeManifest {
         return getComponentCssIds(entryRelativePath)
       }
 
-      // Walk module graph to find all transitively imported .vue files
+      // Walk module graph to find all transitively imported .vue and CSS files
       const vueRelativePaths: string[] = []
+      const cssRelativePaths: string[] = []
       const visited = new Set<string>()
 
       const walk = (mod: EnvironmentModuleNode) => {
@@ -139,6 +140,8 @@ export function createDevManifest(devServer: ViteDevServer): RuntimeManifest {
 
         if (mod.id.endsWith('.vue')) {
           vueRelativePaths.push(path.relative(root, mod.id))
+        } else if (!mod.id.includes('?vue') && cssRE.test(mod.id)) {
+          cssRelativePaths.push(applyServeBase('/' + path.relative(root, mod.id)))
         }
 
         for (const imported of mod.importedModules) {
@@ -147,9 +150,9 @@ export function createDevManifest(devServer: ViteDevServer): RuntimeManifest {
       }
       walk(entryMod)
 
-      // Collect CSS from all discovered .vue files
-      const cssArrays = await Promise.all(vueRelativePaths.map((p) => getComponentCssIds(p)))
-      return cssArrays.flat()
+      // Collect CSS from both standalone CSS files and .vue <style> blocks
+      const vueStyleArrays = await Promise.all(vueRelativePaths.map((p) => getComponentCssIds(p)))
+      return [...cssRelativePaths, ...vueStyleArrays.flat()]
     },
   }
 }
@@ -158,6 +161,8 @@ function basePathForDev(base: string): string {
   const baseUrl = new URL(base, 'https://example.com')
   return baseUrl.pathname.replace(/\/$/, '')
 }
+
+const cssRE = /\.(?:css|scss|sass|less|styl|stylus|pcss|postcss)$/
 
 // these are built-in query parameters so should be ignored
 // if the user happen to add them as attrs

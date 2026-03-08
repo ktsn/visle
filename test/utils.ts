@@ -36,6 +36,7 @@ export const renderCases: { name: string; component: string; props?: Record<stri
   { name: 'Island with barrel import', component: 'with-barrel-import' },
   { name: 'Shared CSS common chunk', component: 'with-shared-css' },
   { name: 'Dynamic import shared CSS', component: 'with-dynamic-shared-css' },
+  { name: 'CSS import in script', component: 'with-css-import' },
 ]
 
 /**
