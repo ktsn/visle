@@ -28,6 +28,7 @@ function startStaticServer(root: string): Promise<{ server: http.Server; port: n
       '.html': 'text/html; charset=utf-8',
       '.js': 'application/javascript',
       '.css': 'text/css',
+      '.svg': 'image/svg+xml',
     }
 
     const server = http.createServer(async (req, res) => {
