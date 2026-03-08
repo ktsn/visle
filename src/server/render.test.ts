@@ -2,7 +2,7 @@ import fs from 'node:fs/promises'
 import path from 'node:path'
 import { fileURLToPath } from 'node:url'
 
-import { describe, test, expect, beforeEach } from 'vitest'
+import { afterEach, describe, test, expect, beforeEach } from 'vitest'
 
 import { visle } from '../build/index.ts'
 import { createDevLoader } from './dev.ts'
@@ -145,25 +145,32 @@ describe('createRender', () => {
   })
 
   describe('isDev = true', () => {
+    let loader: ReturnType<typeof createDevLoader> | undefined
+
+    afterEach(async () => {
+      await loader?.close()
+      loader = undefined
+    })
+
     test('renders vue component from component directory', async () => {
       const render = createRender({
         serverOutDir: path.join(root, 'dist/server'),
       })
 
-      render.setLoader(
-        createDevLoader({
-          root,
-          plugins: [visle()],
-          resolve: {
-            alias: {
-              'visle/internal': path.resolve(
-                path.dirname(fileURLToPath(import.meta.url)),
-                'internal.ts',
-              ),
-            },
+      loader = createDevLoader({
+        root,
+        plugins: [visle()],
+        resolve: {
+          alias: {
+            'visle/internal': path.resolve(
+              path.dirname(fileURLToPath(import.meta.url)),
+              'internal.ts',
+            ),
           },
-        }),
-      )
+        },
+      })
+
+      render.setLoader(loader)
 
       await saveCodes(root, {
         'pages/Comp.vue': `
