@@ -37,6 +37,7 @@ export const renderCases: { name: string; component: string; props?: Record<stri
   { name: 'Shared CSS common chunk', component: 'with-shared-css' },
   { name: 'Dynamic import shared CSS', component: 'with-dynamic-shared-css' },
   { name: 'CSS import in script', component: 'with-css-import' },
+  { name: 'SVG image asset', component: 'with-svg-img' },
 ]
 
 /**
@@ -120,7 +121,7 @@ export function prodRender(root: string) {
  */
 export function normalizeHashes(html: string): string {
   return html
-    .replace(/-[A-Za-z0-9_-]{8}\.(js|css)/g, '-[hash].$1')
+    .replace(/-[A-Za-z0-9_-]{8}\.(js|css|svg)/g, '-[hash].$1')
     .replace(/(_\w+)_[a-z0-9]{5}_(\d+)/g, '$1_[css-module-hash]_$2')
     .replace(/(data-v-)[a-f0-9]{8}/g, '$1[scoped]')
     .replace(/(scoped=)[a-f0-9]{8}/g, '$1[scoped]')
