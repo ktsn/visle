@@ -4,13 +4,6 @@ import { defineComponent, h, useSSRContext, useAttrs, inject, provide, onServerP
 import type { RenderContext } from './render.js'
 import { islandSymbol } from './symbol.js'
 
-function addCssIdsToContext(context: RenderContext, cssIds: string[]) {
-  context.loadCss ??= new Set()
-  for (const cssId of cssIds) {
-    context.loadCss.add(cssId)
-  }
-}
-
 export function createComponentWrapper(
   normalizedRelativePath: string,
   normalizedEntryRelativePath: string,
@@ -26,30 +19,28 @@ export function createComponentWrapper(
 
     setup(props, { slots }) {
       const attrs = useAttrs()
-      const context: RenderContext = useSSRContext()!
-      const manifest = context.manifest!
 
       const isIsland = props.__visle_client__
 
       if (isIsland) {
+        const context: RenderContext = useSSRContext()!
+        const manifest = context.manifest!
+
         const inIsland = inject(islandSymbol, false)
         provide(islandSymbol, true)
 
         let clientImportId = ''
 
         onServerPrefetch(async () => {
-          const [resolvedClientImportId, entryImportId, cssIds] = await Promise.all([
+          const [resolvedClientImportId, entryImportId] = await Promise.all([
             manifest.getClientImportId(normalizedRelativePath),
             manifest.getClientImportId(normalizedEntryRelativePath),
-            manifest.getDependingClientCssIds(normalizedRelativePath),
           ])
 
           clientImportId = resolvedClientImportId
 
           context.loadJs ??= new Set()
           context.loadJs.add(entryImportId)
-
-          addCssIdsToContext(context, cssIds)
         })
 
         if (inIsland) {
@@ -71,13 +62,7 @@ export function createComponentWrapper(
         }
       }
 
-      // Server-only path: just load CSS and render original component
-      onServerPrefetch(async () => {
-        const cssIds = await manifest.getDependingClientCssIds(normalizedRelativePath)
-
-        addCssIdsToContext(context, cssIds)
-      })
-
+      // Server-only path: just render original component
       return () => h(OriginalComponent, attrs, slots)
     },
   })

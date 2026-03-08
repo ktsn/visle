@@ -12,14 +12,6 @@ export interface RenderOptions {
    * Pass the same value of Visle Vite plugin's serverOutDir.
    */
   serverOutDir?: string
-
-  /**
-   * Base public path for serving client assets.
-   * Same as Vite's `base` config. Can be an absolute path (e.g., `/prefix/`)
-   * or a full URL (e.g., `https://cdn.example.com/`).
-   * @default '/'
-   */
-  base?: string
 }
 
 export interface RenderLoader {
@@ -63,8 +55,7 @@ export function createRender<T extends Record<string, any> = Record<string, any>
     async getManifest() {
       if (!cachedManifest) {
         const serverOutDir = options.serverOutDir ?? defaultConfig.serverOutDir
-        const base = options.base ?? '/'
-        cachedManifest = await loadManifest(serverOutDir, base)
+        cachedManifest = await loadManifest(serverOutDir)
       }
       return cachedManifest
     },
@@ -79,6 +70,13 @@ export function createRender<T extends Record<string, any> = Record<string, any>
 
     const app = createApp(component, props)
     const rendered = await renderToString(app, context)
+
+    // Collect CSS for the page entry after rendering so module graph is populated
+    const cssIds = await context.manifest!.getEntryCssIds(componentPath)
+    context.loadCss ??= new Set()
+    for (const cssId of cssIds) {
+      context.loadCss.add(cssId)
+    }
 
     return transformWithRenderContext(rendered, context)
   }
