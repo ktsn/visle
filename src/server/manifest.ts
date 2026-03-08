@@ -5,8 +5,8 @@ import { parse, SFCBlock } from 'vue/compiler-sfc'
 
 import { generateComponentId } from '../core/component-id.js'
 import { getVisleConfig } from '../core/config.js'
-import { manifestFileName, type ManifestData } from '../core/manifest.js'
 import { virtualIslandsBootstrapPath } from '../core/entry.js'
+import { manifestFileName, type ManifestData } from '../core/manifest.js'
 import { isCSS } from '../core/module-id.js'
 import { type AbsolutePath, asAbs, dirname, join, resolve, relative, asRel } from '../core/path.js'
 

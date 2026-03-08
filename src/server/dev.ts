@@ -58,7 +58,11 @@ export function createDevLoader(viteConfig: InlineConfig = {}): DevRenderLoader 
 
       const visleConfig = getVisleConfig(devServer.config)
 
-      const modulePath = resolve(asAbs(devServer.config.root), visleConfig.entryDir, `${componentPath}.vue`)
+      const modulePath = resolve(
+        asAbs(devServer.config.root),
+        visleConfig.entryDir,
+        `${componentPath}.vue`,
+      )
 
       try {
         const serverEnv = devServer.environments.server as RunnableDevEnvironment

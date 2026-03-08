@@ -80,4 +80,3 @@ export function parseId(id: string): {
 export function resolveServerComponentIds(entryDir: AbsolutePath): AbsolutePath[] {
   return resolvePattern('/**/*.vue', entryDir)
 }
-
