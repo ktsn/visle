@@ -24,9 +24,6 @@ importers:
         specifier: ^7.3.1
         version: 7.3.1(@types/node@25.3.3)
     devDependencies:
-      '@babel/parser':
-        specifier: ^7.29.0
-        version: 7.29.0
       '@babel/types':
         specifier: ^7.29.0
         version: 7.29.0

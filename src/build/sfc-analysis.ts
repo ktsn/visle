@@ -1,8 +1,7 @@
-import type { ParserPlugin } from '@babel/parser'
 import type { ObjectExpression } from '@babel/types'
 import type { ElementNode, TemplateChildNode } from '@vue/compiler-core'
 import { NodeTypes } from '@vue/compiler-core'
-import { babelParse, compileScript, type SFCDescriptor } from 'vue/compiler-sfc'
+import { compileScript, type SFCDescriptor } from 'vue/compiler-sfc'
 
 export interface ImportInfo {
   source: string
@@ -32,23 +31,12 @@ export function buildImportMap(descriptor: SFCDescriptor, id: string): Map<strin
   }
 
   if (descriptor.script) {
-    const lang = descriptor.script.lang
-    const plugins: ParserPlugin[] = []
-    if (lang === 'ts' || lang === 'tsx') {
-      plugins.push('typescript')
-    }
-    if (lang === 'jsx' || lang === 'tsx') {
-      plugins.push('jsx')
-    }
-
-    const ast = babelParse(descriptor.script.content, {
-      sourceType: 'module',
-      plugins,
-    })
+    const compiled = compileScript(descriptor, { id })
+    const body = compiled.scriptAst!
 
     // Step 1: Build importName → ImportInfo map from import declarations
     const importSources = new Map<string, ImportInfo>()
-    for (const node of ast.program.body) {
+    for (const node of body) {
       if (node.type === 'ImportDeclaration') {
         const source = node.source.value
         if (typeof source === 'string') {
@@ -68,7 +56,7 @@ export function buildImportMap(descriptor: SFCDescriptor, id: string): Map<strin
     // Step 2: Find options object from export default
     // Supports: export default { ... } and export default fn({ ... })
     let optionsObject: ObjectExpression | undefined
-    for (const node of ast.program.body) {
+    for (const node of body) {
       if (node.type === 'ExportDefaultDeclaration') {
         if (node.declaration.type === 'ObjectExpression') {
           // export default { ... }
