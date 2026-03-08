@@ -4,6 +4,7 @@ import { loadModule } from './load-module.js'
 
 export class VueIsland extends HTMLElement {
   #app: App | null = null
+  #visibilityObserver: IntersectionObserver | null = null
 
   /**
    * Monotonic counter to invalidate stale async work in connectedCallback.
@@ -74,12 +75,14 @@ export class VueIsland extends HTMLElement {
       const observer = new IntersectionObserver(
         (entries) => {
           if (entries.some((e) => e.isIntersecting)) {
+            this.#visibilityObserver = null
             observer.disconnect()
             resolve()
           }
         },
         rootMargin ? { rootMargin } : undefined,
       )
+      this.#visibilityObserver = observer
       // The host element uses display:contents and has no layout box,
       // so observe the first light-DOM child which has actual dimensions.
       observer.observe(this.firstElementChild ?? this)
@@ -88,6 +91,8 @@ export class VueIsland extends HTMLElement {
 
   disconnectedCallback(): void {
     this.#connectToken++
+    this.#visibilityObserver?.disconnect()
+    this.#visibilityObserver = null
     this.#app?.unmount()
     this.#app = null
   }

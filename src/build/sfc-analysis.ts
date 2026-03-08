@@ -120,7 +120,7 @@ export function buildImportMap(descriptor: SFCDescriptor, id: string): Map<strin
 }
 
 /**
- * Recursively finds elements with v-client:load directive.
+ * Recursively finds elements with v-client:* directive.
  */
 export function findVClientElements(children: TemplateChildNode[]): ElementNode[] {
   const results: ElementNode[] = []
