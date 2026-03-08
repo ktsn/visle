@@ -228,6 +228,38 @@ describe('createDevManifest', () => {
     expect(result).toEqual(['/pages/foo.css'])
   })
 
+  test('getEntryCssIds preserves discovery order of standalone CSS and Vue styles', async () => {
+    fs.writeFileSync(
+      path.join(root, 'pages/child-a.vue'),
+      '<template><div></div></template><script setup>const a = 1</script><style>h1 { color: red; }</style>',
+    )
+    fs.writeFileSync(path.join(root, 'pages/middle.css'), 'h2 { color: blue; }')
+    fs.writeFileSync(
+      path.join(root, 'pages/child-b.vue'),
+      '<template><div></div></template><script setup>const b = 1</script><style>h3 { color: green; }</style>',
+    )
+    // parent imports child-a, then middle.css, then child-b — in that order
+    fs.writeFileSync(
+      path.join(root, 'pages/parent.vue'),
+      '<template><ChildA /><ChildB /></template><script setup>import ChildA from "./child-a.vue"\nimport "./middle.css"\nimport ChildB from "./child-b.vue"</script>',
+    )
+
+    const s = await createTestServer()
+    const serverEnv = s.environments.server as RunnableDevEnvironment
+
+    await serverEnv.runner.import(path.join(root, 'pages/parent.vue'))
+
+    const manifest = createDevManifest(s)
+    const result = await manifest.getEntryCssIds('parent')
+
+    // Order must match import discovery: child-a style, middle.css, child-b style
+    expect(result).toEqual([
+      expect.stringMatching(/^\/pages\/child-a\.vue\?vue&type=style&index=0&lang\.css$/),
+      '/pages/middle.css',
+      expect.stringMatching(/^\/pages\/child-b\.vue\?vue&type=style&index=0&lang\.css$/),
+    ])
+  })
+
   test('getEntryCssIds falls back to file parsing when entry is not in module graph', async () => {
     fs.writeFileSync(
       path.join(root, 'pages/foo.vue'),
