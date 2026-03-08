@@ -31,7 +31,7 @@ export function visle(config: VisleConfig = {}): Plugin[] {
 
   const { plugin: serverTransform, islandPaths } = serverTransformPlugin()
   const virtualFile = virtualFilePlugin(resolvedConfig)
-  const { plugin: manifest, getManifestData } = manifestPlugin()
+  const { plugin: manifest, getManifestData } = manifestPlugin(resolvedConfig)
   const { plugin: entryTypes, generate: generateEntryTypes } = entryTypesPlugin(resolvedConfig)
 
   const orchestrationPlugin: Plugin = {

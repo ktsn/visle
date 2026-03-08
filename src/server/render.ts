@@ -12,14 +12,6 @@ export interface RenderOptions {
    * Pass the same value of Visle Vite plugin's serverOutDir.
    */
   serverOutDir?: string
-
-  /**
-   * Base public path for serving client assets.
-   * Same as Vite's `base` config. Can be an absolute path (e.g., `/prefix/`)
-   * or a full URL (e.g., `https://cdn.example.com/`).
-   * @default '/'
-   */
-  base?: string
 }
 
 export interface RenderLoader {
@@ -28,9 +20,8 @@ export interface RenderLoader {
 }
 
 export interface RenderContext {
-  loadCss?: Set<string>
-  loadJs?: Set<string>
   manifest?: RuntimeManifest
+  hasIsland?: boolean
 }
 
 type RenderArgs<P> = {} extends P ? [props?: P] : [props: P]
@@ -63,8 +54,7 @@ export function createRender<T extends Record<string, any> = Record<string, any>
     async getManifest() {
       if (!cachedManifest) {
         const serverOutDir = options.serverOutDir ?? defaultConfig.serverOutDir
-        const base = options.base ?? '/'
-        cachedManifest = await loadManifest(serverOutDir, base)
+        cachedManifest = await loadManifest(serverOutDir)
       }
       return cachedManifest
     },
@@ -80,7 +70,18 @@ export function createRender<T extends Record<string, any> = Record<string, any>
     const app = createApp(component, props)
     const rendered = await renderToString(app, context)
 
-    return transformWithRenderContext(rendered, context)
+    const manifest = context.manifest!
+
+    // Collect CSS for the page entry after rendering so module graph is populated
+    const css = await manifest.getEntryCssIds(componentPath)
+
+    // Collect JS for custom element entry if any island component was rendered
+    const js: string[] = []
+    if (context.hasIsland) {
+      js.push(await manifest.getCustomElementEntryId())
+    }
+
+    return transformWithRenderContext(rendered, { css, js })
   }
 
   render.setLoader = (newLoader: RenderLoader) => {

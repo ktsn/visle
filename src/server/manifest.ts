@@ -1,25 +1,28 @@
 import fs from 'node:fs/promises'
 import path from 'node:path'
 
+import type { EnvironmentModuleNode, RunnableDevEnvironment, ViteDevServer } from 'vite'
 import { parse, SFCBlock } from 'vue/compiler-sfc'
 
 import { generateComponentId } from '../build/component-id.js'
+import { getVisleConfig } from '../build/config.js'
 import { virtualCustomElementEntryPath, customElementEntryPath } from '../build/paths.js'
 import { manifestFileName, type ManifestData } from '../build/plugins/manifest.js'
 
 export interface RuntimeManifest {
   getClientImportId(componentRelativePath: string): Promise<string>
-  getDependingClientCssIds(componentRelativePath: string): Promise<string[]>
+  getEntryCssIds(componentPath: string): Promise<string[]>
+  getCustomElementEntryId(): Promise<string>
 }
 
 /**
  * Loads the manifest file from serverOutDir for production SSR.
  */
-export async function loadManifest(serverOutDir: string, base: string): Promise<RuntimeManifest> {
+export async function loadManifest(serverOutDir: string): Promise<RuntimeManifest> {
   const manifestPath = path.join(serverOutDir, manifestFileName)
-  const basePath = base.replace(/\/$/, '')
 
   const data: ManifestData = JSON.parse(await fs.readFile(manifestPath, 'utf-8'))
+  const basePath = data.base.replace(/\/$/, '')
 
   return {
     async getClientImportId(componentRelativePath: string): Promise<string> {
@@ -30,9 +33,14 @@ export async function loadManifest(serverOutDir: string, base: string): Promise<
       return `${basePath}/${file}`
     },
 
-    async getDependingClientCssIds(componentRelativePath: string): Promise<string[]> {
-      const cssIds = data.cssMap[componentRelativePath] ?? []
+    async getEntryCssIds(componentPath: string): Promise<string[]> {
+      const entryRelativePath = `${data.entryDir}/${componentPath}.vue`
+      const cssIds = data.cssMap[entryRelativePath] ?? []
       return cssIds.map((cssId) => `${basePath}/${cssId}`)
+    },
+
+    async getCustomElementEntryId(): Promise<string> {
+      return `${basePath}/${data.customElementEntry}`
     },
   }
 }
@@ -40,22 +48,64 @@ export async function loadManifest(serverOutDir: string, base: string): Promise<
 /**
  * Creates a dev-mode RuntimeManifest that resolves paths using Vite's dev server.
  */
-export function createDevManifest(
-  viteConfig: {
-    root: string
-    base: string
-    server: { origin?: string }
-  },
-  resolveId: (id: string, importer: string) => Promise<string | undefined>,
-): RuntimeManifest {
-  const { root, base } = viteConfig
+export function createDevManifest(devServer: ViteDevServer): RuntimeManifest {
+  const serverEnv = devServer.environments.server as RunnableDevEnvironment
+  const { root, base } = devServer.config
+  const { entryDir } = getVisleConfig(devServer.config)
 
   // Normalize origin value
-  const origin = viteConfig.server.origin?.replace(/\/$/, '') ?? ''
+  const origin = devServer.config.server.origin?.replace(/\/$/, '') ?? ''
   const basePath = basePathForDev(base)
 
   function applyServeBase(filePath: string): string {
     return `${origin}${basePath}${filePath}`
+  }
+
+  async function getComponentCssIds(componentRelativePath: string): Promise<string[]> {
+    const absPath = path.resolve(root, componentRelativePath)
+
+    if (!absPath.endsWith('.vue')) {
+      return []
+    }
+
+    const code = await fs.readFile(absPath, 'utf-8')
+    const descriptor = parse(code).descriptor
+    const componentId = generateComponentId(componentRelativePath, code, false)
+
+    return Promise.all(
+      descriptor.styles.map(async (style, i) => {
+        const attrsQuery = attrsToQuery(style.attrs, 'css')
+        const srcQuery = style.src ? (style.scoped ? `&src=${componentId}` : '&src=true') : ''
+        const scopedQuery = style.scoped ? `&scoped=${componentId}` : ''
+        const query = `?vue&type=style&index=${i}${srcQuery}${scopedQuery}`
+
+        let stylePath: string
+        if (!style.src) {
+          stylePath = `/${componentRelativePath}`
+        } else if (style.src.startsWith('.')) {
+          stylePath =
+            '/' +
+            path.posix.normalize(path.posix.join(path.dirname(componentRelativePath), style.src))
+        } else {
+          const result = await serverEnv.pluginContainer.resolveId(style.src, absPath)
+          const resolved = result?.id
+          if (resolved) {
+            stylePath = '/' + path.relative(root, resolved)
+          } else {
+            stylePath = '/' + style.src
+          }
+        }
+
+        let styleId = `${stylePath}${query}${attrsQuery}`
+
+        if (style.module) {
+          // inject `.module` before extension so vite handles it as css module
+          styleId = styleId.replace(/\.(\w+)$/, '.module.$1')
+        }
+
+        return applyServeBase(styleId)
+      }),
+    )
   }
 
   return {
@@ -69,50 +119,43 @@ export function createDevManifest(
       return applyServeBase(`/${componentRelativePath}`)
     },
 
-    async getDependingClientCssIds(componentRelativePath: string): Promise<string[]> {
-      const absPath = path.resolve(root, componentRelativePath)
+    async getCustomElementEntryId(): Promise<string> {
+      return applyServeBase(virtualCustomElementEntryPath)
+    },
 
-      if (!absPath.endsWith('.vue')) {
-        return []
+    async getEntryCssIds(componentPath: string): Promise<string[]> {
+      const entryRelativePath = `${entryDir}/${componentPath}.vue`
+      const entryAbsPath = path.resolve(root, entryRelativePath)
+
+      const entryMod = serverEnv.moduleGraph.getModuleById(entryAbsPath)
+      if (!entryMod) {
+        // Module not yet loaded in the module graph, fall back to parsing the entry file
+        return getComponentCssIds(entryRelativePath)
       }
 
-      const code = await fs.readFile(absPath, 'utf-8')
-      const descriptor = parse(code).descriptor
-      const componentId = generateComponentId(componentRelativePath, code, false)
+      // Walk module graph to find all transitively imported .vue files
+      const vueRelativePaths: string[] = []
+      const visited = new Set<string>()
 
-      return Promise.all(
-        descriptor.styles.map(async (style, i) => {
-          const attrsQuery = attrsToQuery(style.attrs, 'css')
-          const srcQuery = style.src ? (style.scoped ? `&src=${componentId}` : '&src=true') : ''
-          const scopedQuery = style.scoped ? `&scoped=${componentId}` : ''
-          const query = `?vue&type=style&index=${i}${srcQuery}${scopedQuery}`
+      const walk = (mod: EnvironmentModuleNode) => {
+        if (!mod.id || visited.has(mod.id)) {
+          return
+        }
+        visited.add(mod.id)
 
-          let stylePath: string
-          if (!style.src) {
-            stylePath = `/${componentRelativePath}`
-          } else if (style.src.startsWith('.')) {
-            stylePath =
-              '/' +
-              path.posix.normalize(path.posix.join(path.dirname(componentRelativePath), style.src))
-          } else {
-            const resolved = await resolveId(style.src, absPath)
-            if (resolved) {
-              stylePath = '/' + path.relative(root, resolved)
-            } else {
-              stylePath = '/' + style.src
-            }
-          }
+        if (mod.id.endsWith('.vue')) {
+          vueRelativePaths.push(path.relative(root, mod.id))
+        }
 
-          let styleId = `${stylePath}${query}${attrsQuery}`
+        for (const imported of mod.importedModules) {
+          walk(imported)
+        }
+      }
+      walk(entryMod)
 
-          if (style.module) {
-            // inject `.module` before extension so vite handles it as css module
-            styleId = styleId.replace(/\.(\w+)$/, '.module.$1')
-          }
-
-          return applyServeBase(styleId)
-        }),
-      )
+      // Collect CSS from all discovered .vue files
+      const cssArrays = await Promise.all(vueRelativePaths.map((p) => getComponentCssIds(p)))
+      return cssArrays.flat()
     },
   }
 }

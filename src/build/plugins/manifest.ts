@@ -1,12 +1,18 @@
 import path from 'node:path'
 
-import { normalizePath, Plugin, ResolvedConfig } from 'vite'
+import { normalizePath, Plugin } from 'vite'
+
+import type { ResolvedVisleConfig } from '../config.js'
+import { customElementEntryPath } from '../paths.js'
 
 export const manifestFileName = 'visle-manifest.json'
 
 export interface ManifestData {
+  base: string
+  entryDir: string
   cssMap: Record<string, string[]>
   jsMap: Record<string, string>
+  customElementEntry: string
 }
 
 interface ManifestPluginResult {
@@ -17,23 +23,24 @@ interface ManifestPluginResult {
 /**
  * Vite plugin that collects CSS/JS manifest data during bundle generation.
  */
-export function manifestPlugin(): ManifestPluginResult {
-  let viteConfig: ResolvedConfig
+export function manifestPlugin(visleConfig: ResolvedVisleConfig): ManifestPluginResult {
+  let base: string
   let cssMap: Map<string, string[]> | undefined
   let jsMap: Map<string, string> | undefined
+  let customElementEntry: string | undefined
 
   const plugin: Plugin = {
     name: 'visle:manifest',
     apply: 'build',
     sharedDuringBuild: true,
 
-    configResolved(resolvedConfig) {
-      viteConfig = resolvedConfig
+    configResolved(viteConfig) {
+      base = viteConfig.base
     },
 
     generateBundle(_options, bundle) {
       const envName = this.environment?.name
-      const root = viteConfig.root
+      const root = this.environment?.config.root ?? ''
 
       if (envName === 'style') {
         const envCssMap = new Map<string, string[]>()
@@ -127,6 +134,9 @@ export function manifestPlugin(): ManifestPluginResult {
         }
 
         jsMap = envJsMap
+
+        const entryKey = normalizePath(path.relative(root, customElementEntryPath))
+        customElementEntry = envJsMap.get(entryKey)
       }
     },
   }
@@ -136,8 +146,11 @@ export function manifestPlugin(): ManifestPluginResult {
 
     getManifestData(): ManifestData {
       return {
+        base,
+        entryDir: visleConfig.entryDir,
         cssMap: Object.fromEntries(cssMap ?? new Map()),
         jsMap: Object.fromEntries(jsMap ?? new Map()),
+        customElementEntry: customElementEntry ?? '',
       }
     },
   }

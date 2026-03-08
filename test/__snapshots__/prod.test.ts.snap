@@ -133,7 +133,11 @@ exports[`Production Build SSR > 'Dynamic import shared CSS' 1`] = `
   <h1>
     Dynamic Shared Styled Page
   </h1>
-  <vue-island entry="/assets/StyledCounter-[hash].js">
+  <vue-island entry="/assets/DynamicImport-[hash].js">
+    <!--[-->
+    <h2>
+      Async Component
+    </h2>
     <button data-v-[scoped]>
       Styled Count: 0
     </button>
@@ -437,6 +441,7 @@ exports[`Production Build SSR > Build output files 1`] = `
   "assets/Counter-[hash].js",
   "assets/CounterA-[hash].js",
   "assets/CounterB-[hash].js",
+  "assets/DynamicImport-[hash].js",
   "assets/ExternalStyledCounter-[hash].js",
   "assets/Inner-[hash].js",
   "assets/NamedExportIsland-[hash].js",
@@ -459,6 +464,7 @@ exports[`Production Build SSR > Build output files 1`] = `
 
 exports[`Production Build SSR > Build output files 2`] = `
 {
+  "base": "/",
   "cssMap": {
     "pages/document.vue": [],
     "pages/named-export.vue": [],
@@ -499,12 +505,15 @@ exports[`Production Build SSR > Build output files 2`] = `
     ],
     "pages/with-slot.vue": [],
   },
+  "customElementEntry": "assets/custom-element-[hash].js",
+  "entryDir": "pages",
   "jsMap": {
     "../../../../src/client/custom-element.ts": "assets/custom-element-[hash].js",
     "components/AliasStyledCounter.vue": "assets/AliasStyledCounter-[hash].js",
     "components/Counter.vue": "assets/Counter-[hash].js",
     "components/CounterA.vue": "assets/CounterA-[hash].js",
     "components/CounterB.vue": "assets/CounterB-[hash].js",
+    "components/DynamicImport.vue": "assets/DynamicImport-[hash].js",
     "components/ExternalStyledCounter.vue": "assets/ExternalStyledCounter-[hash].js",
     "components/Inner.vue": "assets/Inner-[hash].js",
     "components/NamedExportIsland.vue": "assets/NamedExportIsland-[hash].js",
@@ -571,7 +580,11 @@ exports[`Production Build SSR with manual chunks > dynamic import shared CSS pag
   <h1>
     Dynamic Shared Styled Page
   </h1>
-  <vue-island entry="/assets/StyledCounter-[hash].js">
+  <vue-island entry="/assets/DynamicImport-[hash].js">
+    <!--[-->
+    <h2>
+      Async Component
+    </h2>
     <button data-v-[scoped]>
       Styled Count: 0
     </button>

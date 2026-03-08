@@ -46,9 +46,7 @@ export function createDevLoader(viteConfig: InlineConfig = {}): DevRenderLoader 
       }).then((devServer) => {
         return {
           devServer,
-          manifest: createDevManifest(devServer.config, (id, importer) =>
-            devServer.pluginContainer.resolveId(id, importer).then((r) => r?.id),
-          ),
+          manifest: createDevManifest(devServer),
         }
       })
     }

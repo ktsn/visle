@@ -4,7 +4,7 @@ import type { Plugin, ResolvedConfig } from 'vite'
 import { parse } from 'vue/compiler-sfc'
 
 import { generateComponentWrapperCode, componentWrapPrefix } from '../generate.js'
-import { customElementEntryPath, parseId } from '../paths.js'
+import { parseId } from '../paths.js'
 import { buildImportMap, findVClientElements } from '../sfc-analysis.js'
 
 interface ServerTransformPluginResult {
@@ -14,7 +14,7 @@ interface ServerTransformPluginResult {
 
 /**
  * Vite plugin that transforms Vue SFC imports on the server environment.
- * - Redirects `.vue` imports to component wrapper virtual modules
+ * - Redirects island component imports to component wrapper virtual modules
  * - Loads wrapper virtual modules with generated code
  * - Detects `v-client:load` directives and collects island component paths for the islands build
  */
@@ -53,24 +53,14 @@ export function serverTransformPlugin(): ServerTransformPluginResult {
       // Skip when the importer is a wrapper module to avoid infinite recursion.
       const parsedImporter = importer ? parseId(importer) : undefined
       if (parsedImporter?.prefix === componentWrapPrefix) {
-        return
+        return null
       }
 
       const { fileName, query } = parseId(id)
 
       // Skip .vue sub-requests (e.g. ?vue&type=script)
       if (fileName.endsWith('.vue') && query.vue) {
-        return
-      }
-
-      const importerPath = parsedImporter?.fileName
-      const nameMap = importerPath ? componentNameMap.get(importerPath) : undefined
-
-      // For .vue files, always redirect to wrapper (default import).
-      // For non-.vue files, only redirect if componentNameMap has entries.
-      const isVue = fileName.endsWith('.vue')
-      if (!isVue && !nameMap) {
-        return
+        return null
       }
 
       const resolved = await this.resolve(id, importer, { skipSelf: true })
@@ -78,20 +68,16 @@ export function serverTransformPlugin(): ServerTransformPluginResult {
         return null
       }
 
-      const absolutePath = resolved.id
-      const names = nameMap?.get(absolutePath)
+      const importerPath = parsedImporter?.fileName
+      const nameMap = importerPath ? componentNameMap.get(importerPath) : undefined
+      const names = nameMap?.get(resolved.id)
 
-      if (isVue) {
-        const allNames = new Set(names)
-        allNames.add('default')
-        const namesQuery = `?names=${[...allNames].join(',')}`
-        return componentWrapPrefix + absolutePath + namesQuery
+      if (!names || names.size === 0) {
+        return null
       }
 
-      if (names && names.size > 0) {
-        const namesQuery = `?names=${[...names].join(',')}`
-        return componentWrapPrefix + absolutePath + namesQuery
-      }
+      const namesQuery = `?names=${[...names].join(',')}`
+      return componentWrapPrefix + resolved.id + namesQuery
     },
 
     load(id) {
@@ -102,18 +88,9 @@ export function serverTransformPlugin(): ServerTransformPluginResult {
 
       if (prefix === componentWrapPrefix) {
         const componentRelativePath = path.relative(viteConfig.root, fileName)
-        const customElementEntryRelativePath = path.relative(
-          viteConfig.root,
-          customElementEntryPath,
-        )
         const importedNames = query.names ?? []
 
-        return generateComponentWrapperCode(
-          fileName,
-          componentRelativePath,
-          customElementEntryRelativePath,
-          importedNames,
-        )
+        return generateComponentWrapperCode(fileName, componentRelativePath, importedNames)
       }
     },
 

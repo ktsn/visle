@@ -141,7 +141,11 @@ exports[`Dev Server SSR > 'Dynamic import shared CSS' 1`] = `
   <h1>
     Dynamic Shared Styled Page
   </h1>
-  <vue-island entry="/components/StyledCounter.vue">
+  <vue-island entry="/components/DynamicImport.vue">
+    <!--[-->
+    <h2>
+      Async Component
+    </h2>
     <button data-v-[scoped]>
       Styled Count: 0
     </button>

@@ -22,16 +22,13 @@ export function generateServerVirtualEntryCode(entryDir: string, componentIds: s
 export function generateComponentWrapperCode(
   filePath: string,
   componentRelativePath: string,
-  customElementEntryRelativePath: string,
   importedNames: string[],
 ): string {
   const normalizedFilePath = normalizePath(filePath)
   const normalizedRelativePath = normalizePath(componentRelativePath)
-  const normalizedEntryRelativePath = normalizePath(customElementEntryRelativePath)
 
   const serializedFilePath = JSON.stringify(normalizedFilePath)
   const serializedRelativePath = JSON.stringify(normalizedRelativePath)
-  const serializedEntryRelativePath = JSON.stringify(normalizedEntryRelativePath)
 
   const lines = [
     `import { createComponentWrapper } from 'visle/internal'`,
@@ -45,8 +42,8 @@ export function generateComponentWrapperCode(
     for (const [i, name] of importedNames.entries()) {
       lines.push(
         name === 'default'
-          ? `export default createComponentWrapper(${serializedRelativePath}, ${serializedEntryRelativePath}, ${JSON.stringify(name)}, __visle_${i})`
-          : `export const ${name} = createComponentWrapper(${serializedRelativePath}, ${serializedEntryRelativePath}, ${JSON.stringify(name)}, __visle_${i})`,
+          ? `export default createComponentWrapper(${serializedRelativePath}, ${JSON.stringify(name)}, __visle_${i})`
+          : `export const ${name} = createComponentWrapper(${serializedRelativePath}, ${JSON.stringify(name)}, __visle_${i})`,
       )
     }
   }
