@@ -118,6 +118,96 @@ describe('VueIsland custom element', () => {
     })
   })
 
+  describe('visible strategy', () => {
+    let observeCallback: IntersectionObserverCallback
+    let observeOptions: IntersectionObserverInit | undefined
+    let mockDisconnect: ReturnType<typeof vi.fn>
+    let mockObserve: ReturnType<typeof vi.fn>
+
+    beforeEach(() => {
+      mockDisconnect = vi.fn()
+      mockObserve = vi.fn()
+
+      class MockIntersectionObserver {
+        constructor(callback: IntersectionObserverCallback, options?: IntersectionObserverInit) {
+          observeCallback = callback
+          observeOptions = options
+        }
+
+        observe = mockObserve
+        disconnect = mockDisconnect
+        unobserve = vi.fn()
+      }
+
+      vi.stubGlobal('IntersectionObserver', MockIntersectionObserver)
+    })
+
+    test('does not hydrate immediately when strategy is visible', async () => {
+      const el = createIsland({ entry: './test-entry', strategy: 'visible' })
+      document.body.appendChild(el)
+      await flushMicrotasks()
+
+      expect(createSSRApp).not.toHaveBeenCalled()
+      expect(mockObserve).toHaveBeenCalledWith(el.firstElementChild ?? el)
+    })
+
+    test('hydrates when intersection fires', async () => {
+      const el = createIsland({ entry: './test-entry', strategy: 'visible' })
+      document.body.appendChild(el)
+      await flushMicrotasks()
+
+      expect(createSSRApp).not.toHaveBeenCalled()
+
+      // Simulate intersection
+      observeCallback(
+        [{ isIntersecting: true } as IntersectionObserverEntry],
+        {} as IntersectionObserver,
+      )
+      await flushMicrotasks()
+
+      expect(mockDisconnect).toHaveBeenCalled()
+      expect(createSSRApp).toHaveBeenCalledWith({ name: 'TestComponent' }, {})
+    })
+
+    test('cleans up observer on disconnect before visible', async () => {
+      const el = createIsland({ entry: './test-entry', strategy: 'visible' })
+      document.body.appendChild(el)
+      await flushMicrotasks()
+
+      // Disconnect before intersection fires
+      document.body.removeChild(el)
+
+      // Simulate late intersection
+      observeCallback(
+        [{ isIntersecting: true } as IntersectionObserverEntry],
+        {} as IntersectionObserver,
+      )
+      await flushMicrotasks()
+
+      expect(createSSRApp).not.toHaveBeenCalled()
+    })
+
+    test('passes rootMargin to IntersectionObserver from options attribute', async () => {
+      const el = createIsland({
+        entry: './test-entry',
+        strategy: 'visible',
+        options: '{"rootMargin":"200px"}',
+      })
+      document.body.appendChild(el)
+      await flushMicrotasks()
+
+      expect(observeOptions).toEqual({ rootMargin: '200px' })
+    })
+
+    test('does not pass rootMargin when options attribute is absent', async () => {
+      const el = createIsland({ entry: './test-entry', strategy: 'visible' })
+      document.body.appendChild(el)
+      await flushMicrotasks()
+
+      expect(observeOptions).toBeUndefined()
+    })
+  })
+
   describe('disconnectedCallback', () => {
     test('unmounts the app on disconnect', async () => {
       const el = createIsland({ entry: './test-entry' })

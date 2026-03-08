@@ -365,4 +365,11 @@ describe('findVClientElements', () => {
     expect(results).toHaveLength(1)
     expect(results[0]!.tag).toBe('div')
   })
+
+  test('finds element with v-client:visible', () => {
+    const children = parseTemplate('<Counter v-client:visible />')
+    const results = findVClientElements(children)
+    expect(results).toHaveLength(1)
+    expect(results[0]!.tag).toBe('Counter')
+  })
 })

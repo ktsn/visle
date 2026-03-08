@@ -13,15 +13,14 @@ export function createComponentWrapper(
     inheritAttrs: false,
 
     props: {
-      __visle_client__: Boolean,
+      __visle_strategy__: String,
+      __visle_options__: Object,
     },
 
     setup(props, { slots }) {
       const attrs = useAttrs()
 
-      const isIsland = props.__visle_client__
-
-      if (isIsland) {
+      if (props.__visle_strategy__) {
         const context: RenderContext = useSSRContext()!
         const manifest = context.manifest!
 
@@ -41,6 +40,8 @@ export function createComponentWrapper(
 
         return () => {
           const isEmptyProps = Object.keys(attrs).length === 0
+          const strategy = props.__visle_strategy__
+          const options = props.__visle_options__
 
           return h(
             'vue-island',
@@ -48,6 +49,8 @@ export function createComponentWrapper(
               entry: clientImportId,
               'serialized-props': isEmptyProps ? undefined : JSON.stringify(attrs),
               'imported-name': importedName === 'default' ? undefined : importedName,
+              strategy: strategy === 'load' ? undefined : strategy,
+              options: options ? JSON.stringify(options) : undefined,
             },
             [h(OriginalComponent, attrs, slots)],
           )

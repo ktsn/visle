@@ -492,6 +492,7 @@ declare module 'visle' {
   import type { ComponentProps } from 'visle'
 
   interface VisleEntries {
+    'with-visible-island': ComponentProps<typeof import('./pages/with-visible-island.vue')['default']>
     'with-svg-img': ComponentProps<typeof import('./pages/with-svg-img.vue')['default']>
     'with-slot': ComponentProps<typeof import('./pages/with-slot.vue')['default']>
     'with-shared-css': ComponentProps<typeof import('./pages/with-shared-css.vue')['default']>
