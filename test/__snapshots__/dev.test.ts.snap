@@ -383,6 +383,33 @@ exports[`Dev Server SSR > 'Non-ascii file name' 1`] = `
 </p>
 `;
 
+exports[`Dev Server SSR > 'SVG image asset' 1`] = `
+<link
+  rel="stylesheet"
+  href="/pages/with-svg-img.vue?vue&type=style&index=0&lang.css"
+>
+<script
+  type="module"
+  src="/@visle/bootstrap"
+  async
+>
+</script>
+<div class="wrapper">
+  <h1>
+    SVG Image
+  </h1>
+  <img
+    src="/assets/icon.svg"
+    alt="icon"
+  >
+  <vue-island entry="/components/Counter.vue">
+    <button>
+      Count: 0
+    </button>
+  </vue-island>
+</div>
+`;
+
 exports[`Dev Server SSR > 'Same component as island and server' 1`] = `
 <script
   type="module"
@@ -465,6 +492,7 @@ declare module 'visle' {
   import type { ComponentProps } from 'visle'
 
   interface VisleEntries {
+    'with-svg-img': ComponentProps<typeof import('./pages/with-svg-img.vue')['default']>
     'with-slot': ComponentProps<typeof import('./pages/with-slot.vue')['default']>
     'with-shared-css': ComponentProps<typeof import('./pages/with-shared-css.vue')['default']>
     'with-props': ComponentProps<typeof import('./pages/with-props.vue')['default']>

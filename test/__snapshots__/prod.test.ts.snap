@@ -375,6 +375,33 @@ exports[`Production Build SSR > 'Non-ascii file name' 1`] = `
 </p>
 `;
 
+exports[`Production Build SSR > 'SVG image asset' 1`] = `
+<link
+  rel="stylesheet"
+  href="/assets/with-svg-img-[hash].css"
+>
+<script
+  type="module"
+  src="/assets/custom-element-[hash].js"
+  async
+>
+</script>
+<div class="wrapper">
+  <h1>
+    SVG Image
+  </h1>
+  <img
+    src="/assets/icon-[hash].svg"
+    alt="icon"
+  >
+  <vue-island entry="/assets/Counter-[hash].js">
+    <button>
+      Count: 0
+    </button>
+  </vue-island>
+</div>
+`;
+
 exports[`Production Build SSR > 'Same component as island and server' 1`] = `
 <script
   type="module"
@@ -463,6 +490,7 @@ exports[`Production Build SSR > Build output files 1`] = `
   "assets/StyledCounter-[hash].js",
   "assets/_plugin-vue_export-helper-[hash].js",
   "assets/custom-element-[hash].js",
+  "assets/icon-[hash].svg",
   "assets/named-import-[hash].js",
   "assets/vue.runtime.esm-bundler-[hash].js",
   "assets/with-css-[hash].css",
@@ -472,6 +500,7 @@ exports[`Production Build SSR > Build output files 1`] = `
   "assets/with-css-src-alias-[hash].css",
   "assets/with-dynamic-shared-css-[hash].css",
   "assets/with-shared-css-[hash].css",
+  "assets/with-svg-img-[hash].css",
 ]
 `;
 
@@ -520,6 +549,9 @@ exports[`Production Build SSR > Build output files 2`] = `
       "assets/with-shared-css-[hash].css",
     ],
     "pages/with-slot.vue": [],
+    "pages/with-svg-img.vue": [
+      "assets/with-svg-img-[hash].css",
+    ],
   },
   "entryDir": "pages",
   "islandsBootstrap": "assets/custom-element-[hash].js",
@@ -551,6 +583,7 @@ declare module 'visle' {
   import type { ComponentProps } from 'visle'
 
   interface VisleEntries {
+    'with-svg-img': ComponentProps<typeof import('./pages/with-svg-img.vue')['default']>
     'with-slot': ComponentProps<typeof import('./pages/with-slot.vue')['default']>
     'with-shared-css': ComponentProps<typeof import('./pages/with-shared-css.vue')['default']>
     'with-props': ComponentProps<typeof import('./pages/with-props.vue')['default']>
@@ -584,7 +617,7 @@ export {}
 exports[`Production Build SSR with manual chunks > dynamic import shared CSS page includes the merged CSS 1`] = `
 <link
   rel="stylesheet"
-  href="/assets/with-slot-[hash].css"
+  href="/assets/with-svg-img-[hash].css"
 >
 <script
   type="module"
@@ -611,7 +644,7 @@ exports[`Production Build SSR with manual chunks > dynamic import shared CSS pag
 exports[`Production Build SSR with manual chunks > shared CSS page includes the merged CSS 1`] = `
 <link
   rel="stylesheet"
-  href="/assets/with-slot-[hash].css"
+  href="/assets/with-svg-img-[hash].css"
 >
 <script
   type="module"

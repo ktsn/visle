@@ -16,6 +16,7 @@ const hydrationCases: { name: string; component: string; props?: Record<string, 
   { name: 'Multiple islands on the same page', component: 'with-multiple-islands' },
   { name: 'Island with named import', component: 'with-named-import' },
   { name: 'Island with barrel import', component: 'with-barrel-import' },
+  { name: 'SVG image asset', component: 'with-svg-img' },
 ]
 
 /**

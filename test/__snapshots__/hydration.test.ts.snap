@@ -74,3 +74,20 @@ exports[`Client-side Hydration > 'Nested island' 1`] = `
   </vue-island>
 </div>
 `;
+
+exports[`Client-side Hydration > 'SVG image asset' 1`] = `
+<div class="wrapper">
+  <h1>
+    SVG Image
+  </h1>
+  <img
+    src="/assets/icon-[hash].svg"
+    alt="icon"
+  >
+  <vue-island entry="/assets/Counter-[hash].js">
+    <button>
+      Count: 0
+    </button>
+  </vue-island>
+</div>
+`;
