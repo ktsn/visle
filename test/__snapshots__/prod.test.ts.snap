@@ -17,7 +17,7 @@ exports[`Production Build SSR > 'CSS modules' 1`] = `
   rel="stylesheet"
   href="/assets/with-css-module-[hash].css"
 >
-<div class="_container_[css-module-hash]_2">
+<div class="_container_[css-module-hash]">
   CSS Module
 </div>
 `;
