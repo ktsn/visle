@@ -3,8 +3,8 @@ import path from 'node:path'
 
 import { beforeEach, afterEach, describe, expect, test } from 'vitest'
 
-import { manifestFileName } from './manifest.ts'
 import { prodBuild } from '../../../test/utils.ts'
+import { manifestFileName } from './manifest.ts'
 
 const generatedDir = path.resolve(import.meta.dirname, '../../../test/__generated__/server')
 
