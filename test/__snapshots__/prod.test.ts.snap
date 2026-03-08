@@ -1,5 +1,17 @@
 // Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
 
+exports[`Production Build SSR > 'CSS import in script' 1`] = `
+<link
+  rel="stylesheet"
+  href="/assets/with-css-import-[hash].css"
+>
+<div>
+  <h2>
+    CSS Import Page
+  </h2>
+</div>
+`;
+
 exports[`Production Build SSR > 'CSS modules' 1`] = `
 <link
   rel="stylesheet"
@@ -454,6 +466,7 @@ exports[`Production Build SSR > Build output files 1`] = `
   "assets/named-import-[hash].js",
   "assets/vue.runtime.esm-bundler-[hash].js",
   "assets/with-css-[hash].css",
+  "assets/with-css-import-[hash].css",
   "assets/with-css-module-[hash].css",
   "assets/with-css-src-[hash].css",
   "assets/with-css-src-alias-[hash].css",
@@ -472,6 +485,9 @@ exports[`Production Build SSR > Build output files 2`] = `
     "pages/non-ascii-テスト.vue": [],
     "pages/static.vue": [],
     "pages/with-barrel-import.vue": [],
+    "pages/with-css-import.vue": [
+      "assets/with-css-import-[hash].css",
+    ],
     "pages/with-css-module.vue": [
       "assets/with-css-module-[hash].css",
     ],
@@ -552,6 +568,7 @@ declare module 'visle' {
     'with-css-src': ComponentProps<typeof import('./pages/with-css-src.vue')['default']>
     'with-css-src-alias': ComponentProps<typeof import('./pages/with-css-src-alias.vue')['default']>
     'with-css-module': ComponentProps<typeof import('./pages/with-css-module.vue')['default']>
+    'with-css-import': ComponentProps<typeof import('./pages/with-css-import.vue')['default']>
     'with-barrel-import': ComponentProps<typeof import('./pages/with-barrel-import.vue')['default']>
     'static': ComponentProps<typeof import('./pages/static.vue')['default']>
     'non-ascii-テスト': ComponentProps<typeof import('./pages/non-ascii-テスト.vue')['default']>

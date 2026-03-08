@@ -8,6 +8,7 @@ import { generateComponentId } from '../build/component-id.js'
 import { getVisleConfig } from '../build/config.js'
 import { virtualIslandsBootstrapPath } from '../build/paths.js'
 import { manifestFileName, type ManifestData } from '../build/plugins/manifest.js'
+import { isCSS } from '../core/path.js'
 
 export interface RuntimeManifest {
   getClientImportId(componentRelativePath: string): Promise<string>
@@ -127,8 +128,9 @@ export function createDevManifest(devServer: ViteDevServer): RuntimeManifest {
         return getComponentCssIds(entryRelativePath)
       }
 
-      // Walk module graph to find all transitively imported .vue files
-      const vueRelativePaths: string[] = []
+      // Walk module graph to find all transitively imported .vue and CSS files
+      // preserving discovery order
+      const discovered: ({ type: 'css'; id: string } | { type: 'vue'; relativePath: string })[] = []
       const visited = new Set<string>()
 
       const walk = (mod: EnvironmentModuleNode) => {
@@ -138,7 +140,9 @@ export function createDevManifest(devServer: ViteDevServer): RuntimeManifest {
         visited.add(mod.id)
 
         if (mod.id.endsWith('.vue')) {
-          vueRelativePaths.push(path.relative(root, mod.id))
+          discovered.push({ type: 'vue', relativePath: path.relative(root, mod.id) })
+        } else if (!mod.id.includes('?vue') && isCSS(mod.id)) {
+          discovered.push({ type: 'css', id: applyServeBase('/' + path.relative(root, mod.id)) })
         }
 
         for (const imported of mod.importedModules) {
@@ -147,9 +151,13 @@ export function createDevManifest(devServer: ViteDevServer): RuntimeManifest {
       }
       walk(entryMod)
 
-      // Collect CSS from all discovered .vue files
-      const cssArrays = await Promise.all(vueRelativePaths.map((p) => getComponentCssIds(p)))
-      return cssArrays.flat()
+      // Resolve CSS ids in discovery order
+      const cssIdArrays = await Promise.all(
+        discovered.map((entry) =>
+          entry.type === 'css' ? [entry.id] : getComponentCssIds(entry.relativePath),
+        ),
+      )
+      return cssIdArrays.flat()
     },
   }
 }

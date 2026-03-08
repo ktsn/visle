@@ -5,11 +5,7 @@
 
 import type { Plugin } from 'vite'
 
-const cssRE = /\.(?:css|scss|sass|postcss|pcss|less|stylus|styl)(?:\?[^.]+)?$/
-
-function isCSS(id: string): boolean {
-  return cssRE.test(id)
-}
+import { isCSS } from '../../core/path.js'
 
 /**
  * Development-only plugin that removes server-rendered `<link>` style tags
