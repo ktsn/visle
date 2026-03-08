@@ -5,7 +5,7 @@ import type { ResolvedConfig, ViteDevServer } from 'vite'
 import { describe, test, expect, vi, beforeEach, afterEach } from 'vitest'
 
 import { asAbs } from '../../core/path.ts'
-import { defaultConfig } from '../config.ts'
+import { defaultConfig } from '../../core/config.ts'
 import { resolveServerComponentIds } from '../paths.ts'
 import { entryTypesPlugin } from './entry-types.ts'
 

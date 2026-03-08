@@ -1,6 +1,6 @@
 import crypto from 'node:crypto'
 
-import { normalizePath } from 'vite'
+import { normalizePath } from './path.js'
 
 /**
  * Borrowed from @vitejs/plugin-vue
