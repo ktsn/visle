@@ -12,6 +12,7 @@ import { manifestFileName, type ManifestData } from '../build/plugins/manifest.j
 export interface RuntimeManifest {
   getClientImportId(componentRelativePath: string): Promise<string>
   getEntryCssIds(componentPath: string): Promise<string[]>
+  getCustomElementEntryId(): Promise<string>
 }
 
 /**
@@ -36,6 +37,10 @@ export async function loadManifest(serverOutDir: string): Promise<RuntimeManifes
       const entryRelativePath = `${data.entryDir}/${componentPath}.vue`
       const cssIds = data.cssMap[entryRelativePath] ?? []
       return cssIds.map((cssId) => `${basePath}/${cssId}`)
+    },
+
+    async getCustomElementEntryId(): Promise<string> {
+      return `${basePath}/${data.customElementEntry}`
     },
   }
 }
@@ -112,6 +117,10 @@ export function createDevManifest(devServer: ViteDevServer): RuntimeManifest {
       }
 
       return applyServeBase(`/${componentRelativePath}`)
+    },
+
+    async getCustomElementEntryId(): Promise<string> {
+      return applyServeBase(virtualCustomElementEntryPath)
     },
 
     async getEntryCssIds(componentPath: string): Promise<string[]> {

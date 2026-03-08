@@ -6,7 +6,6 @@ import { islandSymbol } from './symbol.js'
 
 export function createComponentWrapper(
   normalizedRelativePath: string,
-  normalizedEntryRelativePath: string,
   importedName: string,
   OriginalComponent: Component,
 ) {
@@ -32,15 +31,8 @@ export function createComponentWrapper(
         let clientImportId = ''
 
         onServerPrefetch(async () => {
-          const [resolvedClientImportId, entryImportId] = await Promise.all([
-            manifest.getClientImportId(normalizedRelativePath),
-            manifest.getClientImportId(normalizedEntryRelativePath),
-          ])
-
-          clientImportId = resolvedClientImportId
-
-          context.loadJs ??= new Set()
-          context.loadJs.add(entryImportId)
+          clientImportId = await manifest.getClientImportId(normalizedRelativePath)
+          context.hasIsland = true
         })
 
         if (inIsland) {

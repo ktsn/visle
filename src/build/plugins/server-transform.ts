@@ -4,7 +4,7 @@ import type { Plugin, ResolvedConfig } from 'vite'
 import { parse } from 'vue/compiler-sfc'
 
 import { generateComponentWrapperCode, componentWrapPrefix } from '../generate.js'
-import { customElementEntryPath, parseId } from '../paths.js'
+import { parseId } from '../paths.js'
 import { buildImportMap, findVClientElements } from '../sfc-analysis.js'
 
 interface ServerTransformPluginResult {
@@ -88,18 +88,9 @@ export function serverTransformPlugin(): ServerTransformPluginResult {
 
       if (prefix === componentWrapPrefix) {
         const componentRelativePath = path.relative(viteConfig.root, fileName)
-        const customElementEntryRelativePath = path.relative(
-          viteConfig.root,
-          customElementEntryPath,
-        )
         const importedNames = query.names ?? []
 
-        return generateComponentWrapperCode(
-          fileName,
-          componentRelativePath,
-          customElementEntryRelativePath,
-          importedNames,
-        )
+        return generateComponentWrapperCode(fileName, componentRelativePath, importedNames)
       }
     },
 

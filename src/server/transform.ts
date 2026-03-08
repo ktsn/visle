@@ -1,25 +1,24 @@
-import { RenderContext } from './render.js'
+export interface Injection {
+  css: string[]
+  js: string[]
+}
 
-export function transformWithRenderContext(html: string, context: RenderContext): string {
-  const injecting = createInjectingHtml(context)
+export function transformWithRenderContext(html: string, injection: Injection): string {
+  const injecting = createInjectingHtml(injection)
   const point = findInjectionPoint(html)
 
   return html.slice(0, point) + injecting + html.slice(point)
 }
 
-function createInjectingHtml(context: RenderContext): string {
+function createInjectingHtml(injection: Injection): string {
   let injecting = ''
 
-  if (context.loadCss) {
-    for (const href of context.loadCss) {
-      injecting += `<link rel="stylesheet" href="${href}">`
-    }
+  for (const href of injection.css) {
+    injecting += `<link rel="stylesheet" href="${href}">`
   }
 
-  if (context.loadJs) {
-    for (const src of context.loadJs) {
-      injecting += `<script type="module" src="${src}" async></script>`
-    }
+  for (const src of injection.js) {
+    injecting += `<script type="module" src="${src}" async></script>`
   }
 
   return injecting
