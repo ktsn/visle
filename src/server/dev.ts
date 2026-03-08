@@ -44,17 +44,9 @@ export function createDevLoader(viteConfig: InlineConfig = {}): DevRenderLoader 
         },
         logLevel: 'silent',
       }).then((devServer) => {
-        const visleConfig = getVisleConfig(devServer.config)
-        const serverEnv = devServer.environments.server as RunnableDevEnvironment
-
         return {
           devServer,
-          manifest: createDevManifest(
-            devServer.config,
-            visleConfig.entryDir,
-            (id, importer) => devServer.pluginContainer.resolveId(id, importer).then((r) => r?.id),
-            () => serverEnv.moduleGraph,
-          ),
+          manifest: createDevManifest(devServer),
         }
       })
     }

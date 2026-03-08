@@ -1,10 +1,11 @@
 import fs from 'node:fs/promises'
 import path from 'node:path'
 
-import type { EnvironmentModuleGraph, EnvironmentModuleNode } from 'vite'
+import type { EnvironmentModuleNode, RunnableDevEnvironment, ViteDevServer } from 'vite'
 import { parse, SFCBlock } from 'vue/compiler-sfc'
 
 import { generateComponentId } from '../build/component-id.js'
+import { getVisleConfig } from '../build/config.js'
 import { virtualCustomElementEntryPath, customElementEntryPath } from '../build/paths.js'
 import { manifestFileName, type ManifestData } from '../build/plugins/manifest.js'
 
@@ -42,20 +43,13 @@ export async function loadManifest(serverOutDir: string): Promise<RuntimeManifes
 /**
  * Creates a dev-mode RuntimeManifest that resolves paths using Vite's dev server.
  */
-export function createDevManifest(
-  viteConfig: {
-    root: string
-    base: string
-    server: { origin?: string }
-  },
-  entryDir: string,
-  resolveId: (id: string, importer: string) => Promise<string | undefined>,
-  getModuleGraph?: () => EnvironmentModuleGraph,
-): RuntimeManifest {
-  const { root, base } = viteConfig
+export function createDevManifest(devServer: ViteDevServer): RuntimeManifest {
+  const serverEnv = devServer.environments.server as RunnableDevEnvironment
+  const { root, base } = devServer.config
+  const { entryDir } = getVisleConfig(devServer.config)
 
   // Normalize origin value
-  const origin = viteConfig.server.origin?.replace(/\/$/, '') ?? ''
+  const origin = devServer.config.server.origin?.replace(/\/$/, '') ?? ''
   const basePath = basePathForDev(base)
 
   function applyServeBase(filePath: string): string {
@@ -88,7 +82,8 @@ export function createDevManifest(
             '/' +
             path.posix.normalize(path.posix.join(path.dirname(componentRelativePath), style.src))
         } else {
-          const resolved = await resolveId(style.src, absPath)
+          const result = await serverEnv.pluginContainer.resolveId(style.src, absPath)
+          const resolved = result?.id
           if (resolved) {
             stylePath = '/' + path.relative(root, resolved)
           } else {
@@ -121,16 +116,12 @@ export function createDevManifest(
 
     async getEntryCssIds(componentPath: string): Promise<string[]> {
       const entryRelativePath = `${entryDir}/${componentPath}.vue`
-
-      if (!getModuleGraph) {
-        return getComponentCssIds(entryRelativePath)
-      }
-
-      const moduleGraph = getModuleGraph()
       const entryAbsPath = path.resolve(root, entryRelativePath)
-      const entryMod = moduleGraph.getModuleById(entryAbsPath)
+
+      const entryMod = serverEnv.moduleGraph.getModuleById(entryAbsPath)
       if (!entryMod) {
-        return []
+        // Module not yet loaded in the module graph, fall back to parsing the entry file
+        return getComponentCssIds(entryRelativePath)
       }
 
       // Walk module graph to find all transitively imported .vue files
