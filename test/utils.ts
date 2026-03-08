@@ -5,6 +5,7 @@ import { fileURLToPath } from 'node:url'
 import { createBuilder, mergeConfig, type UserConfig } from 'vite'
 
 import { visle } from '../src/build/index.ts'
+import { asRel } from '../src/core/path.ts'
 import { createDevLoader } from '../src/server/dev.ts'
 import { createRender } from '../src/server/render.ts'
 
@@ -135,5 +136,5 @@ export async function listFiles(dir: string): Promise<string[]> {
   const entries = await fs.readdir(dir, { withFileTypes: true, recursive: true })
   return entries
     .filter((e) => e.isFile())
-    .map((e) => path.relative(dir, path.join(e.parentPath, e.name)))
+    .map((e) => asRel(path.relative(dir, path.join(e.parentPath, e.name))))
 }
