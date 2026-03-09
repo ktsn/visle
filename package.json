@@ -1,6 +1,6 @@
 {
   "name": "visle",
-  "version": "0.2.7",
+  "version": "0.3.0",
   "description": "Islands Architecture renderer for Vue.js",
   "keywords": [
     "Vue.js",
