@@ -11,6 +11,10 @@
   ],
   "license": "MIT",
   "author": "Katashin",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/ktsn/visle"
+  },
   "files": [
     "dist"
   ],
