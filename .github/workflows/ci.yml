@@ -62,13 +62,17 @@ jobs:
     steps:
       - uses: actions/checkout@v6
 
-      - uses: denoland/setup-deno@v2
+      - uses: pnpm/action-setup@v4
 
-      - name: Install dependencies
-        run: deno install
+      - uses: actions/setup-node@v6
+        with:
+          node-version: lts/*
+          cache: pnpm
+
+      - run: pnpm install
 
       - name: Publish dry run
-        run: deno publish --dry-run
+        run: npx jsr publish --dry-run
 
   test:
     runs-on: ${{ matrix.os }}
