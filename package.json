@@ -30,8 +30,7 @@
     "format:check": "oxfmt --check",
     "docs:dev": "vitepress dev docs",
     "docs:build": "vitepress build docs",
-    "docs:preview": "vitepress preview docs",
-    "prepublishOnly": "pnpm lint && pnpm run test --run && rm -rf dist && pnpm build"
+    "docs:preview": "vitepress preview docs"
   },
   "dependencies": {
     "@vitejs/plugin-vue": "^6.0.3",
