@@ -6,31 +6,6 @@ on:
       - 'v*'
 
 jobs:
-  github-release:
-    runs-on: ubuntu-latest
-
-    permissions:
-      contents: write
-
-    steps:
-      - uses: actions/checkout@v6
-        with:
-          fetch-depth: 0
-
-      - uses: pnpm/action-setup@v4
-
-      - uses: actions/setup-node@v6
-        with:
-          node-version: lts/*
-          cache: pnpm
-
-      - run: pnpm install
-
-      - name: Create GitHub Release
-        run: pnpm changelogithub
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-
   publish-npm:
     runs-on: ubuntu-latest
 
@@ -71,3 +46,32 @@ jobs:
 
       - name: Publish to JSR
         run: npx jsr publish
+
+  github-release:
+    needs:
+      - publish-npm
+      - publish-jsr
+
+    runs-on: ubuntu-latest
+
+    permissions:
+      contents: write
+
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          fetch-depth: 0
+
+      - uses: pnpm/action-setup@v4
+
+      - uses: actions/setup-node@v6
+        with:
+          node-version: lts/*
+          cache: pnpm
+
+      - run: pnpm install
+
+      - name: Create GitHub Release
+        run: pnpm changelogithub
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
