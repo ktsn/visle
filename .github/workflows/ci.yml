@@ -64,6 +64,9 @@ jobs:
 
       - uses: denoland/setup-deno@v2
 
+      - name: Install dependencies
+        run: deno install
+
       - name: Publish dry run
         run: deno publish --dry-run
 
