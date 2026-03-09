@@ -7,7 +7,7 @@ In production, Visle serves pre-built assets from the Vite build output.
 Running `vite build` produces two directories:
 
 - **`dist/client`** (default) — Client-side assets (CSS, island JavaScript)
-- **`dist/server`** (default) — Server-side script for HTML rendering and manifest
+- **`dist/server`** (default) — Server-side components for HTML rendering and the asset manifest
 
 You can customize these paths in the Visle plugin config:
 
@@ -27,7 +27,7 @@ export default defineConfig({
 
 ## Serving Static Assets
 
-You have to serve the `dist/client` directory as static files so that CSS and island JavaScript are available to the browser:
+Serve the `dist/client` directory as static files so that CSS and island JavaScript are available to the browser:
 
 ```ts
 import express from 'express'

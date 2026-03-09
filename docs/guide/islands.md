@@ -6,7 +6,7 @@ Visle uses the Islands Architecture pattern. Your pages are rendered as static H
 
 An island is a Vue component that needs to be interactive in the browser. The rest of the page remains static HTML with zero JavaScript.
 
-To make a component an island, use the `v-client` directive on it in your template. Any Vue component can become an island. You can specify a hydration strategy after `v-client:` to control when the component is hydrated.
+To make a component an island, use the `v-client` directive in your template. Any Vue component can become an island. You can specify a hydration strategy after `v-client:` to control when the component is hydrated.
 
 ### `v-client:load`
 
@@ -18,7 +18,7 @@ Hydrates the component immediately when the page loads:
 
 ### `v-client:visible`
 
-Defers hydration until the component scrolls into the viewport, using `IntersectionObserver`:
+Defers hydration until the component enters the viewport, using `IntersectionObserver`:
 
 ```vue
 <MyComponent v-client:visible />
@@ -52,7 +52,7 @@ Functions, class instances, and other non-serializable values are not supported 
 
 ## How It Works
 
-Each island component gets its own JavaScript entry point. When the page loads:
+Each island component gets its own JavaScript bundle. When the page loads:
 
 1. The server renders the full page as HTML, including the island's initial content
 2. Island components are wrapped in `<vue-island>` custom elements

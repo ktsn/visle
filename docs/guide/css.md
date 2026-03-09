@@ -4,9 +4,9 @@ Visle automatically handles CSS extraction and injection for your components.
 
 ## Per-Entry CSS Splitting
 
-CSS is split per entry component. When you render a component with the render function, only the CSS needed for that page is included in the HTML output as `<link>` elements.
+CSS is split per entry component. When you render a page, only the CSS needed for that page is included in the HTML output as `<link>` elements.
 
-This includes CSS from the entry component itself and all transitively imported components. If your page imports another component with CSS, all their styles are collected and injected.
+This includes CSS from the entry component itself and all transitively imported components. Their styles are collected and injected automatically.
 
 ## Customizing CSS Chunking
 

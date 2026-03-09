@@ -95,7 +95,7 @@ app.listen(3000)
 
 ### Build and Run
 
-Build the client assets with Vite, then run your server entry directly. Access `http://localhost:3000` to see the render result:
+Build the client assets with Vite, then run your server entry directly. Access `http://localhost:3000` to see the rendered page:
 
 ```sh
 npx vite build

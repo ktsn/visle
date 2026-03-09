@@ -4,7 +4,7 @@ Visle provides a dev loader that integrates with Vite's dev server for hot modul
 
 ## Setting Up the Dev Loader
 
-Use `createDevLoader()` from `visle/dev` to create a development loader and connect it to your render instance with `setLoader()`:
+Use `createDevLoader()` from `visle/dev` to create a development loader and connect it to your render function with `setLoader()`:
 
 ```ts
 import { createRender } from 'visle'
@@ -12,12 +12,12 @@ import { createDevLoader } from 'visle/dev'
 
 const render = createRender()
 
-// Create dev loader and set it to render function on development
+// Create and set the dev loader
 const loader = createDevLoader()
 render.setLoader(loader)
 ```
 
-The loader also provides a Connect-compatible middleware for serving Vite's development assets. You need to add `loader.middleware` to your server:
+The loader also provides a Connect-compatible middleware for serving Vite's development assets. Add `loader.middleware` to your server:
 
 ```ts
 import express from 'express'
@@ -29,10 +29,10 @@ const app = express()
 const render = createRender()
 
 if (process.env.NODE_ENV === 'production') {
-  // Serve client assets built with Vite on production
+  // Serve client assets built with Vite in production
   app.use('/assets', express.static('dist/client/assets'))
 } else {
-  // Set dev loader and serve Vite dev assets on development
+  // Set dev loader and serve Vite dev assets in development
   const loader = createDevLoader()
   render.setLoader(loader)
 
@@ -49,7 +49,7 @@ app.listen(3000)
 
 ## Custom Vite Config
 
-You can pass Vite configuration to `createDevLoader()`. The dev loader automatically loads your Vite config file, so in most cases you only need to write your settings in the Vite config without using inline config:
+You can pass Vite configuration to `createDevLoader()`. The dev loader automatically loads your Vite config file, so in most cases you only need to write your settings in the Vite config without passing inline config:
 
 ```ts
 const loader = createDevLoader({
