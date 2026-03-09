@@ -114,7 +114,7 @@ export default defineConfig({
 interface VisleConfig {
   /**
    * Directory containing page entry components.
-   * Default: 'pages'
+   * Default: 'src/pages'
    */
   entryDir?: string
 
