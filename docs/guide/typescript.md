@@ -1,0 +1,90 @@
+# TypeScript
+
+Visle generates type definitions to provide type-safe rendering with auto-completion for component names and props.
+
+## Generated Type Definitions
+
+When you run `vite build`, Visle generates a `visle-generated.d.ts` file in your project root. This file declares the available entry components and their prop types.
+
+Example generated file:
+
+```ts
+// visle-generated.d.ts
+import 'visle'
+
+declare module 'visle' {
+  interface VisleEntries {
+    index: { products: Product[] }
+    detail: { product: Product }
+  }
+}
+```
+
+## Including in `tsconfig.json`
+
+Make sure the generated file is included in your TypeScript configuration:
+
+```json
+{
+  "include": ["visle-generated.d.ts", "**/*.ts", "**/*.vue"]
+}
+```
+
+## Type-Safe Render Calls
+
+Import `VisleEntries` and pass it as a type parameter to `createRender()`:
+
+```ts
+import { createRender, type VisleEntries } from 'visle'
+
+const render = createRender<VisleEntries>()
+```
+
+Now render calls are fully type-checked:
+
+```ts
+// Type-checked: component name and props
+await render('index', { products: [] })
+
+// Type error: unknown component
+await render('nonexistent')
+
+// Type error: wrong props
+await render('index', { wrong: true })
+```
+
+## Customizing the Output Path
+
+By default, the type definition file is written to `visle-generated.d.ts`. You can change this with the `dts` option:
+
+```ts
+import { visle } from 'visle/build'
+import { defineConfig } from 'vite'
+
+export default defineConfig({
+  plugins: [
+    visle({
+      dts: 'src/types/visle.d.ts',
+    }),
+  ],
+})
+```
+
+To disable type generation entirely, set `dts` to `null`:
+
+```ts
+visle({
+  dts: null,
+})
+```
+
+## `ComponentProps` Utility Type
+
+Use `ComponentProps<T>` to extract the props type of a Vue component:
+
+```ts
+import { type ComponentProps } from 'visle'
+import MyComponent from './components/MyComponent.vue'
+
+type Props = ComponentProps<typeof MyComponent>
+```

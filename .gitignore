@@ -1,5 +1,6 @@
 node_modules/
 dist/
+**/.vitepress/cache/
 __generated__/
 coverage/
 *.tsbuildinfo
