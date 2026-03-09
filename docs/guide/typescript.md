@@ -4,7 +4,7 @@ Visle generates type definitions to provide type-safe rendering with auto-comple
 
 ## Generated Type Definitions
 
-When you run `vite build`, Visle generates a `visle-generated.d.ts` file in your project root. This file declares the available entry components and their prop types.
+When you run `vite build` (or `vite dev`), Visle generates a `visle-generated.d.ts` file in your project root. This file declares the available entry components and their prop types.
 
 Example generated file:
 
@@ -22,7 +22,7 @@ declare module 'visle' {
 
 ## Including in `tsconfig.json`
 
-Make sure the generated file is included in your TypeScript configuration:
+Make sure the generated file is included in your TypeScript configuration's `include` or `files`:
 
 ```json
 {
@@ -76,15 +76,4 @@ To disable type generation entirely, set `dts` to `null`:
 visle({
   dts: null,
 })
-```
-
-## `ComponentProps` Utility Type
-
-Use `ComponentProps<T>` to extract the props type of a Vue component:
-
-```ts
-import { type ComponentProps } from 'visle'
-import MyComponent from './components/MyComponent.vue'
-
-type Props = ComponentProps<typeof MyComponent>
 ```

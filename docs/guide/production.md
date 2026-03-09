@@ -1,13 +1,13 @@
 # Production
 
-In production, Visle serves pre-built assets from the Vite build output. No dev loader is needed.
+In production, Visle serves pre-built assets from the Vite build output.
 
 ## Build Output
 
 Running `vite build` produces two directories:
 
 - **`dist/client`** (default) — Client-side assets (CSS, island JavaScript)
-- **`dist/server`** (default) — Server-side entry and manifest
+- **`dist/server`** (default) — Server-side script for HTML rendering and manifest
 
 You can customize these paths in the Visle plugin config:
 
@@ -27,9 +27,7 @@ export default defineConfig({
 
 ## Serving Static Assets
 
-Serve the `dist/client` directory as static files so that CSS and island JavaScript are available to the browser.
-
-### Express
+You have to serve the `dist/client` directory as static files so that CSS and island JavaScript are available to the browser:
 
 ```ts
 import express from 'express'
@@ -38,6 +36,7 @@ import { createRender } from 'visle'
 const app = express()
 const render = createRender()
 
+// Serve the built assets
 app.use('/assets', express.static('dist/client/assets'))
 
 app.get('/', async (req, res) => {
@@ -46,18 +45,6 @@ app.get('/', async (req, res) => {
 })
 
 app.listen(3000)
-```
-
-### Hono
-
-```ts
-import { serve } from '@hono/node-server'
-import { serveStatic } from '@hono/node-server/serve-static'
-import { app } from './server.ts'
-
-app.use('/assets/*', serveStatic({ root: 'dist/client' }))
-
-serve({ fetch: app.fetch, port: 3000 })
 ```
 
 ## Custom `serverOutDir`
@@ -71,7 +58,3 @@ const render = createRender({
 ```
 
 This tells the render function where to find the pre-built server components and manifest.
-
-## No Loader in Production
-
-In production mode, `createRender()` loads components directly from the build output. There is no need to call `setLoader()` or use `createDevLoader()`.

@@ -9,7 +9,7 @@ Creates a render function that renders Vue components to HTML strings.
 ```ts
 import { createRender } from 'visle'
 
-const render = createRender<VisleEntries>()
+const render = createRender()
 const html = await render('index', { title: 'Hello' })
 ```
 
@@ -49,17 +49,6 @@ const render = createRender<VisleEntries>()
 ```
 
 See the [TypeScript guide](../guide/typescript) for details.
-
-### `ComponentProps<T>`
-
-A utility type that extracts the props type from a Vue component.
-
-```ts
-import { type ComponentProps } from 'visle'
-import Counter from './Counter.vue'
-
-type CounterProps = ComponentProps<typeof Counter>
-```
 
 ## `visle/dev` Module
 
@@ -157,7 +146,7 @@ interface VisleConfig {
 Hydrates an island component immediately when the page loads.
 
 ```vue
-<Counter v-client:load />
+<MyComponent v-client:load />
 ```
 
 ### `v-client:visible`
@@ -165,7 +154,7 @@ Hydrates an island component immediately when the page loads.
 Hydrates an island component when it enters the viewport.
 
 ```vue
-<Counter v-client:visible />
+<MyComponent v-client:visible />
 ```
 
 **Options:**
@@ -173,5 +162,5 @@ Hydrates an island component when it enters the viewport.
 - `rootMargin` — Margin around the viewport for triggering hydration early
 
 ```vue
-<Counter v-client:visible="{ rootMargin: '200px' }" />
+<MyComponent v-client:visible="{ rootMargin: '200px' }" />
 ```

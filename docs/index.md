@@ -52,11 +52,24 @@ import Counter from '../components/Counter.vue'
 </template>
 ```
 
+```vue
+<!-- components/Counter.vue -->
+<script setup lang="ts">
+import { ref } from 'vue'
+
+const count = ref(0)
+</script>
+
+<template>
+  <button @click="count++">Count: {{ count }}</button>
+</template>
+```
+
 Components used with a `v-client` directive become interactive islands that are hydrated on the client.
 
 ### Create a Server Entry
 
-Create a server file (e.g. `server.ts`) that uses `createRender()` to render pages to HTML:
+Create a server file (e.g. `server.ts`) that uses `createRender()` to render pages to HTML. This example uses Express, but you can use any server library such as Hono, Fastify, or the built-in `node:http` module:
 
 ```ts
 // server.ts
@@ -64,11 +77,15 @@ import express from 'express'
 import { createRender } from 'visle'
 
 const app = express()
+
+// Visle's render function
 const render = createRender()
 
+// Serve client assets built with Vite
 app.use('/assets', express.static('dist/client/assets'))
 
 app.get('/', async (req, res) => {
+  // Render html string with pages/index.vue
   const html = await render('index')
   res.send(html)
 })
@@ -78,7 +95,7 @@ app.listen(3000)
 
 ### Build and Run
 
-Build the client assets with Vite, then run your server entry directly:
+Build the client assets with Vite, then run your server entry directly. Access `http://localhost:3000` to see the render result:
 
 ```sh
 npx vite build
