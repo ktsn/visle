@@ -40,7 +40,12 @@ describe('createRender', () => {
   })
 
   describe('isDev = false', () => {
-    const emptyManifest = JSON.stringify({ base: '/', entryDir: 'pages', cssMap: {}, jsMap: {} })
+    const emptyManifest = JSON.stringify({
+      base: '/',
+      entryDir: 'src/pages',
+      cssMap: {},
+      jsMap: {},
+    })
 
     test('renders vue component with props', async () => {
       const render = createRender({
@@ -173,7 +178,7 @@ describe('createRender', () => {
       render.setLoader(loader)
 
       await saveCodes(root, {
-        'pages/Comp.vue': `
+        'src/pages/Comp.vue': `
           <template>
             <div>Hello</div>
           </template>`,
