@@ -57,6 +57,16 @@ jobs:
       - name: Build
         run: pnpm build
 
+  publish-dry-run:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+
+      - uses: denoland/setup-deno@v2
+
+      - name: Publish dry run
+        run: deno publish --dry-run
+
   test:
     runs-on: ${{ matrix.os }}
     strategy:
