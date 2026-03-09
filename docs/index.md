@@ -33,10 +33,10 @@ export default defineConfig({
 
 ### Create a Page Component
 
-Create a Vue component in the `pages/` directory. This is the default entry directory for Visle.
+Create a Vue component in the `src/pages/` directory. This is the default entry directory for Visle.
 
 ```vue
-<!-- pages/index.vue -->
+<!-- src/pages/index.vue -->
 <script setup lang="ts">
 import Counter from '../components/Counter.vue'
 </script>
@@ -55,7 +55,7 @@ import Counter from '../components/Counter.vue'
 ```
 
 ```vue
-<!-- components/Counter.vue -->
+<!-- src/components/Counter.vue -->
 <script setup lang="ts">
 import { ref } from 'vue'
 
@@ -87,7 +87,7 @@ const render = createRender()
 app.use('/assets', express.static('dist/client/assets'))
 
 app.get('/', async (req, res) => {
-  // Render html string with pages/index.vue
+  // Render html string with src/pages/index.vue
   const html = await render('index')
   res.send(html)
 })

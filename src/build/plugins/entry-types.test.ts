@@ -54,12 +54,12 @@ describe('entryTypesPlugin', () => {
     const { plugin } = createPlugin()
     const watcher = createWatcher()
 
-    vi.mocked(resolveServerComponentIds).mockReturnValue([asAbs('/project/pages/Index.vue')])
+    vi.mocked(resolveServerComponentIds).mockReturnValue([asAbs('/project/src/pages/Index.vue')])
 
     const hook = plugin.configureServer as (server: ViteDevServer) => Promise<void>
     await hook(createServer(watcher))
 
-    expect(resolveServerComponentIds).toHaveBeenCalledWith('/project/pages')
+    expect(resolveServerComponentIds).toHaveBeenCalledWith('/project/src/pages')
     expect(fs.writeFile).toHaveBeenCalledWith(
       '/project/visle-generated.d.ts',
       expect.stringMatching('Index'),
@@ -69,11 +69,11 @@ describe('entryTypesPlugin', () => {
   test('generates dts via generate() for build', async () => {
     const { generate } = createPlugin()
 
-    vi.mocked(resolveServerComponentIds).mockReturnValue([asAbs('/project/pages/Index.vue')])
+    vi.mocked(resolveServerComponentIds).mockReturnValue([asAbs('/project/src/pages/Index.vue')])
 
     await generate()
 
-    expect(resolveServerComponentIds).toHaveBeenCalledWith('/project/pages')
+    expect(resolveServerComponentIds).toHaveBeenCalledWith('/project/src/pages')
     expect(fs.writeFile).toHaveBeenCalledWith(
       '/project/visle-generated.d.ts',
       expect.stringMatching('Index'),
@@ -84,7 +84,7 @@ describe('entryTypesPlugin', () => {
     const { plugin } = createPlugin()
     const watcher = createWatcher()
 
-    vi.mocked(resolveServerComponentIds).mockReturnValue([asAbs('/project/pages/New.vue')])
+    vi.mocked(resolveServerComponentIds).mockReturnValue([asAbs('/project/src/pages/New.vue')])
 
     const hook = plugin.configureServer as (server: ViteDevServer) => Promise<void>
     await hook(createServer(watcher))
@@ -92,7 +92,7 @@ describe('entryTypesPlugin', () => {
     expect(fs.writeFile).toHaveBeenCalledTimes(1)
 
     // Trigger add event for a .vue file in entryRoot
-    watcher.emit('add', '/project/pages/New.vue')
+    watcher.emit('add', '/project/src/pages/New.vue')
     await vi.advanceTimersByTimeAsync(100)
 
     // Content is the same, so no second write
@@ -104,15 +104,18 @@ describe('entryTypesPlugin', () => {
     const watcher = createWatcher()
 
     vi.mocked(resolveServerComponentIds)
-      .mockReturnValueOnce([asAbs('/project/pages/Index.vue')])
-      .mockReturnValueOnce([asAbs('/project/pages/Index.vue'), asAbs('/project/pages/New.vue')])
+      .mockReturnValueOnce([asAbs('/project/src/pages/Index.vue')])
+      .mockReturnValueOnce([
+        asAbs('/project/src/pages/Index.vue'),
+        asAbs('/project/src/pages/New.vue'),
+      ])
 
     const hook = plugin.configureServer as (server: ViteDevServer) => Promise<void>
     await hook(createServer(watcher))
 
     expect(fs.writeFile).toHaveBeenCalledTimes(1)
 
-    watcher.emit('add', '/project/pages/New.vue')
+    watcher.emit('add', '/project/src/pages/New.vue')
     await vi.advanceTimersByTimeAsync(100)
 
     expect(fs.writeFile).toHaveBeenCalledTimes(2)
@@ -127,13 +130,16 @@ describe('entryTypesPlugin', () => {
     const watcher = createWatcher()
 
     vi.mocked(resolveServerComponentIds)
-      .mockReturnValueOnce([asAbs('/project/pages/Index.vue'), asAbs('/project/pages/Old.vue')])
-      .mockReturnValueOnce([asAbs('/project/pages/Index.vue')])
+      .mockReturnValueOnce([
+        asAbs('/project/src/pages/Index.vue'),
+        asAbs('/project/src/pages/Old.vue'),
+      ])
+      .mockReturnValueOnce([asAbs('/project/src/pages/Index.vue')])
 
     const hook = plugin.configureServer as (server: ViteDevServer) => Promise<void>
     await hook(createServer(watcher))
 
-    watcher.emit('unlink', '/project/pages/Old.vue')
+    watcher.emit('unlink', '/project/src/pages/Old.vue')
     await vi.advanceTimersByTimeAsync(100)
 
     expect(fs.writeFile).toHaveBeenCalledTimes(2)
@@ -144,15 +150,21 @@ describe('entryTypesPlugin', () => {
     const watcher = createWatcher()
 
     vi.mocked(resolveServerComponentIds)
-      .mockReturnValueOnce([asAbs('/project/pages/Index.vue'), asAbs('/project/pages/Old.vue')])
-      .mockReturnValueOnce([asAbs('/project/pages/Index.vue'), asAbs('/project/pages/New.vue')])
+      .mockReturnValueOnce([
+        asAbs('/project/src/pages/Index.vue'),
+        asAbs('/project/src/pages/Old.vue'),
+      ])
+      .mockReturnValueOnce([
+        asAbs('/project/src/pages/Index.vue'),
+        asAbs('/project/src/pages/New.vue'),
+      ])
 
     const hook = plugin.configureServer as (server: ViteDevServer) => Promise<void>
     await hook(createServer(watcher))
 
     // Simulate rename: unlink + add in quick succession
-    watcher.emit('unlink', '/project/pages/Old.vue')
-    watcher.emit('add', '/project/pages/New.vue')
+    watcher.emit('unlink', '/project/src/pages/Old.vue')
+    watcher.emit('add', '/project/src/pages/New.vue')
     await vi.advanceTimersByTimeAsync(100)
 
     // Initial write + one debounced write
@@ -164,13 +176,13 @@ describe('entryTypesPlugin', () => {
     const watcher = createWatcher()
 
     vi.mocked(resolveServerComponentIds)
-      .mockReturnValueOnce([asAbs('/project/pages/Index.vue')])
-      .mockReturnValueOnce([asAbs('/project/pages/Index.vue')])
+      .mockReturnValueOnce([asAbs('/project/src/pages/Index.vue')])
+      .mockReturnValueOnce([asAbs('/project/src/pages/Index.vue')])
 
     const hook = plugin.configureServer as (server: ViteDevServer) => Promise<void>
     await hook(createServer(watcher))
 
-    watcher.emit('add', '/project/pages/utils.ts')
+    watcher.emit('add', '/project/src/pages/utils.ts')
     await vi.advanceTimersByTimeAsync(100)
 
     // Only the initial write
@@ -182,8 +194,8 @@ describe('entryTypesPlugin', () => {
     const watcher = createWatcher()
 
     vi.mocked(resolveServerComponentIds)
-      .mockReturnValueOnce([asAbs('/project/pages/Index.vue')])
-      .mockReturnValueOnce([asAbs('/project/pages/Index.vue')])
+      .mockReturnValueOnce([asAbs('/project/src/pages/Index.vue')])
+      .mockReturnValueOnce([asAbs('/project/src/pages/Index.vue')])
 
     const hook = plugin.configureServer as (server: ViteDevServer) => Promise<void>
     await hook(createServer(watcher))
@@ -209,7 +221,7 @@ describe('entryTypesPlugin', () => {
   test('uses custom dts path', async () => {
     const { generate } = createPlugin('types/visle.d.ts')
 
-    vi.mocked(resolveServerComponentIds).mockReturnValue([asAbs('/project/pages/Index.vue')])
+    vi.mocked(resolveServerComponentIds).mockReturnValue([asAbs('/project/src/pages/Index.vue')])
 
     await generate()
 

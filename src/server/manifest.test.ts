@@ -17,7 +17,7 @@ let root: string
 beforeEach(() => {
   fs.mkdirSync(generatedDir, { recursive: true })
   root = fs.mkdtempSync(path.join(generatedDir, 'manifest-'))
-  fs.mkdirSync(path.join(root, 'pages'), { recursive: true })
+  fs.mkdirSync(path.join(root, 'src/pages'), { recursive: true })
 })
 
 afterEach(() => {
@@ -69,13 +69,13 @@ describe('createDevManifest', () => {
     const s = await createTestServer()
     const manifest = createDevManifest(s)
 
-    const result = await manifest.getClientImportId('pages/foo.vue')
+    const result = await manifest.getClientImportId('src/pages/foo.vue')
 
-    expect(result).toBe('/pages/foo.vue')
+    expect(result).toBe('/src/pages/foo.vue')
   })
 
   test('return empty id array for css without <style>', async () => {
-    fs.writeFileSync(path.join(root, 'pages/foo.vue'), '<template><div></div></template>')
+    fs.writeFileSync(path.join(root, 'src/pages/foo.vue'), '<template><div></div></template>')
 
     const s = await createTestServer()
     const manifest = createDevManifest(s)
@@ -87,7 +87,7 @@ describe('createDevManifest', () => {
 
   test('return ids for <style> blocks in code', async () => {
     const code = '<template><div></div></template><style scoped>h1 { color: red; }</style>'
-    fs.writeFileSync(path.join(root, 'pages/foo.vue'), code)
+    fs.writeFileSync(path.join(root, 'src/pages/foo.vue'), code)
 
     const s = await createTestServer()
     const manifest = createDevManifest(s)
@@ -96,40 +96,40 @@ describe('createDevManifest', () => {
 
     expect(result).toEqual([
       expect.stringMatching(
-        /^\/pages\/foo\.vue\?vue&type=style&index=0&scoped=[\da-f]+&lang\.css$/,
+        /^\/src\/pages\/foo\.vue\?vue&type=style&index=0&scoped=[\da-f]+&lang\.css$/,
       ),
     ])
   })
 
   test('return ids for <style> block as css module', async () => {
     const code = '<template><div></div></template><style module>h1 { color: red; }</style>'
-    fs.writeFileSync(path.join(root, 'pages/foo.vue'), code)
+    fs.writeFileSync(path.join(root, 'src/pages/foo.vue'), code)
 
     const s = await createTestServer()
     const manifest = createDevManifest(s)
 
     const result = await manifest.getEntryCssIds('foo')
 
-    expect(result).toEqual(['/pages/foo.vue?vue&type=style&index=0&lang.module.css'])
+    expect(result).toEqual(['/src/pages/foo.vue?vue&type=style&index=0&lang.module.css'])
   })
 
   test('return ids for <style src> blocks', async () => {
     const code = '<template><div></div></template><style src="./foo.css"></style>'
-    fs.writeFileSync(path.join(root, 'pages/foo.vue'), code)
-    fs.writeFileSync(path.join(root, 'pages/foo.css'), 'h1 { color: red; }')
+    fs.writeFileSync(path.join(root, 'src/pages/foo.vue'), code)
+    fs.writeFileSync(path.join(root, 'src/pages/foo.css'), 'h1 { color: red; }')
 
     const s = await createTestServer()
     const manifest = createDevManifest(s)
 
     const result = await manifest.getEntryCssIds('foo')
 
-    expect(result).toEqual(['/pages/foo.css?vue&type=style&index=0&src=true&lang.css'])
+    expect(result).toEqual(['/src/pages/foo.css?vue&type=style&index=0&src=true&lang.css'])
   })
 
   test('return ids for <style src> blocks with scoped', async () => {
     const code = '<template><div></div></template><style src="./foo.css" scoped></style>'
-    fs.writeFileSync(path.join(root, 'pages/foo.vue'), code)
-    fs.writeFileSync(path.join(root, 'pages/foo.css'), 'h1 { color: red; }')
+    fs.writeFileSync(path.join(root, 'src/pages/foo.vue'), code)
+    fs.writeFileSync(path.join(root, 'src/pages/foo.css'), 'h1 { color: red; }')
 
     const s = await createTestServer()
     const manifest = createDevManifest(s)
@@ -138,32 +138,32 @@ describe('createDevManifest', () => {
 
     expect(result).toEqual([
       expect.stringMatching(
-        /^\/pages\/foo\.css\?vue&type=style&index=0&src=[\da-f]+&scoped=[\da-f]+&lang\.css$/,
+        /^\/src\/pages\/foo\.css\?vue&type=style&index=0&src=[\da-f]+&scoped=[\da-f]+&lang\.css$/,
       ),
     ])
   })
 
   test('resolve non-relative <style src> path via resolveId', async () => {
     const code = '<template><div></div></template><style src="@/styles/foo.css"></style>'
-    fs.writeFileSync(path.join(root, 'pages/foo.vue'), code)
-    fs.mkdirSync(path.join(root, 'pages/styles'), { recursive: true })
-    fs.writeFileSync(path.join(root, 'pages/styles/foo.css'), 'h1 { color: red; }')
+    fs.writeFileSync(path.join(root, 'src/pages/foo.vue'), code)
+    fs.mkdirSync(path.join(root, 'src/pages/styles'), { recursive: true })
+    fs.writeFileSync(path.join(root, 'src/pages/styles/foo.css'), 'h1 { color: red; }')
 
     const s = await createTestServer({
       resolve: {
-        alias: { '@': path.join(root, 'pages') },
+        alias: { '@': path.join(root, 'src/pages') },
       },
     })
     const manifest = createDevManifest(s)
 
     const result = await manifest.getEntryCssIds('foo')
 
-    expect(result).toEqual(['/pages/styles/foo.css?vue&type=style&index=0&src=true&lang.css'])
+    expect(result).toEqual(['/src/pages/styles/foo.css?vue&type=style&index=0&src=true&lang.css'])
   })
 
   test('fall back to raw src value when resolveId returns undefined', async () => {
     const code = '<template><div></div></template><style src="unknown-package/style.css"></style>'
-    fs.writeFileSync(path.join(root, 'pages/foo.vue'), code)
+    fs.writeFileSync(path.join(root, 'src/pages/foo.vue'), code)
 
     const s = await createTestServer()
     const manifest = createDevManifest(s)
@@ -177,18 +177,18 @@ describe('createDevManifest', () => {
     const s = await createTestServer({ base: 'https://example.com/prefix' })
     const manifest = createDevManifest(s)
 
-    const result = await manifest.getClientImportId('pages/foo.vue')
+    const result = await manifest.getClientImportId('src/pages/foo.vue')
 
-    expect(result).toBe('/prefix/pages/foo.vue')
+    expect(result).toBe('/prefix/src/pages/foo.vue')
   })
 
   test('return url with specified dev server origin', async () => {
     const s = await createTestServer({ serverOrigin: 'http://localhost:3000' })
     const manifest = createDevManifest(s)
 
-    const result = await manifest.getClientImportId('pages/foo.vue')
+    const result = await manifest.getClientImportId('src/pages/foo.vue')
 
-    expect(result).toBe('http://localhost:3000/pages/foo.vue')
+    expect(result).toBe('http://localhost:3000/src/pages/foo.vue')
   })
 
   test('getEntryCssIds collects CSS transitively from module graph', async () => {
@@ -196,74 +196,74 @@ describe('createDevManifest', () => {
       '<template><div></div></template><script setup>const a = 1</script><style>h1 { color: red; }</style>'
     const parentCode =
       '<template><Child /></template><script setup>import Child from "./child.vue"</script>'
-    fs.writeFileSync(path.join(root, 'pages/child.vue'), childCode)
-    fs.writeFileSync(path.join(root, 'pages/parent.vue'), parentCode)
+    fs.writeFileSync(path.join(root, 'src/pages/child.vue'), childCode)
+    fs.writeFileSync(path.join(root, 'src/pages/parent.vue'), parentCode)
 
     const s = await createTestServer()
     const serverEnv = s.environments.server as RunnableDevEnvironment
 
     // Load the module via SSR runner to populate the server module graph
-    await serverEnv.runner.import(path.join(root, 'pages/parent.vue'))
+    await serverEnv.runner.import(path.join(root, 'src/pages/parent.vue'))
 
     const manifest = createDevManifest(s)
     const result = await manifest.getEntryCssIds('parent')
 
     // Child has one style block
-    expect(result).toEqual(['/pages/child.vue?vue&type=style&index=0&lang.css'])
+    expect(result).toEqual(['/src/pages/child.vue?vue&type=style&index=0&lang.css'])
   })
 
   test('getEntryCssIds collects CSS imported in <script setup>', async () => {
     const code = '<template><div></div></template><script setup>import "./foo.css"</script>'
-    fs.writeFileSync(path.join(root, 'pages/foo.vue'), code)
-    fs.writeFileSync(path.join(root, 'pages/foo.css'), 'h1 { color: red; }')
+    fs.writeFileSync(path.join(root, 'src/pages/foo.vue'), code)
+    fs.writeFileSync(path.join(root, 'src/pages/foo.css'), 'h1 { color: red; }')
 
     const s = await createTestServer()
     const serverEnv = s.environments.server as RunnableDevEnvironment
 
     // Load the module via SSR runner to populate the server module graph
-    await serverEnv.runner.import(path.join(root, 'pages/foo.vue'))
+    await serverEnv.runner.import(path.join(root, 'src/pages/foo.vue'))
 
     const manifest = createDevManifest(s)
     const result = await manifest.getEntryCssIds('foo')
 
-    expect(result).toEqual(['/pages/foo.css'])
+    expect(result).toEqual(['/src/pages/foo.css'])
   })
 
   test('getEntryCssIds preserves discovery order of standalone CSS and Vue styles', async () => {
     fs.writeFileSync(
-      path.join(root, 'pages/child-a.vue'),
+      path.join(root, 'src/pages/child-a.vue'),
       '<template><div></div></template><script setup>const a = 1</script><style>h1 { color: red; }</style>',
     )
-    fs.writeFileSync(path.join(root, 'pages/middle.css'), 'h2 { color: blue; }')
+    fs.writeFileSync(path.join(root, 'src/pages/middle.css'), 'h2 { color: blue; }')
     fs.writeFileSync(
-      path.join(root, 'pages/child-b.vue'),
+      path.join(root, 'src/pages/child-b.vue'),
       '<template><div></div></template><script setup>const b = 1</script><style>h3 { color: green; }</style>',
     )
     // parent imports child-a, then middle.css, then child-b — in that order
     fs.writeFileSync(
-      path.join(root, 'pages/parent.vue'),
+      path.join(root, 'src/pages/parent.vue'),
       '<template><ChildA /><ChildB /></template><script setup>import ChildA from "./child-a.vue"\nimport "./middle.css"\nimport ChildB from "./child-b.vue"</script>',
     )
 
     const s = await createTestServer()
     const serverEnv = s.environments.server as RunnableDevEnvironment
 
-    await serverEnv.runner.import(path.join(root, 'pages/parent.vue'))
+    await serverEnv.runner.import(path.join(root, 'src/pages/parent.vue'))
 
     const manifest = createDevManifest(s)
     const result = await manifest.getEntryCssIds('parent')
 
     // Order must match import discovery: child-a style, middle.css, child-b style
     expect(result).toEqual([
-      expect.stringMatching(/^\/pages\/child-a\.vue\?vue&type=style&index=0&lang\.css$/),
-      '/pages/middle.css',
-      expect.stringMatching(/^\/pages\/child-b\.vue\?vue&type=style&index=0&lang\.css$/),
+      expect.stringMatching(/^\/src\/pages\/child-a\.vue\?vue&type=style&index=0&lang\.css$/),
+      '/src/pages/middle.css',
+      expect.stringMatching(/^\/src\/pages\/child-b\.vue\?vue&type=style&index=0&lang\.css$/),
     ])
   })
 
   test('getEntryCssIds falls back to file parsing when entry is not in module graph', async () => {
     fs.writeFileSync(
-      path.join(root, 'pages/foo.vue'),
+      path.join(root, 'src/pages/foo.vue'),
       '<template><div></div></template><style>h1 { color: red; }</style>',
     )
 
@@ -273,7 +273,7 @@ describe('createDevManifest', () => {
     // foo is not in the module graph (never transformed), falls back to parsing
     const result = await manifest.getEntryCssIds('foo')
 
-    expect(result).toEqual(['/pages/foo.vue?vue&type=style&index=0&lang.css'])
+    expect(result).toEqual(['/src/pages/foo.vue?vue&type=style&index=0&lang.css'])
   })
 })
 
@@ -288,7 +288,7 @@ describe('loadManifest', () => {
       path.join(root, manifestFileName),
       JSON.stringify({
         base: '/',
-        entryDir: 'pages',
+        entryDir: 'src/pages',
         cssMap: {},
         jsMap: {},
         ...data,
@@ -321,7 +321,7 @@ describe('loadManifest', () => {
 
   test('get entry css ids from css map', async () => {
     writeManifest({
-      cssMap: { 'pages/foo.vue': ['foo-1234.css'] },
+      cssMap: { 'src/pages/foo.vue': ['foo-1234.css'] },
     })
 
     const manifest = await loadManifest(asAbs(root))

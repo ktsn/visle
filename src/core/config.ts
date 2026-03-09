@@ -14,7 +14,7 @@ export interface VisleConfig {
 export type ResolvedVisleConfig = Required<VisleConfig>
 
 export const defaultConfig: ResolvedVisleConfig = {
-  entryDir: 'pages',
+  entryDir: 'src/pages',
   clientOutDir: 'dist/client',
   serverOutDir: 'dist/server',
   dts: 'visle-generated.d.ts',
