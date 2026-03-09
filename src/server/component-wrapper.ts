@@ -8,7 +8,7 @@ export function createComponentWrapper(
   normalizedRelativePath: string,
   importedName: string,
   OriginalComponent: Component,
-) {
+): Component {
   return defineComponent({
     inheritAttrs: false,
 
