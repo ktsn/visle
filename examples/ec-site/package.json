@@ -3,9 +3,9 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "dev": "node app/dev.ts",
+    "dev": "node src/dev.ts",
     "build": "vite build",
-    "start": "node app/prod.ts"
+    "start": "node src/prod.ts"
   },
   "dependencies": {
     "@hono/node-server": "^1.19.9",

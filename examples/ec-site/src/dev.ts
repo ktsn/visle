@@ -3,7 +3,7 @@ import http from 'node:http'
 import { getRequestListener } from '@hono/node-server'
 import { createDevLoader } from 'visle/dev'
 
-import { app, render } from './server.ts'
+import { app, render } from './app/server.ts'
 
 const loader = createDevLoader()
 render.setLoader(loader)

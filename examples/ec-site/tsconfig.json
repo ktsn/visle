@@ -4,5 +4,5 @@
     "noEmit": true,
     "allowImportingTsExtensions": true
   },
-  "include": ["app/**/*.ts", "components/**/*.vue", "pages/**/*.vue", "visle-generated.d.ts"]
+  "include": ["src/**/*.ts", "src/**/*.vue", "visle-generated.d.ts"]
 }
