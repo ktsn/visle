@@ -4,6 +4,25 @@ export default defineConfig({
   title: 'Visle',
   description: 'Islands Architecture Renderer for Vue.js',
 
+  head: [
+    [
+      'style',
+      {},
+      `:root {
+  --vp-c-brand-1: #1a9e6f;
+  --vp-c-brand-2: #16875e;
+  --vp-c-brand-3: #12704e;
+  --vp-c-brand-soft: rgba(26, 158, 111, 0.14);
+}
+.dark {
+  --vp-c-brand-1: #3dd68c;
+  --vp-c-brand-2: #34c07d;
+  --vp-c-brand-3: #2baa6e;
+  --vp-c-brand-soft: rgba(61, 214, 140, 0.16);
+}`,
+    ],
+  ],
+
   themeConfig: {
     nav: [
       { text: 'Guide', link: '/guide/islands' },
