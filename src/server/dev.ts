@@ -1,5 +1,8 @@
+import assert from 'node:assert'
+
 import connect from 'connect'
-import { Connect, createServer, InlineConfig, RunnableDevEnvironment, ViteDevServer } from 'vite'
+import { Connect, createServer, InlineConfig, isRunnableDevEnvironment } from 'vite'
+import type { RunnableDevEnvironment, ViteDevServer } from 'vite'
 
 import { getVisleConfig } from '../core/config.js'
 import { asAbs, resolve } from '../core/path.js'
@@ -21,10 +24,10 @@ export function createDevLoader(viteConfig: InlineConfig = {}): DevRenderLoader 
       return next()
     }
 
-    cachePromise.then(({ devServer }) => {
+    void cachePromise.then(({ devServer }) => {
       devServer.middlewares(req, res, next)
       return
-    })
+    }, next)
   })
 
   /**
@@ -65,7 +68,7 @@ export function createDevLoader(viteConfig: InlineConfig = {}): DevRenderLoader 
       )
 
       try {
-        const serverEnv = devServer.environments.server as RunnableDevEnvironment
+        const serverEnv = getServerEnvironment(devServer)
         const module = await serverEnv.runner.import(modulePath)
         return module.default
       } catch (e) {
@@ -90,4 +93,13 @@ export function createDevLoader(viteConfig: InlineConfig = {}): DevRenderLoader 
       }
     },
   }
+}
+
+export function getServerEnvironment(devServer: ViteDevServer): RunnableDevEnvironment {
+  const serverEnv = devServer.environments.server
+  assert(
+    serverEnv && isRunnableDevEnvironment(serverEnv),
+    "[visle] Vite's server environment is not available. Make sure to add visle() plugin to your Vite config file.",
+  )
+  return serverEnv
 }

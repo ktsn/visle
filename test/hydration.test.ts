@@ -47,7 +47,8 @@ function startStaticServer(root: string): Promise<{ server: http.Server; port: n
     })
 
     server.listen(0, () => {
-      resolve({ server, port: (server.address() as { port: number }).port })
+      const addr = server.address()
+      resolve({ server, port: typeof addr === 'object' && addr !== null ? addr.port : 0 })
     })
   })
 }

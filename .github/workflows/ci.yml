@@ -17,20 +17,8 @@ jobs:
           cache: true
           run-install: true
 
+      - run: vp run -r build
       - run: vp check
-
-  build:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v6
-
-      - uses: voidzero-dev/setup-vp@v1
-        with:
-          node-version: '24'
-          cache: true
-          run-install: true
-
-      - run: vp run build
 
   publish-dry-run:
     runs-on: ubuntu-latest

@@ -1,3 +1,4 @@
+// oxlint-disable typescript/no-unsafe-type-assertion
 import path from 'node:path'
 
 export type AbsolutePath = string & { readonly __brand: 'AbsolutePath' }

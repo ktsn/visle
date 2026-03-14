@@ -1,3 +1,4 @@
+// oxlint-disable typescript/no-unsafe-type-assertion
 import { EventEmitter } from 'node:events'
 import fs from 'node:fs/promises'
 

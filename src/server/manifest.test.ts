@@ -1,3 +1,4 @@
+// oxlint-disable typescript/no-unsafe-type-assertion
 import fs from 'node:fs'
 import path from 'node:path'
 

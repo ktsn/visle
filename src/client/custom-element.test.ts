@@ -1,4 +1,5 @@
 // @vitest-environment happy-dom
+// oxlint-disable typescript/no-unsafe-type-assertion
 import { describe, expect, test, vi, beforeEach } from 'vite-plus/test'
 import { createSSRApp } from 'vue'
 
@@ -110,8 +111,7 @@ describe('VueIsland custom element', () => {
       vi.mocked(createSSRApp).mockClear()
 
       // Manually re-invoke connectedCallback (simulates re-adoption without prior disconnect)
-      ;(el as any).connectedCallback()
-      await flushMicrotasks()
+      await el.connectedCallback()
 
       expect(firstApp.unmount).toHaveBeenCalled()
       expect(createSSRApp).toHaveBeenCalledTimes(1)

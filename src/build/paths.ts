@@ -11,6 +11,7 @@ import { componentWrapPrefix } from './generate.js'
 export const islandsBootstrapPath = resolve(
   // In Deno, import.meta.dirname can be undefined (in https module).
   // Just casting it to string for now.
+  // oxlint-disable-next-line typescript/no-unnecessary-type-assertion
   asAbs(import.meta.dirname as string),
 
   // The extension can be different between environments.

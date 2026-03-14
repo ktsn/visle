@@ -10,7 +10,7 @@
   "dependencies": {
     "@hono/node-server": "^1.19.9",
     "hono": "^4.11.9",
-    "visle": "file:../../",
+    "visle": "workspace:*",
     "vue": "^3.5.28"
   },
   "devDependencies": {

@@ -7,7 +7,7 @@ import { islandsBootstrapPath } from '../paths.js'
 
 interface ManifestPluginResult {
   plugin: Plugin
-  getManifestData(): ManifestData
+  getManifestData: () => ManifestData
 }
 
 /**
@@ -137,7 +137,7 @@ export function manifestPlugin(visleConfig: ResolvedVisleConfig): ManifestPlugin
   return {
     plugin,
 
-    getManifestData(): ManifestData {
+    getManifestData: (): ManifestData => {
       return {
         base,
         entryDir: visleConfig.entryDir,
