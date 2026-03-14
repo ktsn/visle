@@ -1,4 +1,4 @@
-import { describe, test, expect } from 'vitest'
+import { describe, test, expect } from 'vite-plus/test'
 
 import { asAbs } from '../core/path.ts'
 import { generateEntryTypesCode } from './generate.ts'

@@ -4,6 +4,5 @@
     "noEmit": true,
     "allowImportingTsExtensions": true
   },
-  "include": ["src/**/*.test.ts", "test/**/*"],
-  "references": [{ "path": "./tsconfig.json" }]
+  "include": ["src/**/*.test.ts", "test/**/*"]
 }

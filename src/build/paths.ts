@@ -1,9 +1,9 @@
-import path from 'node:path'
+import path from "node:path";
 
-import { globSync } from 'glob'
+import { globSync } from "glob";
 
-import { type AbsolutePath, asAbs, asRel, join, resolve } from '../core/path.js'
-import { componentWrapPrefix } from './generate.js'
+import { type AbsolutePath, asAbs, asRel, join, resolve } from "../core/path.js";
+import { componentWrapPrefix } from "./generate.js";
 
 // -----------------------------
 // Custom Element Paths
@@ -16,7 +16,7 @@ export const islandsBootstrapPath = resolve(
   // The extension can be different between environments.
   // e.g. in testing env, it is `.ts` while in production it is `.js`.
   asRel(`../client/custom-element${path.extname(import.meta.url)}`),
-)
+);
 
 // -----------------------------
 // Path Resolution Functions
@@ -26,16 +26,16 @@ export const islandsBootstrapPath = resolve(
  * Resolves glob patterns to find files
  */
 export function resolvePattern(pattern: string | string[], root: AbsolutePath): AbsolutePath[] {
-  if (typeof pattern === 'string') {
-    return globSync(join(root, pattern)).map(asAbs)
+  if (typeof pattern === "string") {
+    return globSync(join(root, pattern)).map(asAbs);
   }
 
-  return pattern.flatMap((p) => resolvePattern(p, root))
+  return pattern.flatMap((p) => resolvePattern(p, root));
 }
 
 export interface ParsedIdQuery {
-  vue?: boolean
-  names?: string[]
+  vue?: boolean;
+  names?: string[];
 }
 
 /**
@@ -43,40 +43,40 @@ export interface ParsedIdQuery {
  * Handles the `\0visle:wrap:` prefix and `names` query param.
  */
 export function parseId(id: string): {
-  fileName: string
-  query: ParsedIdQuery
-  prefix?: string
+  fileName: string;
+  query: ParsedIdQuery;
+  prefix?: string;
 } {
-  let prefix: string | undefined
-  let raw = id
+  let prefix: string | undefined;
+  let raw = id;
 
   if (raw.startsWith(componentWrapPrefix)) {
-    prefix = componentWrapPrefix
-    raw = raw.slice(componentWrapPrefix.length)
+    prefix = componentWrapPrefix;
+    raw = raw.slice(componentWrapPrefix.length);
   }
 
-  const [fileName, searchParams] = raw.split('?')
-  const parsed = new URLSearchParams(searchParams)
+  const [fileName, searchParams] = raw.split("?");
+  const parsed = new URLSearchParams(searchParams);
 
-  const query: ParsedIdQuery = {}
-  if (parsed.has('vue')) {
-    query.vue = true
+  const query: ParsedIdQuery = {};
+  if (parsed.has("vue")) {
+    query.vue = true;
   }
-  const names = parsed.get('names')
+  const names = parsed.get("names");
   if (names) {
-    query.names = names.split(',').filter(Boolean)
+    query.names = names.split(",").filter(Boolean);
   }
 
   return {
     fileName: fileName!,
     query,
     prefix,
-  }
+  };
 }
 
 /**
  * Resolves paths for all server components
  */
 export function resolveServerComponentIds(entryDir: AbsolutePath): AbsolutePath[] {
-  return resolvePattern('/**/*.vue', entryDir)
+  return resolvePattern("/**/*.vue", entryDir);
 }

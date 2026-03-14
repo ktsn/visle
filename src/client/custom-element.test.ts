@@ -1,5 +1,5 @@
 // @vitest-environment happy-dom
-import { describe, expect, test, vi, beforeEach } from 'vitest'
+import { describe, expect, test, vi, beforeEach } from 'vite-plus/test'
 import { createSSRApp } from 'vue'
 
 import { VueIsland } from './custom-element.ts'

@@ -3,7 +3,7 @@ import http from 'node:http'
 import path from 'node:path'
 
 import { chromium, type Browser, type Page } from 'playwright'
-import { describe, test, expect, beforeAll, afterAll } from 'vitest'
+import { describe, test, expect, beforeAll, afterAll } from 'vite-plus/test'
 
 import { createTmpDir, copyFixtures, prodBuild, prodRender, normalizeHashes } from './utils.ts'
 

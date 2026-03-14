@@ -2,7 +2,7 @@ import { EventEmitter } from 'node:events'
 import fs from 'node:fs/promises'
 
 import type { ResolvedConfig, ViteDevServer } from 'vite'
-import { describe, test, expect, vi, beforeEach, afterEach } from 'vitest'
+import { describe, test, expect, vi, beforeEach, afterEach } from 'vite-plus/test'
 
 import { defaultConfig } from '../../core/config.ts'
 import { asAbs } from '../../core/path.ts'
