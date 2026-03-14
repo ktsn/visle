@@ -26,12 +26,11 @@
     "./dev": "./dist/server/dev.js"
   },
   "scripts": {
-    "build": "tsc -b ./ ./tsconfig.test.json",
+    "build": "tsc -b",
     "test": "vp test",
     "test:coverage": "vp test --coverage --coverage.reporter=lcov",
-    "lint": "vp lint",
-    "format": "vp fmt --write",
-    "format:check": "vp fmt --check",
+    "check": "vp check",
+    "fmt": "vp fmt",
     "docs:dev": "vitepress dev docs",
     "docs:build": "vitepress build docs",
     "docs:preview": "vitepress preview docs",

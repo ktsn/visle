@@ -6,73 +6,45 @@ on:
   pull_request:
 
 jobs:
-  lint:
+  check:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v6
 
-      - uses: pnpm/action-setup@v4
-
-      - uses: actions/setup-node@v6
+      - uses: voidzero-dev/setup-vp@v1
         with:
-          node-version: lts/*
-          cache: pnpm
+          node-version: '24'
+          cache: true
+          run-install: true
 
-      - run: pnpm install
-
-      - name: Lint
-        run: pnpm lint
-
-  format:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v6
-
-      - uses: pnpm/action-setup@v4
-
-      - uses: actions/setup-node@v6
-        with:
-          node-version: lts/*
-          cache: pnpm
-
-      - run: pnpm install
-
-      - name: Check format
-        run: pnpm format:check
+      - run: vp check
 
   build:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v6
 
-      - uses: pnpm/action-setup@v4
-
-      - uses: actions/setup-node@v6
+      - uses: voidzero-dev/setup-vp@v1
         with:
-          node-version: lts/*
-          cache: pnpm
+          node-version: '24'
+          cache: true
+          run-install: true
 
-      - run: pnpm install
-
-      - name: Build
-        run: pnpm build
+      - run: vp run build
 
   publish-dry-run:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v6
 
-      - uses: pnpm/action-setup@v4
-
-      - uses: actions/setup-node@v6
+      - uses: voidzero-dev/setup-vp@v1
         with:
-          node-version: lts/*
-          cache: pnpm
-
-      - run: pnpm install
+          node-version: '24'
+          cache: true
+          run-install: true
 
       - name: Publish dry run
-        run: npx jsr publish --dry-run
+        run: vpx jsr publish --dry-run
 
   test:
     runs-on: ${{ matrix.os }}
@@ -82,14 +54,11 @@ jobs:
     steps:
       - uses: actions/checkout@v6
 
-      - uses: pnpm/action-setup@v4
-
-      - uses: actions/setup-node@v6
+      - uses: voidzero-dev/setup-vp@v1
         with:
-          node-version: lts/*
-          cache: pnpm
-
-      - run: pnpm install
+          node-version: '24'
+          cache: true
+          run-install: true
 
       - name: Get Playwright version
         id: playwright-version
@@ -112,7 +81,7 @@ jobs:
       # Windows bundles its own deps, so it can skip this step entirely on cache hit.
       - name: Install Playwright
         if: steps.playwright-cache.outputs.cache-hit != 'true' || runner.os == 'Linux'
-        run: pnpm exec playwright install --with-deps chromium
+        run: vp exec playwright install --with-deps chromium
 
       - name: Test
-        run: pnpm test -- --run
+        run: vp test
