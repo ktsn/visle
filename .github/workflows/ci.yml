@@ -17,7 +17,7 @@ jobs:
           cache: true
           run-install: true
 
-      - run: vp run build
+      - run: vp run -r build
       - run: vp check
 
   publish-dry-run:
