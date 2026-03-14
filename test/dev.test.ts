@@ -1,7 +1,7 @@
 import fs from 'node:fs/promises'
 import path from 'node:path'
 
-import { describe, test, expect, beforeAll, afterAll } from 'vitest'
+import { describe, test, expect, beforeAll, afterAll } from 'vite-plus/test'
 
 import { RenderFunction } from '../src/server/render.ts'
 import { createTmpDir, copyFixtures, devRender, normalizeHashes, renderCases } from './utils.ts'

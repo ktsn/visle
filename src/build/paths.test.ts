@@ -1,4 +1,4 @@
-import { describe, expect, test } from 'vitest'
+import { describe, expect, test } from 'vite-plus/test'
 
 import { componentWrapPrefix } from './generate.js'
 import { parseId } from './paths.js'

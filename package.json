@@ -27,22 +27,23 @@
   },
   "scripts": {
     "build": "tsc -b ./ ./tsconfig.test.json",
-    "test": "vitest",
-    "test:coverage": "vitest --coverage --coverage.reporter=lcov",
-    "lint": "oxlint",
-    "format": "oxfmt --write",
-    "format:check": "oxfmt --check",
+    "test": "vp test",
+    "test:coverage": "vp test --coverage --coverage.reporter=lcov",
+    "lint": "vp lint",
+    "format": "vp fmt --write",
+    "format:check": "vp fmt --check",
     "docs:dev": "vitepress dev docs",
     "docs:build": "vitepress build docs",
     "docs:preview": "vitepress preview docs",
-    "release": "bumpp package.json jsr.json"
+    "release": "bumpp package.json jsr.json",
+    "prepare": "vp config"
   },
   "dependencies": {
     "@vitejs/plugin-vue": "^6.0.3",
     "@vue/compiler-core": "^3.5.28",
     "connect": "^3.7.0",
     "glob": "^13.0.0",
-    "vite": "^8.0.0"
+    "vite": "npm:@voidzero-dev/vite-plus-core@latest"
   },
   "devDependencies": {
     "@babel/types": "^7.29.0",
@@ -56,17 +57,22 @@
     "changelogithub": "^14.0.0",
     "diffable-html": "^6.0.1",
     "happy-dom": "^20.7.0",
-    "oxfmt": "^0.37.0",
-    "oxlint": "^1.42.0",
     "playwright": "^1.58.2",
     "rollup": "^4.55.2",
     "typescript": "^5.9.3",
+    "vite-plus": "latest",
     "vitepress": "^1.6.4",
-    "vitest": "^4.1.0",
+    "vitest": "npm:@voidzero-dev/vite-plus-test@latest",
     "vue": "^3.5.27"
   },
   "peerDependencies": {
     "vue": ">=3.0.0"
   },
-  "packageManager": "pnpm@10.32.1+sha512.a706938f0e89ac1456b6563eab4edf1d1faf3368d1191fc5c59790e96dc918e4456ab2e67d613de1043d2e8c81f87303e6b40d4ffeca9df15ef1ad567348f2be"
+  "packageManager": "pnpm@10.32.1+sha512.a706938f0e89ac1456b6563eab4edf1d1faf3368d1191fc5c59790e96dc918e4456ab2e67d613de1043d2e8c81f87303e6b40d4ffeca9df15ef1ad567348f2be",
+  "pnpm": {
+    "overrides": {
+      "vite": "npm:@voidzero-dev/vite-plus-core@latest",
+      "vitest": "npm:@voidzero-dev/vite-plus-test@latest"
+    }
+  }
 }

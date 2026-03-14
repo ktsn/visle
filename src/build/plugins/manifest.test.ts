@@ -1,7 +1,7 @@
 import fs from 'node:fs'
 import path from 'node:path'
 
-import { beforeEach, afterEach, describe, expect, test } from 'vitest'
+import { beforeEach, afterEach, describe, expect, test } from 'vite-plus/test'
 
 import { prodBuild } from '../../../test/utils.ts'
 import { manifestFileName } from '../../core/manifest.ts'

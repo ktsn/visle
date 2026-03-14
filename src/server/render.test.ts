@@ -2,7 +2,7 @@ import fs from 'node:fs/promises'
 import path from 'node:path'
 import { fileURLToPath } from 'node:url'
 
-import { afterEach, describe, test, expect, beforeEach } from 'vitest'
+import { afterEach, describe, test, expect, beforeEach } from 'vite-plus/test'
 
 import { visle } from '../build/index.ts'
 import { createDevLoader } from './dev.ts'

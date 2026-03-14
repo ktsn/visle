@@ -2,7 +2,7 @@ import fs from 'node:fs'
 import path from 'node:path'
 
 import { createServer, type RunnableDevEnvironment, type ViteDevServer } from 'vite'
-import { afterEach, beforeEach, describe, expect, test } from 'vitest'
+import { afterEach, beforeEach, describe, expect, test } from 'vite-plus/test'
 
 import { visle } from '../build/index.ts'
 import { virtualIslandsBootstrapPath } from '../core/entry.ts'

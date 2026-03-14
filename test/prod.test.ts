@@ -1,7 +1,7 @@
 import fs from 'node:fs/promises'
 import path from 'node:path'
 
-import { describe, test, expect, beforeAll } from 'vitest'
+import { describe, test, expect, beforeAll } from 'vite-plus/test'
 
 import { manifestFileName } from '../src/core/manifest.ts'
 import { RenderFunction } from '../src/server/render.ts'
