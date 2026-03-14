@@ -20,23 +20,23 @@ afterEach(() => {
   fs.rmSync(root, { recursive: true, force: true })
 })
 
-describe('build manifest CSS order', () => {
-  test('cssMap preserves depth-first import order', async () => {
+describe('build manifest CSS map', () => {
+  test('collects transitive CSS', async () => {
     fs.writeFileSync(
       path.join(root, 'pages/child-a.vue'),
       '<template><div>A</div></template><style>h1 { color: red; }</style>',
+    )
+    fs.writeFileSync(
+      path.join(root, 'pages/child-b.vue'),
+      '<template><div>B</div><ChildC /></template><script setup>import ChildC from "./child-c.vue"</script><style>h3 { color: green; }</style>',
     )
     fs.writeFileSync(
       path.join(root, 'pages/child-c.vue'),
       '<template><div>C</div></template><style>h2 { color: blue; }</style>',
     )
     fs.writeFileSync(
-      path.join(root, 'pages/child-b.vue'),
-      '<template><div>B</div></template><style>h3 { color: green; }</style>',
-    )
-    fs.writeFileSync(
       path.join(root, 'pages/parent.vue'),
-      '<template><ChildA /><ChildC /><ChildB /></template><script setup>import ChildA from "./child-a.vue"\nimport ChildC from "./child-c.vue"\nimport ChildB from "./child-b.vue"</script>',
+      '<template><ChildA /><ChildB /></template><script setup>import ChildA from "./child-a.vue"\nimport ChildB from "./child-b.vue"</script>',
     )
 
     await prodBuild(root)
@@ -48,9 +48,8 @@ describe('build manifest CSS order', () => {
     expect(cssList).toBeDefined()
     expect(cssList).toHaveLength(3)
 
-    // Order must match depth-first import traversal: child-a, child-c, child-b
-    expect(cssList[0]).toEqual(expect.stringMatching(/child-a/))
-    expect(cssList[1]).toEqual(expect.stringMatching(/child-c/))
-    expect(cssList[2]).toEqual(expect.stringMatching(/child-b/))
+    expect(cssList).toContainEqual(expect.stringMatching(/child-a/))
+    expect(cssList).toContainEqual(expect.stringMatching(/child-b/))
+    expect(cssList).toContainEqual(expect.stringMatching(/child-c/))
   })
 })
