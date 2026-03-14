@@ -26,7 +26,7 @@ export function createDevLoader(viteConfig: InlineConfig = {}): DevRenderLoader 
     void cachePromise.then(({ devServer }) => {
       devServer.middlewares(req, res, next)
       return
-    })
+    }, next)
   })
 
   /**
