@@ -129,7 +129,7 @@ export function createDevManifest(devServer: ViteDevServer): RuntimeManifest {
           entry.type === 'css' ? [entry.id] : getComponentCssIds(entry.relativePath),
         ),
       )
-      return cssIdArrays.flat()
+      return [...new Set(cssIdArrays.flat())]
     },
   }
 }
