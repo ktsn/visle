@@ -50,7 +50,6 @@ export function manifestPlugin(visleConfig: ResolvedVisleConfig): ManifestPlugin
          * Recursively traverse static and dynamic dependencies, writing
          * visited state and result in the sets passed through arguments.
          * The values are shared and mutated during recursive calls.
-         * Set retains insertion order so depth-first discovery order is preserved.
          */
         function collectCss(
           fileName: string,

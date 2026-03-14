@@ -6,7 +6,7 @@ exports[`Client-side Hydration > 'Island with barrel import' 1`] = `
     Page
   </h1>
   <vue-island
-    entry="/assets/Counter-[hash].js"
+    entry="/assets/barrel-[hash].js"
     imported-name="Counter"
   >
     <button>
