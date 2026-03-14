@@ -9,6 +9,6 @@
     ".": "./src/server/index.ts",
     "./internal": "./src/server/internal.ts",
     "./build": "./src/build/index.ts",
-    "./dev": "./src/server/dev.ts"
+    "./dev": "./src/dev/index.ts"
   }
 }

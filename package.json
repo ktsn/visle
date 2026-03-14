@@ -23,7 +23,7 @@
     ".": "./dist/server/index.js",
     "./internal": "./dist/server/internal.js",
     "./build": "./dist/build/index.js",
-    "./dev": "./dist/server/dev.js"
+    "./dev": "./dist/dev/index.js"
   },
   "scripts": {
     "build": "tsc -b",

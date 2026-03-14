@@ -5,7 +5,7 @@ import { fileURLToPath } from 'node:url'
 import { afterEach, describe, test, expect, beforeEach } from 'vite-plus/test'
 
 import { visle } from '../build/index.ts'
-import { createDevLoader } from './dev.ts'
+import { createDevLoader } from '../dev/index.ts'
 import { createRender } from './render.ts'
 
 /**
