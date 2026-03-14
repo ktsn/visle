@@ -16,18 +16,14 @@ jobs:
     steps:
       - uses: actions/checkout@v6
 
-      - uses: pnpm/action-setup@v4
-
-      - uses: actions/setup-node@v6
+      - uses: voidzero-dev/setup-vp@v1
         with:
-          node-version: lts/*
-          cache: pnpm
-          registry-url: https://registry.npmjs.org
-
-      - run: pnpm install
+          node-version: '24'
+          cache: true
+          run-install: true
 
       - name: Build
-        run: pnpm build
+        run: vp run build
 
       - name: Publish to npm
         run: pnpm publish --provenance --no-git-checks
@@ -44,17 +40,14 @@ jobs:
     steps:
       - uses: actions/checkout@v6
 
-      - uses: pnpm/action-setup@v4
-
-      - uses: actions/setup-node@v6
+      - uses: voidzero-dev/setup-vp@v1
         with:
-          node-version: lts/*
-          cache: pnpm
-
-      - run: pnpm install
+          node-version: '24'
+          cache: true
+          run-install: true
 
       - name: Publish to JSR
-        run: npx jsr publish
+        run: vpx jsr publish
 
   github-release:
     needs:
@@ -71,16 +64,13 @@ jobs:
         with:
           fetch-depth: 0
 
-      - uses: pnpm/action-setup@v4
-
-      - uses: actions/setup-node@v6
+      - uses: voidzero-dev/setup-vp@v1
         with:
-          node-version: lts/*
-          cache: pnpm
-
-      - run: pnpm install
+          node-version: '24'
+          cache: true
+          run-install: true
 
       - name: Create GitHub Release
-        run: pnpm changelogithub
+        run: vp exec changelogithub
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
