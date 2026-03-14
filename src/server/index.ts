@@ -3,7 +3,9 @@ import type { AllowedComponentProps, ComponentCustomProps, VNodeProps } from 'vu
 export { createRender } from './render.js'
 
 export type ComponentProps<T> = T extends new (...args: any) => { $props: infer P }
-  ? Omit<P, keyof VNodeProps | keyof AllowedComponentProps | keyof ComponentCustomProps>
+  ? // ComponentCustomProps can have extra fields with declaration merging.
+    // oxlint-disable-next-line typescript/no-redundant-type-constituents
+    Omit<P, keyof VNodeProps | keyof AllowedComponentProps | keyof ComponentCustomProps>
   : Record<string, unknown>
 
 /**

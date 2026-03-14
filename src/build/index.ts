@@ -125,12 +125,14 @@ export function visle(config: VisleConfig = {}): Plugin[] {
         return
       }
 
+      if (!Array.isArray(opts.input) && typeof opts.input !== 'string') {
+        return this.error(
+          'It is not allowed to pass an object value to the input option of the islands environment',
+        )
+      }
+
       // Update islands environment input with paths discovered during server build
-      const existing = Array.isArray(opts.input)
-        ? opts.input
-        : opts.input
-          ? [opts.input as string]
-          : []
+      const existing = Array.isArray(opts.input) ? opts.input : [opts.input]
 
       return { ...opts, input: [...existing, ...islandPaths] }
     },

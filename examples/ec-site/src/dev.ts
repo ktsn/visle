@@ -12,7 +12,7 @@ const requestListener = getRequestListener(app.fetch)
 
 const server = http.createServer((req, res) => {
   loader.middleware(req, res, () => {
-    requestListener(req, res)
+    void requestListener(req, res)
   })
 })
 

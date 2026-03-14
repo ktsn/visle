@@ -68,9 +68,8 @@ export class VueIsland extends HTMLElement {
   }
 
   #waitForVisible(): Promise<void> {
-    const rootMargin = safeParseObject(this.getAttribute('options'))?.rootMargin as
-      | string
-      | undefined
+    const options = safeParseObject(this.getAttribute('options'))
+    const rootMargin = typeof options.rootMargin === 'string' ? options.rootMargin : undefined
     return new Promise((resolve) => {
       const observer = new IntersectionObserver(
         (entries) => {

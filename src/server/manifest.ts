@@ -1,6 +1,7 @@
+import assert from 'node:assert'
 import fs from 'node:fs/promises'
 
-import type { EnvironmentModuleNode, RunnableDevEnvironment, ViteDevServer } from 'vite'
+import { isRunnableDevEnvironment, type EnvironmentModuleNode, type ViteDevServer } from 'vite'
 import { parse, SFCBlock } from 'vue/compiler-sfc'
 
 import { generateComponentId } from '../core/component-id.js'
@@ -50,7 +51,13 @@ export async function loadManifest(serverOutDir: AbsolutePath): Promise<RuntimeM
  * Creates a dev-mode RuntimeManifest that resolves paths using Vite's dev server.
  */
 export function createDevManifest(devServer: ViteDevServer): RuntimeManifest {
-  const serverEnv = devServer.environments.server as RunnableDevEnvironment
+  const s = devServer.environments.server
+  assert(
+    s && isRunnableDevEnvironment(s),
+    "[visle] Vite's server environment is not available. Make sure to add visle() plugin to your Vite config file.",
+  )
+  const serverEnv = s
+
   const root = asAbs(devServer.config.root)
   const { base } = devServer.config
   const { entryDir } = getVisleConfig(devServer.config)

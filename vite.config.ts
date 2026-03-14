@@ -29,8 +29,8 @@ export default defineConfig({
     },
     ignorePatterns: ['dist/', 'node_modules/'],
     options: {
-      typeAware: false,
-      typeCheck: false,
+      typeAware: true,
+      typeCheck: true,
     },
   },
   test: {
