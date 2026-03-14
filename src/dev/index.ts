@@ -6,8 +6,9 @@ import type { RunnableDevEnvironment, ViteDevServer } from 'vite'
 
 import { getVisleConfig } from '../core/config.js'
 import { asAbs, resolve } from '../core/path.js'
-import { createDevManifest, RuntimeManifest } from './manifest.js'
-import { RenderLoader } from './render.js'
+import { RuntimeManifest } from '../server/manifest.js'
+import { RenderLoader } from '../server/render.js'
+import { createDevManifest } from './manifest.js'
 
 interface DevRenderLoader extends RenderLoader {
   middleware: Connect.Server
