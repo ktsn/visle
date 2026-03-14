@@ -260,6 +260,34 @@ describe('createDevManifest', () => {
     ])
   })
 
+  test('getEntryCssIds deduplicates CSS ids when multiple components share the same style src', async () => {
+    // Two components reference the same unscoped <style src="./shared.css">
+    fs.writeFileSync(
+      path.join(root, 'src/pages/child-a.vue'),
+      '<template><div></div></template><script setup>const a = 1</script><style src="./shared.css"></style>',
+    )
+    fs.writeFileSync(
+      path.join(root, 'src/pages/child-b.vue'),
+      '<template><div></div></template><script setup>const b = 1</script><style src="./shared.css"></style>',
+    )
+    fs.writeFileSync(path.join(root, 'src/pages/shared.css'), 'h1 { color: red; }')
+    fs.writeFileSync(
+      path.join(root, 'src/pages/parent.vue'),
+      '<template><ChildA /><ChildB /></template><script setup>import ChildA from "./child-a.vue"\nimport ChildB from "./child-b.vue"</script>',
+    )
+
+    const s = await createTestServer()
+    const serverEnv = s.environments.server as RunnableDevEnvironment
+
+    await serverEnv.runner.import(path.join(root, 'src/pages/parent.vue'))
+
+    const manifest = createDevManifest(s)
+    const result = await manifest.getEntryCssIds('parent')
+
+    // The shared CSS should appear only once, not duplicated
+    expect(result).toEqual(['/src/pages/shared.css?vue&type=style&index=0&src=true&lang.css'])
+  })
+
   test('getEntryCssIds falls back to file parsing when entry is not in module graph', async () => {
     fs.writeFileSync(
       path.join(root, 'src/pages/foo.vue'),
