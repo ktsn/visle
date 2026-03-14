@@ -112,7 +112,6 @@ describe('VueIsland custom element', () => {
 
       // Manually re-invoke connectedCallback (simulates re-adoption without prior disconnect)
       await el.connectedCallback()
-      await flushMicrotasks()
 
       expect(firstApp.unmount).toHaveBeenCalled()
       expect(createSSRApp).toHaveBeenCalledTimes(1)
