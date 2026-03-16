@@ -10,7 +10,7 @@ import { load } from './strategy/load.js'
 export interface IslandStrategy {
   /**
    * Called when the island wrapper schedules to mount the island component.
-   * Each strategy implments this function to control when to mount by calling
+   * Each strategy implements this function to control when to mount by calling
    * onReady callback
    *
    * @param wrapper Island wrapper element
