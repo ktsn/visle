@@ -1,10 +1,28 @@
 import { createSSRApp, App } from 'vue'
 
 import { loadModule } from './load-module.js'
+import { strategies } from './strategy/index.js'
+import { load } from './strategy/load.js'
+
+/**
+ * Define when the island wrapper mount (hydrate) slotted component.
+ */
+export interface IslandStrategy {
+  /**
+   * Called when the island wrapper schedules to mount the island component.
+   * Each strategy implements this function to control when to mount by calling
+   * onReady callback
+   *
+   * @param wrapper Island wrapper element
+   * @param onReady Callback function to be called when the island is ready to mount
+   * @return Cleanup function of scheduling
+   */
+  schedule: (wrapper: VueIsland, onReady: () => void) => (() => void) | undefined
+}
 
 export class VueIsland extends HTMLElement {
-  #app: App | null = null
-  #visibilityObserver: IntersectionObserver | null = null
+  #app: App | undefined
+  #cleanupSchedule: (() => void) | undefined
 
   /**
    * Monotonic counter to invalidate stale async work in connectedCallback.
@@ -28,72 +46,65 @@ export class VueIsland extends HTMLElement {
   async connectedCallback(): Promise<void> {
     const token = ++this.#connectToken
 
-    if (this.#app) {
-      this.#app.unmount()
-      this.#app = null
-    }
+    this.#cleanup()
 
     const entry = this.getAttribute('entry')
     if (!entry) {
       return
     }
 
-    const strategy = this.getAttribute('strategy') ?? 'load'
+    const strategyName = this.getAttribute('strategy') ?? 'load'
 
-    if (strategy === 'visible') {
-      await this.#waitForVisible()
-      if (token !== this.#connectToken || !this.isConnected) {
+    let strategy = strategies[strategyName]
+    if (!strategy) {
+      console.warn(
+        `[visle] Unknown strategy v-client:${strategyName}. Falling back to v-client:load.`,
+      )
+      strategy = load
+    }
+
+    this.#cleanupSchedule = strategy.schedule(this, async () => {
+      if (this.#connectCancelled(token)) {
         return
       }
-    }
 
-    const importedName = this.getAttribute('imported-name') ?? 'default'
+      const module = await loadModule(entry)
 
-    const module = await loadModule(entry)
+      if (this.#connectCancelled(token)) {
+        return
+      }
 
-    if (token !== this.#connectToken || !this.isConnected) {
-      return
-    }
+      const importedName = this.getAttribute('imported-name') ?? 'default'
+      const entryComponent = module[importedName]
+      if (!entryComponent) {
+        console.error(`[visle] Export "${importedName}" not found in module "${entry}"`)
+        return
+      }
 
-    const entryComponent = module[importedName]
-    if (!entryComponent) {
-      console.error(`[visle] Export "${importedName}" not found in module "${entry}"`)
-      return
-    }
+      const parsedProps = safeParseObject(this.getAttribute('serialized-props'))
 
-    const parsedProps = safeParseObject(this.getAttribute('serialized-props'))
-
-    this.#app = createSSRApp(entryComponent, parsedProps)
-    this.#app.mount(this)
-  }
-
-  #waitForVisible(): Promise<void> {
-    const options = safeParseObject(this.getAttribute('options'))
-    const rootMargin = typeof options.rootMargin === 'string' ? options.rootMargin : undefined
-    return new Promise((resolve) => {
-      const observer = new IntersectionObserver(
-        (entries) => {
-          if (entries.some((e) => e.isIntersecting)) {
-            this.#visibilityObserver = null
-            observer.disconnect()
-            resolve()
-          }
-        },
-        rootMargin ? { rootMargin } : undefined,
-      )
-      this.#visibilityObserver = observer
-      // The host element uses display:contents and has no layout box,
-      // so observe the first light-DOM child which has actual dimensions.
-      observer.observe(this.firstElementChild ?? this)
+      this.#app = createSSRApp(entryComponent, parsedProps)
+      this.#app.mount(this)
     })
   }
 
   disconnectedCallback(): void {
     this.#connectToken++
-    this.#visibilityObserver?.disconnect()
-    this.#visibilityObserver = null
+    this.#cleanup()
+  }
+
+  /**
+   * Return true if the current connectedCallback is cancelled .
+   * @param token Unique integer generated for each connectedCallback call
+   */
+  #connectCancelled(token: number): boolean {
+    return token !== this.#connectToken || !this.isConnected
+  }
+
+  #cleanup(): void {
+    this.#cleanupSchedule?.()
     this.#app?.unmount()
-    this.#app = null
+    this.#app = this.#cleanupSchedule = undefined
   }
 }
 
