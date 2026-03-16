@@ -18,6 +18,7 @@ const hydrationCases: { name: string; component: string; props?: Record<string, 
   { name: 'Island with barrel import', component: 'with-barrel-import' },
   { name: 'SVG image asset', component: 'with-svg-img' },
   { name: 'Island with visible strategy', component: 'with-visible-island' },
+  { name: 'Island with media strategy', component: 'with-media-island' },
 ]
 
 /**
@@ -138,6 +139,25 @@ describe('Client-side Hydration', () => {
 
     // Scroll to the bottom so the island enters the viewport
     await page.evaluate(() => window.scrollTo(0, document.body.scrollHeight))
+    await page.waitForFunction(() => '_vnode' in document.querySelector('vue-island')!)
+
+    expect(warnings).toEqual([])
+    expect(errors).toEqual([])
+    await page.close()
+  })
+
+  test('media strategy defers hydration until media query matches', async () => {
+    // Open page with a wide viewport (media query "(max-width: 768px)" won't match)
+    const { page, warnings, errors } = await openPage('with-media-island')
+
+    // Island should not be hydrated yet (viewport is wider than 768px)
+    const isHydratedBefore = await page.evaluate(
+      () => '_vnode' in document.querySelector('vue-island')!,
+    )
+    expect(isHydratedBefore).toBe(false)
+
+    // Resize viewport to a narrow width so the media query matches
+    await page.setViewportSize({ width: 500, height: 600 })
     await page.waitForFunction(() => '_vnode' in document.querySelector('vue-island')!)
 
     expect(warnings).toEqual([])
