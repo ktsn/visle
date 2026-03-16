@@ -503,6 +503,7 @@ declare module 'visle' {
     'with-named-import': ComponentProps<typeof import('./pages/with-named-import.vue')['default']>
     'with-multiple-islands': ComponentProps<typeof import('./pages/with-multiple-islands.vue')['default']>
     'with-mount-variation': ComponentProps<typeof import('./pages/with-mount-variation.vue')['default']>
+    'with-media-island': ComponentProps<typeof import('./pages/with-media-island.vue')['default']>
     'with-island': ComponentProps<typeof import('./pages/with-island.vue')['default']>
     'with-island-props': ComponentProps<typeof import('./pages/with-island-props.vue')['default']>
     'with-island-alias': ComponentProps<typeof import('./pages/with-island-alias.vue')['default']>
