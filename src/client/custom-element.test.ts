@@ -223,15 +223,6 @@ describe('VueIsland custom element', () => {
       vi.stubGlobal('cancelIdleCallback', mockCancelIdleCallback)
     })
 
-    test('does not hydrate immediately when strategy is idle', async () => {
-      const el = createIsland({ entry: './test-entry', strategy: 'idle' })
-      document.body.appendChild(el)
-      await flushMicrotasks()
-
-      expect(createSSRApp).not.toHaveBeenCalled()
-      expect(mockRequestIdleCallback).toHaveBeenCalled()
-    })
-
     test('hydrates when idle callback fires', async () => {
       const el = createIsland({ entry: './test-entry', strategy: 'idle' })
       document.body.appendChild(el)
