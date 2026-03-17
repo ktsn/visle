@@ -164,3 +164,23 @@ Hydrates an island component when it enters the viewport.
 ```vue
 <MyComponent v-client:visible="{ rootMargin: '200px' }" />
 ```
+
+### `v-client:idle`
+
+Hydrates an island component when the browser becomes idle.
+
+```vue
+<MyComponent v-client:idle />
+```
+
+**Options:**
+
+- `timeout` — Maximum time to wait before forcing hydration (ms)
+
+### `v-client:media`
+
+Hydrates an island component when the specified media query matches.
+
+```vue
+<MyComponent v-client:media="'(max-width: 768px)'" />
+```

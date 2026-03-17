@@ -32,6 +32,32 @@ You can customize the `rootMargin` to start hydration before the component is fu
 
 This triggers hydration when the component is within 100px of the viewport.
 
+### `v-client:idle`
+
+Defers hydration until the browser is idle, using `requestIdleCallback`:
+
+```vue
+<MyComponent v-client:idle />
+```
+
+You can specify a maximum wait time with `timeout`. The following example forces hydration after 2 seconds:
+
+```vue
+<MyComponent v-client:idle="{ timeout: 2000 }" />
+```
+
+If the browser does not support `requestIdleCallback`, hydration occurs after the `window`'s `load` event.
+
+### `v-client:media`
+
+Defers hydration until the specified media query matches. The following example hydrates when the browser width is 768px or less:
+
+```vue
+<MyComponent v-client:media="'(max-width: 768px)'" />
+```
+
+Note that the value passed to the directive is a JavaScript string literal — wrapped in single quotes inside the double quotes.
+
 ## Props
 
 Props passed to island components must be JSON-serializable. This means you can use:
