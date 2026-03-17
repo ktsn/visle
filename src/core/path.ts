@@ -21,7 +21,7 @@ function hasDriveLetter(p: string): boolean {
  * Matches `/` or drive letter like `C:/`
  */
 function isAbsolute(p: string): boolean {
-  return p.startsWith('/') || /^[a-zA-Z]:\//.test(p)
+  return p.startsWith('/') || hasDriveLetter(p)
 }
 
 export function asAbs(value: string): AbsolutePath {
