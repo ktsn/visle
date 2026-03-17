@@ -507,6 +507,7 @@ declare module 'visle' {
     'with-island': ComponentProps<typeof import('./pages/with-island.vue')['default']>
     'with-island-props': ComponentProps<typeof import('./pages/with-island-props.vue')['default']>
     'with-island-alias': ComponentProps<typeof import('./pages/with-island-alias.vue')['default']>
+    'with-idle-island': ComponentProps<typeof import('./pages/with-idle-island.vue')['default']>
     'with-dynamic-shared-css': ComponentProps<typeof import('./pages/with-dynamic-shared-css.vue')['default']>
     'with-css': ComponentProps<typeof import('./pages/with-css.vue')['default']>
     'with-css-src': ComponentProps<typeof import('./pages/with-css-src.vue')['default']>

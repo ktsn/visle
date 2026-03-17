@@ -18,6 +18,7 @@ const hydrationCases: { name: string; component: string; props?: Record<string, 
   { name: 'Island with barrel import', component: 'with-barrel-import' },
   { name: 'SVG image asset', component: 'with-svg-img' },
   { name: 'Island with visible strategy', component: 'with-visible-island' },
+  { name: 'Island with idle strategy', component: 'with-idle-island' },
   { name: 'Island with media strategy', component: 'with-media-island' },
 ]
 
@@ -139,6 +140,17 @@ describe('Client-side Hydration', () => {
 
     // Scroll to the bottom so the island enters the viewport
     await page.evaluate(() => window.scrollTo(0, document.body.scrollHeight))
+    await page.waitForFunction(() => '_vnode' in document.querySelector('vue-island')!)
+
+    expect(warnings).toEqual([])
+    expect(errors).toEqual([])
+    await page.close()
+  })
+
+  test('idle strategy hydrates when browser is idle', async () => {
+    const { page, warnings, errors } = await openPage('with-idle-island')
+
+    // The idle callback should fire quickly since there's nothing blocking the main thread
     await page.waitForFunction(() => '_vnode' in document.querySelector('vue-island')!)
 
     expect(warnings).toEqual([])
