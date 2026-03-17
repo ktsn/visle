@@ -379,4 +379,11 @@ describe('findVClientElements', () => {
     expect(results).toHaveLength(1)
     expect(results[0]!.tag).toBe('Counter')
   })
+
+  test('finds element with v-client:media', () => {
+    const children = parseTemplate(`<MobileMenu v-client:media="'(max-width: 768px)'" />`)
+    const results = findVClientElements(children)
+    expect(results).toHaveLength(1)
+    expect(results[0]!.tag).toBe('MobileMenu')
+  })
 })

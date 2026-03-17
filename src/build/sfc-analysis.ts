@@ -137,7 +137,8 @@ export function findVClientElements(children: TemplateChildNode[]): ElementNode[
         prop.arg?.type === NodeTypes.SIMPLE_EXPRESSION &&
         (prop.arg.content === 'load' ||
           prop.arg.content === 'visible' ||
-          prop.arg.content === 'idle'),
+          prop.arg.content === 'idle' ||
+          prop.arg.content === 'media'),
     )
 
     if (hasVClient) {

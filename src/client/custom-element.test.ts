@@ -300,6 +300,96 @@ describe('VueIsland custom element', () => {
     })
   })
 
+  describe('media strategy', () => {
+    let mockMatchMedia: ReturnType<typeof vi.fn>
+    let changeHandler: ((event: MediaQueryListEvent) => void) | null
+    let mockRemoveEventListener: ReturnType<typeof vi.fn>
+
+    function stubMatchMedia(matches: boolean) {
+      changeHandler = null
+      mockRemoveEventListener = vi.fn()
+
+      const mql = {
+        matches,
+        addEventListener: vi.fn((_event: string, handler: (event: MediaQueryListEvent) => void) => {
+          changeHandler = handler
+        }),
+        removeEventListener: mockRemoveEventListener,
+      }
+
+      mockMatchMedia = vi.fn(() => mql)
+      vi.stubGlobal('matchMedia', mockMatchMedia)
+      return mql
+    }
+
+    test('hydrates immediately when media query matches', async () => {
+      stubMatchMedia(true)
+
+      const el = createIsland({
+        entry: './test-entry',
+        strategy: 'media',
+        options: '"(max-width: 768px)"',
+      })
+      document.body.appendChild(el)
+      await flushMicrotasks()
+
+      expect(mockMatchMedia).toHaveBeenCalledWith('(max-width: 768px)')
+      expect(createSSRApp).toHaveBeenCalledWith({ name: 'TestComponent' }, {})
+    })
+
+    test('defers and hydrates when media query starts matching', async () => {
+      stubMatchMedia(false)
+
+      const el = createIsland({
+        entry: './test-entry',
+        strategy: 'media',
+        options: '"(max-width: 768px)"',
+      })
+      document.body.appendChild(el)
+      await flushMicrotasks()
+
+      expect(createSSRApp).not.toHaveBeenCalled()
+
+      // Simulate media query change
+      changeHandler!({ matches: true } as MediaQueryListEvent)
+      await flushMicrotasks()
+
+      expect(mockRemoveEventListener).toHaveBeenCalledWith('change', changeHandler)
+      expect(createSSRApp).toHaveBeenCalledWith({ name: 'TestComponent' }, {})
+    })
+
+    test('cleans up listener on disconnect before match', async () => {
+      stubMatchMedia(false)
+
+      const el = createIsland({
+        entry: './test-entry',
+        strategy: 'media',
+        options: '"(max-width: 768px)"',
+      })
+      document.body.appendChild(el)
+      await flushMicrotasks()
+
+      document.body.removeChild(el)
+
+      // Simulate late media query change
+      changeHandler!({ matches: true } as MediaQueryListEvent)
+      await flushMicrotasks()
+
+      expect(createSSRApp).not.toHaveBeenCalled()
+    })
+
+    test('hydrates immediately when options attribute is missing', async () => {
+      const el = createIsland({
+        entry: './test-entry',
+        strategy: 'media',
+      })
+      document.body.appendChild(el)
+      await flushMicrotasks()
+
+      expect(createSSRApp).toHaveBeenCalledWith({ name: 'TestComponent' }, {})
+    })
+  })
+
   describe('disconnectedCallback', () => {
     test('unmounts the app on disconnect', async () => {
       const el = createIsland({ entry: './test-entry' })

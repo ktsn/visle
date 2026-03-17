@@ -30,6 +30,21 @@ exports[`Client-side Hydration > 'Island with idle strategy' 1`] = `
 </div>
 `;
 
+exports[`Client-side Hydration > 'Island with media strategy' 1`] = `
+<div>
+  <vue-island
+    entry="/assets/Counter-[hash].js"
+    serialized-props="{&quot;count&quot;:5}"
+    strategy="media"
+    options="&quot;(max-width: 768px)&quot;"
+  >
+    <button>
+      Count: 5
+    </button>
+  </vue-island>
+</div>
+`;
+
 exports[`Client-side Hydration > 'Island with named import' 1`] = `
 <div>
   <h1>
