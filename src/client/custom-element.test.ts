@@ -208,6 +208,98 @@ describe('VueIsland custom element', () => {
     })
   })
 
+  describe('idle strategy', () => {
+    let mockRequestIdleCallback: ReturnType<typeof vi.fn>
+    let mockCancelIdleCallback: ReturnType<typeof vi.fn>
+
+    beforeEach(() => {
+      mockRequestIdleCallback = vi.fn((_cb: IdleRequestCallback) => {
+        // Store callback but don't call it immediately
+        return 42
+      })
+      mockCancelIdleCallback = vi.fn()
+
+      vi.stubGlobal('requestIdleCallback', mockRequestIdleCallback)
+      vi.stubGlobal('cancelIdleCallback', mockCancelIdleCallback)
+    })
+
+    test('hydrates when idle callback fires', async () => {
+      const el = createIsland({ entry: './test-entry', strategy: 'idle' })
+      document.body.appendChild(el)
+      await flushMicrotasks()
+
+      expect(createSSRApp).not.toHaveBeenCalled()
+
+      // Fire the idle callback
+      const idleCallback = mockRequestIdleCallback.mock.calls[0]![0] as () => void
+      idleCallback()
+      await flushMicrotasks()
+
+      expect(createSSRApp).toHaveBeenCalledWith({ name: 'TestComponent' }, {})
+    })
+
+    test('cleans up on disconnect before idle fires', async () => {
+      const el = createIsland({ entry: './test-entry', strategy: 'idle' })
+      document.body.appendChild(el)
+      await flushMicrotasks()
+
+      document.body.removeChild(el)
+
+      expect(mockCancelIdleCallback).toHaveBeenCalledWith(42)
+    })
+
+    test('passes timeout option from options attribute', async () => {
+      const el = createIsland({
+        entry: './test-entry',
+        strategy: 'idle',
+        options: '{"timeout":2000}',
+      })
+      document.body.appendChild(el)
+      await flushMicrotasks()
+
+      expect(mockRequestIdleCallback).toHaveBeenCalledWith(expect.any(Function), { timeout: 2000 })
+    })
+
+    test('falls back to load event + setTimeout when requestIdleCallback is unavailable', async () => {
+      vi.stubGlobal('requestIdleCallback', undefined)
+
+      // Simulate a loading document so the fallback waits for the load event
+      Object.defineProperty(document, 'readyState', {
+        value: 'loading',
+        writable: true,
+        configurable: true,
+      })
+
+      const el = createIsland({ entry: './test-entry', strategy: 'idle' })
+      document.body.appendChild(el)
+      await flushMicrotasks()
+
+      expect(createSSRApp).not.toHaveBeenCalled()
+
+      // Restore readyState and simulate load event
+      Object.defineProperty(document, 'readyState', {
+        value: 'complete',
+        writable: true,
+        configurable: true,
+      })
+      window.dispatchEvent(new Event('load'))
+      await flushMicrotasks()
+
+      expect(createSSRApp).toHaveBeenCalledWith({ name: 'TestComponent' }, {})
+    })
+
+    test('falls back to setTimeout immediately when requestIdleCallback is unavailable and document is already complete', async () => {
+      vi.stubGlobal('requestIdleCallback', undefined)
+
+      // document.readyState is already 'complete' in happy-dom by default
+      const el = createIsland({ entry: './test-entry', strategy: 'idle' })
+      document.body.appendChild(el)
+      await flushMicrotasks()
+
+      expect(createSSRApp).toHaveBeenCalledWith({ name: 'TestComponent' }, {})
+    })
+  })
+
   describe('disconnectedCallback', () => {
     test('unmounts the app on disconnect', async () => {
       const el = createIsland({ entry: './test-entry' })
