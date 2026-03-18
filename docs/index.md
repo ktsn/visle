@@ -6,6 +6,9 @@ hero:
   tagline: Islands Architecture Renderer for Vue.js
 ---
 
+> [!WARNING]
+> This library is not production ready yet. Use at your own risk.
+
 ## Getting Started
 
 Visle is not a framework — it is an HTML renderer that uses Vue templates as a template engine. It renders pages on the server as static HTML, and lets you selectively hydrate interactive parts as islands on the client.
