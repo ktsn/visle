@@ -16,7 +16,7 @@ jobs:
     steps:
       - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6
 
-      - uses: voidzero-dev/setup-vp@3c260a15f27f2af781536250480a2eae32e56a24 # v1
+      - uses: voidzero-dev/setup-vp@af9f92ccd3e5694c919913c47be133a1847ea58e # v1
         with:
           node-version: '24'
           cache: true
@@ -40,7 +40,7 @@ jobs:
     steps:
       - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6
 
-      - uses: voidzero-dev/setup-vp@3c260a15f27f2af781536250480a2eae32e56a24 # v1
+      - uses: voidzero-dev/setup-vp@af9f92ccd3e5694c919913c47be133a1847ea58e # v1
         with:
           node-version: '24'
           cache: true
@@ -64,7 +64,7 @@ jobs:
         with:
           fetch-depth: 0
 
-      - uses: voidzero-dev/setup-vp@3c260a15f27f2af781536250480a2eae32e56a24 # v1
+      - uses: voidzero-dev/setup-vp@af9f92ccd3e5694c919913c47be133a1847ea58e # v1
         with:
           node-version: '24'
           cache: true
