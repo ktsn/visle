@@ -41,8 +41,7 @@
     "@vitejs/plugin-vue": "^6.0.3",
     "@vue/compiler-core": "^3.5.28",
     "connect": "^3.7.0",
-    "glob": "^13.0.0",
-    "vite": "npm:@voidzero-dev/vite-plus-core@latest"
+    "glob": "^13.0.0"
   },
   "devDependencies": {
     "@babel/types": "7.29.0",
@@ -60,6 +59,7 @@
     "playwright": "1.58.2",
     "rollup": "4.59.0",
     "typescript": "5.9.3",
+    "vite": "npm:@voidzero-dev/vite-plus-core@latest",
     "vite-plus": "latest",
     "vitepress": "2.0.0-alpha.16",
     "vitest": "npm:@voidzero-dev/vite-plus-test@latest",
