@@ -4,7 +4,7 @@
   "type": "module",
   "scripts": {
     "dev": "node src/dev.ts",
-    "build": "vite build",
+    "build": "vp build",
     "start": "node src/prod.ts"
   },
   "dependencies": {
@@ -14,6 +14,6 @@
     "vue": "^3.5.28"
   },
   "devDependencies": {
-    "vite": "^8.0.0"
+    "vite": "npm:@voidzero-dev/vite-plus-core@latest"
   }
 }
