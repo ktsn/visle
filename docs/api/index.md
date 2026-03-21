@@ -136,6 +136,11 @@ interface VisleConfig {
    * Default: 'visle-generated.d.ts'
    */
   dts?: string | null
+
+  /**
+   * @vitejs/plugin-vue options
+   */
+  vue?: ViteVuePluginOptions
 }
 ```
 
