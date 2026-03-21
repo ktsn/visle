@@ -1,3 +1,5 @@
+import type { Options } from '@vitejs/plugin-vue'
+
 /**
  * Configuration for Visle plugin
  */
@@ -6,6 +8,9 @@ export interface VisleConfig {
   serverOutDir?: string
   clientOutDir?: string
   dts?: string | null
+
+  /** @vitejs/plugin-vue options */
+  vue?: Options
 }
 
 /**
@@ -18,6 +23,7 @@ export const defaultConfig: ResolvedVisleConfig = {
   clientOutDir: 'dist/client',
   serverOutDir: 'dist/server',
   dts: 'visle-generated.d.ts',
+  vue: {},
 }
 
 const visleConfigKey = '__visle'
