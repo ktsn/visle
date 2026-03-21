@@ -34,6 +34,8 @@ export default defineConfig({
 })
 ```
 
+Do not add `@vitejs/plugin-vue` since Visle plugin includes it internally.
+
 ### Create a Page Component
 
 Create a Vue component in the `src/pages/` directory. This is the default entry directory for Visle.
