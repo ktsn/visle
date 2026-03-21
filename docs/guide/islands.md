@@ -60,20 +60,32 @@ Note that the value passed to the directive is a JavaScript string literal — w
 
 ## Props
 
-Props passed to island components must be JSON-serializable. This means you can use:
+Props passed to island components must be serializable. The following values are supported:
 
-- Strings, numbers, booleans
-- Plain objects
-- Arrays
+- Strings, numbers, booleans, `null`, `undefined`
+- Plain objects and arrays
+- `Date`
+- `RegExp`
+- `Map` and `Set`
+- `URL`
+- `BigInt`
+- `Infinity`, `-Infinity`, `NaN`
 
-Functions, class instances, and other non-serializable values are not supported as island props.
+Functions, symbols, class instances, and circular references are not supported and will throw an error.
 
 ```vue
 <!-- OK -->
-<ProductCard v-client:load :product="{ id: 1, name: 'Shirt' }" />
+<ProductCard
+  v-client:load
+  :product="{
+    id: 1,
+    name: 'Shirt',
+    tags: new Set(['vue', 'visle']),
+  }"
+></ProductCard>
 
 <!-- Not supported: function prop -->
-<ProductCard v-client:load :get-product="(id) => productStore.get(id)" />
+<ProductCard v-client:load :get-product="(id) => productStore.get(id)"></ProductCard>
 ```
 
 ## How It Works
