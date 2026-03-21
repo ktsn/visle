@@ -3,9 +3,9 @@ import path from 'node:path'
 import { Component, createApp } from 'vue'
 import { renderToString } from 'vue/server-renderer'
 
-import { defaultConfig } from '../core/config.js'
-import { resolveServerDistPath } from '../core/entry.js'
-import { asAbs } from '../core/path.js'
+import { defaultConfig } from '../shared/config.js'
+import { resolveServerDistPath } from '../shared/entry.js'
+import { asAbs } from '../shared/path.js'
 import { RuntimeManifest, loadManifest } from './manifest.js'
 import { transformWithRenderContext } from './transform.js'
 

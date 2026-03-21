@@ -6,7 +6,7 @@ import { createServer, type RunnableDevEnvironment, type ViteDevServer } from 'v
 import { afterEach, beforeEach, describe, expect, test } from 'vite-plus/test'
 
 import { visle } from '../build/index.ts'
-import { virtualIslandsBootstrapPath } from '../core/entry.ts'
+import { virtualIslandsBootstrapPath } from '../shared/entry.ts'
 import { createDevManifest } from './manifest.ts'
 
 const generatedDir = path.resolve(import.meta.dirname, '../../test/__generated__/dev')

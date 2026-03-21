@@ -1,8 +1,8 @@
 import vuePlugin from '@vitejs/plugin-vue'
 import { createObjectProperty, createSimpleExpression, NodeTypes } from '@vue/compiler-core'
 
-import { generateComponentId } from '../core/component-id.js'
-import type { ResolvedVisleConfig } from '../core/config.js'
+import { generateComponentId } from '../shared/component-id.js'
+import type { ResolvedVisleConfig } from '../shared/config.js'
 
 /**
  * Wrap @vitejs/plugin-vue to inject Visle specific options.

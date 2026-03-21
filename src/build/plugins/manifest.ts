@@ -1,8 +1,8 @@
 import type { Plugin } from 'vite'
 
-import type { ResolvedVisleConfig } from '../../core/config.js'
-import type { ManifestData } from '../../core/manifest.js'
-import { asAbs, relative } from '../../core/path.js'
+import type { ResolvedVisleConfig } from '../../shared/config.js'
+import type { ManifestData } from '../../shared/manifest.js'
+import { asAbs, relative } from '../../shared/path.js'
 import { islandsBootstrapPath } from '../paths.js'
 
 interface ManifestPluginResult {

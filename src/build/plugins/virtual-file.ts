@@ -1,8 +1,8 @@
 import { Plugin } from 'vite'
 
-import type { ResolvedVisleConfig } from '../../core/config.js'
-import { virtualIslandsBootstrapPath } from '../../core/entry.js'
-import { type AbsolutePath, asAbs, resolve } from '../../core/path.js'
+import type { ResolvedVisleConfig } from '../../shared/config.js'
+import { virtualIslandsBootstrapPath } from '../../shared/entry.js'
+import { type AbsolutePath, asAbs, resolve } from '../../shared/path.js'
 import { generateServerVirtualEntryCode, serverVirtualEntryId } from '../generate.js'
 import { islandsBootstrapPath, resolveServerComponentIds } from '../paths.js'
 

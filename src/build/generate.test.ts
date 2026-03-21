@@ -1,6 +1,6 @@
 import { describe, test, expect } from 'vite-plus/test'
 
-import { asAbs } from '../core/path.ts'
+import { asAbs } from '../shared/path.ts'
 import { generateEntryTypesCode } from './generate.ts'
 
 describe('generateEntryTypesCode', () => {

@@ -4,10 +4,10 @@ import connect from 'connect'
 import { Connect, createServer, InlineConfig, isRunnableDevEnvironment } from 'vite'
 import type { RunnableDevEnvironment, ViteDevServer } from 'vite'
 
-import { getVisleConfig } from '../core/config.js'
-import { asAbs, resolve } from '../core/path.js'
 import { RuntimeManifest } from '../server/manifest.js'
 import { RenderLoader } from '../server/render.js'
+import { getVisleConfig } from '../shared/config.js'
+import { asAbs, resolve } from '../shared/path.js'
 import { createDevManifest } from './manifest.js'
 
 interface DevRenderLoader extends RenderLoader {

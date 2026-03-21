@@ -4,7 +4,7 @@ import path from 'node:path'
 import { beforeEach, afterEach, describe, expect, test } from 'vite-plus/test'
 
 import { prodBuild } from '../../../test/utils.ts'
-import { manifestFileName } from '../../core/manifest.ts'
+import { manifestFileName } from '../../shared/manifest.ts'
 
 const generatedDir = path.resolve(import.meta.dirname, '../../../test/__generated__/server')
 

@@ -3,12 +3,12 @@ import fs from 'node:fs/promises'
 import { type EnvironmentModuleNode, type ViteDevServer } from 'vite'
 import { parse, SFCBlock } from 'vue/compiler-sfc'
 
-import { generateComponentId } from '../core/component-id.js'
-import { getVisleConfig } from '../core/config.js'
-import { virtualIslandsBootstrapPath } from '../core/entry.js'
-import { isCSS } from '../core/module-id.js'
-import { asAbs, asRel, dirname, join, relative, resolve } from '../core/path.js'
 import { type RuntimeManifest } from '../server/manifest.js'
+import { generateComponentId } from '../shared/component-id.js'
+import { getVisleConfig } from '../shared/config.js'
+import { virtualIslandsBootstrapPath } from '../shared/entry.js'
+import { isCSS } from '../shared/module-id.js'
+import { asAbs, asRel, dirname, join, relative, resolve } from '../shared/path.js'
 import { getServerEnvironment } from './index.js'
 
 /**

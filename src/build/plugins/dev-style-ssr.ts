@@ -5,8 +5,8 @@
 
 import type { Plugin } from 'vite'
 
-import { isCSS } from '../../core/module-id.js'
-import { type AbsolutePath, asAbs } from '../../core/path.js'
+import { isCSS } from '../../shared/module-id.js'
+import { type AbsolutePath, asAbs } from '../../shared/path.js'
 
 /**
  * Development-only plugin that removes server-rendered `<link>` style tags

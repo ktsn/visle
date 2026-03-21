@@ -2,7 +2,7 @@ import path from 'node:path'
 
 import { globSync } from 'glob'
 
-import { type AbsolutePath, asAbs, asRel, join, resolve } from '../core/path.js'
+import { type AbsolutePath, asAbs, asRel, join, resolve } from '../shared/path.js'
 import { componentWrapPrefix } from './generate.js'
 
 // -----------------------------

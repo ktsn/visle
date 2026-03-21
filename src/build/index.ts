@@ -3,9 +3,9 @@ import path from 'node:path'
 
 import type { Plugin } from 'vite'
 
-import { type VisleConfig, defaultConfig, setVisleConfig } from '../core/config.js'
-import { manifestFileName } from '../core/manifest.js'
-import { asAbs, join, resolve } from '../core/path.js'
+import { type VisleConfig, defaultConfig, setVisleConfig } from '../shared/config.js'
+import { manifestFileName } from '../shared/manifest.js'
+import { asAbs, join, resolve } from '../shared/path.js'
 import { serverVirtualEntryId } from './generate.js'
 import { islandsBootstrapPath, resolveServerComponentIds } from './paths.js'
 import { devStyleSSRPlugin } from './plugins/dev-style-ssr.js'

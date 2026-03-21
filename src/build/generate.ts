@@ -1,4 +1,4 @@
-import { type AbsolutePath, type RelativePath, relative } from '../core/path.js'
+import { type AbsolutePath, type RelativePath, relative } from '../shared/path.js'
 
 export const serverVirtualEntryId = '\0@visle/server-entry'
 
