@@ -71,7 +71,7 @@ Props passed to island components must be serializable. The following values are
 - `BigInt`
 - `Infinity`, `-Infinity`, `NaN`
 
-Functions, symbols, class instances, and circular references are not supported and will throw an error.
+Functions, symbols, custom class instances (non-built-in), and circular references are not supported and will throw an error.
 
 ```vue
 <!-- OK -->
