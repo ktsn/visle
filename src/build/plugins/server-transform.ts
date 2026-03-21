@@ -1,7 +1,7 @@
 import type { Plugin, ResolvedConfig } from 'vite'
 import { parse } from 'vue/compiler-sfc'
 
-import { asAbs, relative } from '../../core/path.js'
+import { asAbs, relative } from '../../shared/path.js'
 import { generateComponentWrapperCode, componentWrapPrefix } from '../generate.js'
 import { parseId } from '../paths.js'
 import { buildImportMap, findVClientElements } from '../sfc-analysis.js'

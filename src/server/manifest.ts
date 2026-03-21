@@ -1,7 +1,7 @@
 import fs from 'node:fs/promises'
 
-import { manifestFileName, type ManifestData } from '../core/manifest.js'
-import { type AbsolutePath, join } from '../core/path.js'
+import { manifestFileName, type ManifestData } from '../shared/manifest.js'
+import { type AbsolutePath, join } from '../shared/path.js'
 
 export interface RuntimeManifest {
   getClientImportId(componentRelativePath: string): Promise<string>

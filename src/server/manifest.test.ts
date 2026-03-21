@@ -3,8 +3,8 @@ import path from 'node:path'
 
 import { afterEach, beforeEach, describe, expect, test } from 'vite-plus/test'
 
-import { manifestFileName } from '../core/manifest.ts'
-import { asAbs } from '../core/path.ts'
+import { manifestFileName } from '../shared/manifest.ts'
+import { asAbs } from '../shared/path.ts'
 import { loadManifest } from './manifest.ts'
 
 const generatedDir = path.resolve(import.meta.dirname, '../../test/__generated__/server')

@@ -2,8 +2,8 @@ import fs from 'node:fs/promises'
 
 import type { Plugin } from 'vite'
 
-import type { ResolvedVisleConfig } from '../../core/config.js'
-import { type AbsolutePath, asAbs, resolve } from '../../core/path.js'
+import type { ResolvedVisleConfig } from '../../shared/config.js'
+import { type AbsolutePath, asAbs, resolve } from '../../shared/path.js'
 import { generateEntryTypesCode } from '../generate.js'
 import { resolveServerComponentIds } from '../paths.js'
 
