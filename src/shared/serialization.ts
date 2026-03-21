@@ -13,6 +13,23 @@ const TYPE_INFINITY = 8
 const TYPE_NEG_INFINITY = 9
 const TYPE_NAN = 10
 
+/**
+ * Serialize props value passed to island components.
+ * It supports JSON serializable values and types in type codes defined above.
+ * Non-JSON serializable values will be encoded to a tagged-tuple which has
+ * a type code and a serialized payload.
+ *
+ * @example
+ * ```
+ * [1, 2, 3] -> [0, [1, 2, 3]]
+ * undefined -> [1]
+ * new Date("2024-01-01") -> [2, "2024-01-01T00:00:00.000Z"]
+ * ```
+ *
+ * It does not support circular data structures. Throws an error it it is detected.
+ *
+ * The output is a JSON string with tagged-tuple encoding.
+ */
 export function serializeProps(props: Record<string, unknown>): string {
   const seen = new WeakSet<object>()
   const serialized: Record<string, unknown> = {}
@@ -22,6 +39,10 @@ export function serializeProps(props: Record<string, unknown>): string {
   return JSON.stringify(serialized)
 }
 
+/**
+ * Deserialize props value from JSON string with tagged-tuple encoding.
+ * If the JSON's root value is not an object, it returns an empty object.
+ */
 export function deserializeProps(json: string): Record<string, unknown> {
   const parsed: unknown = JSON.parse(json)
   if (!isRecord(parsed)) {
