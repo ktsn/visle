@@ -131,7 +131,7 @@ describe('wrapVuePlugin', () => {
 
     // whitespace: 'preserve' should keep whitespace as-is
     expect(code).toContain('  hello  ')
-    // comments: true should keep HTML comments in the output
+    // comments: false should remove HTML comments from the output
     expect(code).not.toContain('greeting')
   })
 
