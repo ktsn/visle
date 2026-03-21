@@ -5,7 +5,14 @@ import path from 'node:path'
 import { chromium, type Browser, type Page } from 'playwright'
 import { describe, test, expect, beforeAll, afterAll } from 'vite-plus/test'
 
-import { createTmpDir, copyFixtures, prodBuild, prodRender, normalizeHashes } from './utils.ts'
+import {
+  createTmpDir,
+  removeTmpDir,
+  copyFixtures,
+  prodBuild,
+  prodRender,
+  normalizeHashes,
+} from './utils.ts'
 
 /**
  * Only pages that contain island components.
@@ -86,6 +93,7 @@ describe('Client-side Hydration', () => {
   afterAll(async () => {
     await browser?.close()
     server?.close()
+    await removeTmpDir('e2e-client')
   })
 
   /**
