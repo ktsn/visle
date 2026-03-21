@@ -302,7 +302,7 @@ exports[`Dev Server SSR > 'Island with props' 1`] = `
 <div>
   <vue-island
     entry="/components/Counter.vue"
-    serialized-props="{&quot;count&quot;:42,&quot;label&quot;:&quot;Click me&quot;}"
+    props="{&quot;count&quot;:42,&quot;label&quot;:&quot;Click me&quot;}"
   >
     <button label="Click me">
       Count: 42
@@ -420,7 +420,7 @@ exports[`Dev Server SSR > 'Same component as island and server' 1`] = `
 <div>
   <vue-island
     entry="/components/Counter.vue"
-    serialized-props="{&quot;count&quot;:1}"
+    props="{&quot;count&quot;:1}"
   >
     <button>
       Count: 1

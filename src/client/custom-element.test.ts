@@ -3,6 +3,7 @@
 import { describe, expect, test, vi, beforeEach } from 'vite-plus/test'
 import { createSSRApp } from 'vue'
 
+import { serializeProps } from '../shared/serialization.ts'
 import { VueIsland } from './custom-element.ts'
 
 vi.mock('vue', () => ({
@@ -63,10 +64,10 @@ describe('VueIsland custom element', () => {
       expect(app.mount).toHaveBeenCalledWith(el)
     })
 
-    test('passes parsed props from serialized-props attribute', async () => {
+    test('passes parsed props from props attribute', async () => {
       const el = createIsland({
         entry: './test-entry',
-        'serialized-props': '{"msg":"hello","count":42}',
+        props: '{"msg":"hello","count":42}',
       })
       document.body.appendChild(el)
       await flushMicrotasks()
@@ -77,20 +78,19 @@ describe('VueIsland custom element', () => {
       )
     })
 
-    test('falls back to empty object on invalid JSON in serialized-props', async () => {
-      const el = createIsland({ entry: './test-entry', 'serialized-props': '{invalid' })
+    test('deserializes tagged-tuple props (e.g. Date) back to original types', async () => {
+      const date = new Date('2024-06-15T00:00:00.000Z')
+      const el = createIsland({
+        entry: './test-entry',
+        props: serializeProps({ created: date, tags: [1, 2] }),
+      })
       document.body.appendChild(el)
       await flushMicrotasks()
 
-      expect(createSSRApp).toHaveBeenCalledWith({ name: 'TestComponent' }, {})
-    })
-
-    test('falls back to empty object when serialized-props is a non-object JSON value', async () => {
-      const el = createIsland({ entry: './test-entry', 'serialized-props': '"string"' })
-      document.body.appendChild(el)
-      await flushMicrotasks()
-
-      expect(createSSRApp).toHaveBeenCalledWith({ name: 'TestComponent' }, {})
+      const passedProps = vi.mocked(createSSRApp).mock.calls[0]![1] as Record<string, unknown>
+      expect(passedProps.created).toBeInstanceOf(Date)
+      expect((passedProps.created as Date).toISOString()).toBe('2024-06-15T00:00:00.000Z')
+      expect(passedProps.tags).toEqual([1, 2])
     })
 
     test('does not mount if disconnected during import', async () => {

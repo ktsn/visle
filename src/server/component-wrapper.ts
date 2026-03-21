@@ -1,6 +1,7 @@
 import type { Component } from 'vue'
 import { defineComponent, h, useSSRContext, useAttrs, inject, provide, onServerPrefetch } from 'vue'
 
+import { serializeProps } from '../shared/serialization.js'
 import type { RenderContext } from './render.js'
 import { islandSymbol } from './symbol.js'
 
@@ -47,7 +48,7 @@ export function createComponentWrapper(
             'vue-island',
             {
               entry: clientImportId,
-              'serialized-props': isEmptyProps ? undefined : JSON.stringify(attrs),
+              props: isEmptyProps ? undefined : serializeProps(attrs),
               'imported-name': importedName === 'default' ? undefined : importedName,
               strategy: strategy === 'load' ? undefined : strategy,
               options: options ? JSON.stringify(options) : undefined,
