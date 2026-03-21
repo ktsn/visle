@@ -8,6 +8,8 @@ import { visle } from '../build/index.ts'
 import { createDevLoader } from '../dev/index.ts'
 import { createRender } from './render.ts'
 
+const generatedDir = path.resolve(import.meta.dirname, '../../test/__generated__/server')
+
 /**
  * Save JavaScript code provided as the argument.
  *
@@ -33,8 +35,8 @@ describe('createRender', () => {
   let root: string
 
   beforeEach(async () => {
-    const tmpDir = path.resolve('test/__generated__/server')
-    root = await fs.mkdtemp(path.join(tmpDir, 'render-'))
+    await fs.mkdir(generatedDir, { recursive: true })
+    root = await fs.mkdtemp(path.join(generatedDir, 'render-'))
   })
 
   afterEach(async () => {
