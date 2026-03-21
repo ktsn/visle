@@ -110,6 +110,31 @@ describe('wrapVuePlugin', () => {
     expect(code).toContain('__visle_strategy__')
   })
 
+  test('additional compilerOptions', async () => {
+    await createTestServer({
+      ...defaultConfig,
+      vue: {
+        template: {
+          compilerOptions: {
+            whitespace: 'preserve',
+            comments: false,
+          },
+        },
+      },
+    })
+
+    const filePath = await writeTempVue(
+      'compiler-options',
+      `<template><div>  hello  <!-- greeting -->  world  </div></template>`,
+    )
+    const code = await transform(filePath)
+
+    // whitespace: 'preserve' should keep whitespace as-is
+    expect(code).toContain('  hello  ')
+    // comments: true should keep HTML comments in the output
+    expect(code).not.toContain('greeting')
+  })
+
   test('additional feature', async () => {
     await createTestServer({
       ...defaultConfig,
