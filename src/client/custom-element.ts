@@ -1,5 +1,6 @@
 import { createSSRApp, App } from 'vue'
 
+import { deserializeProps } from '../shared/serialization.js'
 import { loadModule } from './load-module.js'
 import { strategies } from './strategy/index.js'
 import { load } from './strategy/load.js'
@@ -81,7 +82,7 @@ export class VueIsland extends HTMLElement {
         return
       }
 
-      const parsedProps = safeParseObject(this.getAttribute('serialized-props'))
+      const parsedProps = deserializeProps(this.getAttribute('props') ?? '{}')
 
       this.#app = createSSRApp(entryComponent, parsedProps)
       this.#app.mount(this)
@@ -105,23 +106,6 @@ export class VueIsland extends HTMLElement {
     this.#cleanupSchedule?.()
     this.#app?.unmount()
     this.#app = this.#cleanupSchedule = undefined
-  }
-}
-
-/**
- * Parse a JSON string as an object, returning an empty object if
- * parsing fails or the parsed value is not an object.
- */
-function safeParseObject(value: string | null): Record<string, unknown> {
-  if (!value) {
-    return {}
-  }
-
-  try {
-    const parsed = JSON.parse(value)
-    return typeof parsed === 'object' && parsed != null ? parsed : {}
-  } catch {
-    return {}
   }
 }
 
