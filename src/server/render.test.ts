@@ -34,9 +34,11 @@ describe('createRender', () => {
 
   beforeEach(async () => {
     const tmpDir = path.resolve('test/__generated__/server')
-    root = path.join(tmpDir, `islands-test-${Math.random()}`)
+    root = await fs.mkdtemp(path.join(tmpDir, 'render-'))
+  })
+
+  afterEach(async () => {
     await fs.rm(root, { recursive: true, force: true })
-    await fs.mkdir(root, { recursive: true })
   })
 
   describe('isDev = false', () => {

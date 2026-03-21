@@ -52,6 +52,14 @@ export async function createTmpDir(name: string): Promise<string> {
 }
 
 /**
+ * Remove a temporary directory created by `createTmpDir`.
+ */
+export async function removeTmpDir(name: string): Promise<void> {
+  const root = path.join(tmpDir, name)
+  await fs.rm(root, { recursive: true, force: true })
+}
+
+/**
  * Copy fixture files into a temporary directory.
  */
 export async function copyFixtures(root: string): Promise<void> {

@@ -1,12 +1,13 @@
 import fs from 'node:fs/promises'
 import path from 'node:path'
 
-import { describe, test, expect, beforeAll } from 'vite-plus/test'
+import { describe, test, expect, beforeAll, afterAll } from 'vite-plus/test'
 
 import { manifestFileName } from '../src/core/manifest.ts'
 import { RenderFunction } from '../src/server/render.ts'
 import {
   createTmpDir,
+  removeTmpDir,
   copyFixtures,
   prodBuild,
   prodRender,
@@ -24,6 +25,10 @@ describe('Production Build SSR', () => {
     await copyFixtures(root)
     await prodBuild(root)
     render = prodRender(root)
+  })
+
+  afterAll(async () => {
+    await removeTmpDir('prod')
   })
 
   test('Build output files', async () => {
@@ -74,6 +79,10 @@ describe('Production Build SSR with manual chunks', () => {
       },
     })
     render = prodRender(root)
+  })
+
+  afterAll(async () => {
+    await removeTmpDir('prod-manual-chunks')
   })
 
   test('all styles are merged into one CSS file', async () => {
