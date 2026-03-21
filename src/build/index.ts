@@ -1,11 +1,8 @@
 import fs from 'node:fs/promises'
 import path from 'node:path'
 
-import vue from '@vitejs/plugin-vue'
-import { createObjectProperty, createSimpleExpression, NodeTypes } from '@vue/compiler-core'
 import type { Plugin } from 'vite'
 
-import { generateComponentId } from '../shared/component-id.js'
 import { type VisleConfig, defaultConfig, setVisleConfig } from '../shared/config.js'
 import { manifestFileName } from '../shared/manifest.js'
 import { asAbs, join, resolve } from '../shared/path.js'
@@ -16,6 +13,7 @@ import { entryTypesPlugin } from './plugins/entry-types.js'
 import { manifestPlugin } from './plugins/manifest.js'
 import { serverTransformPlugin } from './plugins/server-transform.js'
 import { virtualFilePlugin } from './plugins/virtual-file.js'
+import { wrapVuePlugin } from './vue.js'
 
 export type { VisleConfig }
 
@@ -35,6 +33,7 @@ export function visle(config: VisleConfig = {}): Plugin[] {
   const virtualFile = virtualFilePlugin(resolvedConfig)
   const { plugin: manifest, getManifestData } = manifestPlugin(resolvedConfig)
   const { plugin: entryTypes, generate: generateEntryTypes } = entryTypesPlugin(resolvedConfig)
+  const vuePlugin = wrapVuePlugin(resolvedConfig)
 
   const orchestrationPlugin: Plugin = {
     name: 'visle:orchestration',
@@ -145,44 +144,7 @@ export function visle(config: VisleConfig = {}): Plugin[] {
     virtualFile,
     manifest,
     entryTypes,
-    vue({
-      features: {
-        componentIdGenerator: (filePath, source, isProduction) => {
-          return generateComponentId(filePath, source, isProduction ?? false)
-        },
-      },
-      template: {
-        compilerOptions: {
-          isCustomElement: (tag) => tag === 'vue-island',
-          directiveTransforms: {
-            // server-transform plugin searches v-client directive to detect
-            // island component. Strip v-client directive here to make sure to
-            // remove it in all environment.
-            client: (dir) => {
-              const props = [
-                createObjectProperty(
-                  createSimpleExpression('__visle_strategy__', true),
-                  createSimpleExpression(
-                    JSON.stringify(
-                      dir.arg?.type === NodeTypes.SIMPLE_EXPRESSION ? dir.arg.content : 'load',
-                    ),
-                    false,
-                  ),
-                ),
-              ]
-
-              if (dir.exp) {
-                props.push(
-                  createObjectProperty(createSimpleExpression('__visle_options__', true), dir.exp),
-                )
-              }
-
-              return { props }
-            },
-          },
-        },
-      },
-    }),
+    vuePlugin,
     devStyleSSRPlugin(),
   ]
 }
