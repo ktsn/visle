@@ -9,7 +9,7 @@ import { defaultConfig, type ResolvedVisleConfig } from '../core/config.ts'
 import { wrapVuePlugin } from './vue.ts'
 
 const root = path.resolve(__dirname, '..', '..')
-const tempDir = path.resolve(root, 'test/__generated__/server')
+const tempDir = path.resolve(root, 'test/__generated__/server/vue-plugin')
 
 describe('wrapVuePlugin', () => {
   let server: ViteDevServer | undefined
