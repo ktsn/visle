@@ -62,7 +62,6 @@ describe('entryTypesPlugin', () => {
     await hook(createServer(watcher))
 
     expect(resolveServerComponentIds).toHaveBeenCalledWith('/project/src/pages')
-    expect(fs.mkdir).toHaveBeenCalledWith('/project', { recursive: true })
     expect(fs.writeFile).toHaveBeenCalledWith(
       '/project/visle-generated.d.ts',
       expect.stringMatching('Index'),
@@ -228,6 +227,7 @@ describe('entryTypesPlugin', () => {
 
     await generate()
 
+    expect(fs.mkdir).toHaveBeenCalledWith('/project/types', { recursive: true })
     expect(fs.writeFile).toHaveBeenCalledWith(
       '/project/types/visle.d.ts',
       expect.stringMatching('Index'),
