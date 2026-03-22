@@ -22,7 +22,7 @@ export const defaultConfig: ResolvedVisleConfig = {
   entryDir: 'src/pages',
   clientOutDir: 'dist/client',
   serverOutDir: 'dist/server',
-  dts: 'visle-generated.d.ts',
+  dts: 'src/visle-generated.d.ts',
   vue: {},
 }
 

@@ -40,7 +40,7 @@ interface RenderFunction<T> {
 
 ### `VisleEntries`
 
-An interface for declaring available entry components and their prop types. Populated by the generated `visle-generated.d.ts` via module augmentation.
+An interface for declaring available entry components and their prop types. Populated by the generated `src/visle-generated.d.ts` via module augmentation.
 
 ```ts
 import { createRender, type VisleEntries } from 'visle'
@@ -133,7 +133,7 @@ interface VisleConfig {
   /**
    * Path for generated type definition file.
    * Set to `null` to disable.
-   * Default: 'visle-generated.d.ts'
+   * Default: 'src/visle-generated.d.ts'
    */
   dts?: string | null
 

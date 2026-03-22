@@ -44,8 +44,8 @@ describe('Production Build SSR', () => {
     expect(JSON.parse(normalizeHashes(manifestJson))).toMatchSnapshot()
   })
 
-  test('Type definition file is generated in project root', async () => {
-    const dtsPath = path.join(root, 'visle-generated.d.ts')
+  test('Type definition file is generated', async () => {
+    const dtsPath = path.join(root, 'src/visle-generated.d.ts')
     const content = await fs.readFile(dtsPath, 'utf-8')
 
     expect(content).toMatchSnapshot()

@@ -10,7 +10,7 @@ export type ComponentProps<T> = T extends new (...args: any) => { $props: infer 
 
 /**
  * Map of component paths to their props types.
- * Populated by the generated `visle-generated.d.ts` via module augmentation.
+ * Populated by the generated d.ts file via module augmentation.
  * Pass to `createRender<VisleEntries>()` for type-safe rendering.
  */
 export interface VisleEntries {}
