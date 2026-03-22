@@ -1,4 +1,5 @@
 import fs from 'node:fs/promises'
+import path from 'node:path'
 
 import type { Plugin } from 'vite'
 
@@ -37,6 +38,7 @@ export function entryTypesPlugin(config: ResolvedVisleConfig): {
     }
 
     lastContent = content
+    await fs.mkdir(path.dirname(dtsPath), { recursive: true })
     await fs.writeFile(dtsPath, content)
   }
 

@@ -13,6 +13,7 @@ import { entryTypesPlugin } from './entry-types.ts'
 vi.mock('node:fs/promises', () => ({
   default: {
     writeFile: vi.fn(() => Promise.resolve()),
+    mkdir: vi.fn(() => Promise.resolve()),
   },
 }))
 
@@ -61,6 +62,7 @@ describe('entryTypesPlugin', () => {
     await hook(createServer(watcher))
 
     expect(resolveServerComponentIds).toHaveBeenCalledWith('/project/src/pages')
+    expect(fs.mkdir).toHaveBeenCalledWith('/project', { recursive: true })
     expect(fs.writeFile).toHaveBeenCalledWith(
       '/project/visle-generated.d.ts',
       expect.stringMatching('Index'),
