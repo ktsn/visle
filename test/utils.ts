@@ -74,7 +74,7 @@ export function devRender(root: string) {
 
   const loader = createDevLoader({
     root,
-    plugins: [visle({ entryDir: 'pages' })],
+    plugins: [visle({ entryDir: 'pages', dts: 'visle-generated.d.ts' })],
     resolve: {
       alias: {
         '@': root,
@@ -96,7 +96,7 @@ export async function prodBuild(root: string, options: UserConfig = {}): Promise
     mergeConfig(
       {
         root,
-        plugins: [visle({ entryDir: 'pages' })],
+        plugins: [visle({ entryDir: 'pages', dts: 'visle-generated.d.ts' })],
         resolve: {
           alias: {
             '@': root,

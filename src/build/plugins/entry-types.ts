@@ -8,7 +8,7 @@ import { generateEntryTypesCode } from '../generate.js'
 import { resolveServerComponentIds } from '../paths.js'
 
 /**
- * Plugin that generates `visle-generated.d.ts`.
+ * Plugin that generates the d.ts file.
  * In dev, it watches for entry component file additions/removals to keep it updated.
  * In build, the returned `generate` function is called from `buildApp`.
  */

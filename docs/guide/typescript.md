@@ -4,12 +4,12 @@ Visle generates type definitions to provide type-safe rendering with auto-comple
 
 ## Generated Type Definitions
 
-When you run `vite build` (or `vite dev`), Visle generates a `visle-generated.d.ts` file in your project root. This file declares the available entry components and their prop types.
+When you run `vite build` (or `vite dev`), Visle generates a `src/visle-generated.d.ts` file in your project. This file declares the available entry components and their prop types.
 
 Example generated file:
 
 ```ts
-// visle-generated.d.ts
+// src/visle-generated.d.ts
 import 'visle'
 
 declare module 'visle' {
@@ -22,11 +22,11 @@ declare module 'visle' {
 
 ## Including in `tsconfig.json`
 
-Make sure the generated file is included in your TypeScript configuration's `include` or `files`:
+Make sure the generated file is included in your TypeScript configuration's `include` or `files` (in most cases, it is already covered by `src/**/*.ts` pattern):
 
 ```json
 {
-  "include": ["visle-generated.d.ts", "**/*.ts", "**/*.vue"]
+  "include": ["src/**/*.ts", "src/**/*.vue"]
 }
 ```
 
@@ -55,7 +55,7 @@ await render('index', { wrong: true })
 
 ## Customizing the Output Path
 
-By default, the type definition file is written to `visle-generated.d.ts`. You can change this with the `dts` option:
+By default, the type definition file is written to `src/visle-generated.d.ts`. You can change this with the `dts` option:
 
 ```ts
 import { visle } from 'visle/build'

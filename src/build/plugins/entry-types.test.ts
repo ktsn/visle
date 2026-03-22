@@ -63,7 +63,7 @@ describe('entryTypesPlugin', () => {
 
     expect(resolveServerComponentIds).toHaveBeenCalledWith('/project/src/pages')
     expect(fs.writeFile).toHaveBeenCalledWith(
-      '/project/visle-generated.d.ts',
+      '/project/src/visle-generated.d.ts',
       expect.stringMatching('Index'),
     )
   })
@@ -77,7 +77,7 @@ describe('entryTypesPlugin', () => {
 
     expect(resolveServerComponentIds).toHaveBeenCalledWith('/project/src/pages')
     expect(fs.writeFile).toHaveBeenCalledWith(
-      '/project/visle-generated.d.ts',
+      '/project/src/visle-generated.d.ts',
       expect.stringMatching('Index'),
     )
   })
@@ -122,7 +122,7 @@ describe('entryTypesPlugin', () => {
 
     expect(fs.writeFile).toHaveBeenCalledTimes(2)
     expect(fs.writeFile).toHaveBeenLastCalledWith(
-      '/project/visle-generated.d.ts',
+      '/project/src/visle-generated.d.ts',
       expect.stringMatching('New'),
     )
   })
