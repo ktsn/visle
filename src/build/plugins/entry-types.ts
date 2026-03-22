@@ -3,7 +3,7 @@ import fs from 'node:fs/promises'
 import type { Plugin } from 'vite'
 
 import type { ResolvedVisleConfig } from '../../shared/config.js'
-import { type AbsolutePath, asAbs, resolve } from '../../shared/path.js'
+import { type AbsolutePath, asAbs, dirname, resolve } from '../../shared/path.js'
 import { generateEntryTypesCode } from '../generate.js'
 import { resolveServerComponentIds } from '../paths.js'
 
@@ -30,13 +30,15 @@ export function entryTypesPlugin(config: ResolvedVisleConfig): {
 
   async function generateAndWrite(): Promise<void> {
     const componentIds = resolveServerComponentIds(entryRoot)
-    const content = generateEntryTypesCode(entryRoot, root, componentIds)
+    const dtsDir = dirname(dtsPath)
+    const content = generateEntryTypesCode(entryRoot, dtsDir, componentIds)
 
     if (content === lastContent) {
       return
     }
 
     lastContent = content
+    await fs.mkdir(dtsDir, { recursive: true })
     await fs.writeFile(dtsPath, content)
   }
 

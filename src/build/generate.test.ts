@@ -6,13 +6,13 @@ import { generateEntryTypesCode } from './generate.ts'
 describe('generateEntryTypesCode', () => {
   test('generates module augmentation with component entries', () => {
     const entryDir = asAbs('/project/pages')
-    const root = asAbs('/project')
+    const dtsDir = asAbs('/project')
     const componentIds = [
       asAbs('/project/pages/static.vue'),
       asAbs('/project/pages/with-props.vue'),
     ]
 
-    const result = generateEntryTypesCode(entryDir, root, componentIds)
+    const result = generateEntryTypesCode(entryDir, dtsDir, componentIds)
 
     expect(result).toContain(
       "'static': ComponentProps<typeof import('./pages/static.vue')['default']>",
@@ -24,10 +24,10 @@ describe('generateEntryTypesCode', () => {
 
   test('handles nested components', () => {
     const entryDir = asAbs('/project/pages')
-    const root = asAbs('/project')
+    const dtsDir = asAbs('/project')
     const componentIds = [asAbs('/project/pages/nested/index.vue')]
 
-    const result = generateEntryTypesCode(entryDir, root, componentIds)
+    const result = generateEntryTypesCode(entryDir, dtsDir, componentIds)
 
     expect(result).toContain(
       "'nested/index': ComponentProps<typeof import('./pages/nested/index.vue')['default']>",
@@ -40,6 +40,18 @@ describe('generateEntryTypesCode', () => {
     expect(result).toContain("declare module 'visle'")
     expect(result).toContain("import type { ComponentProps } from 'visle'")
     expect(result).toContain('interface VisleEntries {\n\n  }')
+  })
+
+  test('generates import paths relative to dts directory', () => {
+    const entryDir = asAbs('/project/pages')
+    const dtsDir = asAbs('/project/types')
+    const componentIds = [asAbs('/project/pages/static.vue')]
+
+    const result = generateEntryTypesCode(entryDir, dtsDir, componentIds)
+
+    expect(result).toContain(
+      "'static': ComponentProps<typeof import('../pages/static.vue')['default']>",
+    )
   })
 
   test('include empty export', () => {

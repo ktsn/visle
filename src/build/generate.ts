@@ -49,16 +49,26 @@ export function generateComponentWrapperCode(
   return lines.join('\n') + '\n'
 }
 
+/**
+ * Generate d.ts content to annotate Visle's `render` function
+ * with the entry components and their props types.
+ *
+ * @param entryDir Entry components directory (VisleConfig#entryDir)
+ * @param dtsDir Output directory of the d.ts file (dirname of VisleConfig#dts)
+ * @param componentIds All entry component file paths
+ * @returns Generated d.ts content
+ */
 export function generateEntryTypesCode(
   entryDir: AbsolutePath,
-  root: AbsolutePath,
+  dtsDir: AbsolutePath,
   componentIds: AbsolutePath[],
 ): string {
   const entries = componentIds
     .map((id) => {
       const key = relative(entryDir, id).replace(/\.vue$/, '')
-      const importPath = relative(root, id)
-      return `    '${key}': ComponentProps<typeof import('./${importPath}')['default']>`
+      const importPath = relative(dtsDir, id)
+      const importSpecifier = importPath.startsWith('.') ? importPath : `./${importPath}`
+      return `    '${key}': ComponentProps<typeof import('${importSpecifier}')['default']>`
     })
     .join('\n')
 
