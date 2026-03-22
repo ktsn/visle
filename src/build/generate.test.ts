@@ -42,6 +42,18 @@ describe('generateEntryTypesCode', () => {
     expect(result).toContain('interface VisleEntries {\n\n  }')
   })
 
+  test('generates import paths relative to dts directory', () => {
+    const entryDir = asAbs('/project/pages')
+    const dtsDir = asAbs('/project/types')
+    const componentIds = [asAbs('/project/pages/static.vue')]
+
+    const result = generateEntryTypesCode(entryDir, dtsDir, componentIds)
+
+    expect(result).toContain(
+      "'static': ComponentProps<typeof import('../pages/static.vue')['default']>",
+    )
+  })
+
   test('include empty export', () => {
     const result = generateEntryTypesCode(asAbs('/project/pages'), asAbs('/project'), [])
 
