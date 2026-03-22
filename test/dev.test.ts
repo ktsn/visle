@@ -33,7 +33,7 @@ describe('Dev Server SSR', () => {
     // Trigger dev server initialization (it starts lazily on first render)
     await render('static')
 
-    const dtsPath = path.join(root, 'src/visle-generated.d.ts')
+    const dtsPath = path.join(root, 'visle-generated.d.ts')
     const content = await fs.readFile(dtsPath, 'utf-8')
     expect(content).toMatchSnapshot()
   })

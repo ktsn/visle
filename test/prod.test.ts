@@ -45,7 +45,7 @@ describe('Production Build SSR', () => {
   })
 
   test('Type definition file is generated', async () => {
-    const dtsPath = path.join(root, 'src/visle-generated.d.ts')
+    const dtsPath = path.join(root, 'visle-generated.d.ts')
     const content = await fs.readFile(dtsPath, 'utf-8')
 
     expect(content).toMatchSnapshot()
