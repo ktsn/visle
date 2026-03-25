@@ -47,9 +47,7 @@
     "@babel/types": "7.29.0",
     "@types/connect": "3.4.38",
     "@types/diffable-html": "5.0.2",
-    "@types/express": "5.0.6",
     "@types/node": "25.5.0",
-    "@types/sanitize-html": "2.16.1",
     "@vitest/coverage-v8": "4.1.0",
     "bumpp": "11.0.1",
     "changelogithub": "14.0.0",
@@ -57,12 +55,11 @@
     "happy-dom": "20.8.4",
     "oxc-minify": "0.120.0",
     "playwright": "1.58.2",
-    "rollup": "4.60.0",
     "typescript": "5.9.3",
-    "vite": "npm:@voidzero-dev/vite-plus-core@latest",
-    "vite-plus": "latest",
+    "vite": "npm:@voidzero-dev/vite-plus-core@0.1.12",
+    "vite-plus": "0.1.12",
     "vitepress": "2.0.0-alpha.17",
-    "vitest": "npm:@voidzero-dev/vite-plus-test@latest",
+    "vitest": "npm:@voidzero-dev/vite-plus-test@0.1.12",
     "vue": "3.5.30"
   },
   "peerDependencies": {
@@ -71,8 +68,8 @@
   "packageManager": "pnpm@10.32.1+sha512.a706938f0e89ac1456b6563eab4edf1d1faf3368d1191fc5c59790e96dc918e4456ab2e67d613de1043d2e8c81f87303e6b40d4ffeca9df15ef1ad567348f2be",
   "pnpm": {
     "overrides": {
-      "vite": "npm:@voidzero-dev/vite-plus-core@latest",
-      "vitest": "npm:@voidzero-dev/vite-plus-test@latest"
+      "vite": "npm:@voidzero-dev/vite-plus-core@0.1.12",
+      "vitest": "npm:@voidzero-dev/vite-plus-test@0.1.12"
     }
   }
 }
