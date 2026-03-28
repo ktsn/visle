@@ -59,7 +59,7 @@
     "vite": "npm:@voidzero-dev/vite-plus-core@0.1.12",
     "vite-plus": "0.1.12",
     "vitepress": "2.0.0-alpha.17",
-    "vitest": "npm:@voidzero-dev/vite-plus-test@0.1.12",
+    "vitest": "npm:@voidzero-dev/vite-plus-test@0.1.14",
     "vue": "3.5.31"
   },
   "peerDependencies": {
@@ -69,7 +69,7 @@
   "pnpm": {
     "overrides": {
       "vite": "npm:@voidzero-dev/vite-plus-core@0.1.12",
-      "vitest": "npm:@voidzero-dev/vite-plus-test@0.1.12"
+      "vitest": "npm:@voidzero-dev/vite-plus-test@0.1.14"
     }
   }
 }
