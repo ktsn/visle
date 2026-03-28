@@ -55,7 +55,7 @@
     "happy-dom": "20.8.8",
     "oxc-minify": "0.121.0",
     "playwright": "1.58.2",
-    "typescript": "5.9.3",
+    "typescript": "6.0.2",
     "vite": "npm:@voidzero-dev/vite-plus-core@0.1.12",
     "vite-plus": "0.1.12",
     "vitepress": "2.0.0-alpha.17",
