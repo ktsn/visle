@@ -11,6 +11,10 @@
       "matchDepTypes": ["dependencies"],
       "matchUpdateTypes": ["patch"],
       "automerge": true
+    },
+    {
+      "matchPackageNames": ["vite-plus", "@voidzero-dev/vite-plus-*"],
+      "groupName": "vite-plus"
     }
   ]
 }
