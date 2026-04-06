@@ -51,4 +51,30 @@ describe('generateHtmlPlugin', () => {
     const aboutHtml = await fs.readFile(path.join(root, 'dist/client/about/index.html'), 'utf-8')
     expect(aboutHtml).toContain('<p>About</p>')
   })
+
+  test('errors when entry components have props defined', async () => {
+    await fs.writeFile(
+      path.join(root, 'pages/index.vue'),
+      '<script setup lang="ts">defineProps<{ message: string }>()</script><template><div>{{ message }}</div></template>',
+    )
+    await fs.writeFile(
+      path.join(root, 'pages/about.vue'),
+      '<script setup lang="ts">defineProps<{ title: string }>()</script><template><p>{{ title }}</p></template>',
+    )
+    await fs.writeFile(
+      path.join(root, 'pages/static.vue'),
+      '<template><div>No props</div></template>',
+    )
+
+    let message = ''
+    try {
+      await prodBuild(root, {}, { generate: true })
+    } catch (e) {
+      message = String(e)
+    }
+    expect(message).toMatch('The following entries cannot have props when using generate option:')
+    expect(message).toMatch('- about')
+    expect(message).toMatch('- index')
+    expect(message).not.toMatch('- static')
+  })
 })

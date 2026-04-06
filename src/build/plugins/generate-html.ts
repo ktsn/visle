@@ -1,9 +1,10 @@
 import type { Plugin } from 'vite'
+import type { ConcreteComponent } from 'vue'
 
 import { createRender } from '../../server/render.js'
 import type { ResolvedVisleConfig } from '../../shared/config.js'
-import { asAbs, relative, resolve } from '../../shared/path.js'
-import { resolveServerComponentIds } from '../paths.js'
+import { resolveServerDistPath } from '../../shared/entry.js'
+import { asAbs, resolve } from '../../shared/path.js'
 
 export const generateVirtualEntryId = '\0@visle/generate-entry'
 
@@ -12,6 +13,17 @@ export function entryKeyToHtmlPath(entryKey: string): string {
     return `${entryKey}.html`
   }
   return `${entryKey}/index.html`
+}
+
+function hasProps(component: ConcreteComponent): boolean {
+  const props = component.props
+  if (!props) {
+    return false
+  }
+  if (Array.isArray(props)) {
+    return props.length > 0
+  }
+  return Object.keys(props).length > 0
 }
 
 export function generateHtmlPlugin(visleConfig: ResolvedVisleConfig): Plugin {
@@ -37,10 +49,16 @@ export function generateHtmlPlugin(visleConfig: ResolvedVisleConfig): Plugin {
     async generateBundle(_options, bundle) {
       const root = asAbs(this.environment.config.root)
       const serverOutDir = resolve(root, visleConfig.serverOutDir)
-      const entryDir = resolve(root, visleConfig.entryDir)
 
-      const componentIds = resolveServerComponentIds(entryDir)
-      const entryKeys = componentIds.map((id) => relative(entryDir, id).replace(/\.vue$/, ''))
+      const serverEntry = await import(/* @vite-ignore */ resolveServerDistPath(serverOutDir))
+      const components: Record<string, ConcreteComponent> = serverEntry.default
+      const entryKeys = Object.keys(components)
+
+      const entriesWithProps = entryKeys.filter((key) => hasProps(components[key]!))
+      if (entriesWithProps.length > 0) {
+        const list = entriesWithProps.map((key) => `  - ${key}`).join('\n')
+        this.error(`The following entries cannot have props when using generate option:\n${list}`)
+      }
 
       const render = createRender({ serverOutDir })
 
