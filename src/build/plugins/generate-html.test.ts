@@ -6,20 +6,6 @@ import { afterEach, beforeEach, describe, expect, test } from 'vite-plus/test'
 import { prodBuild } from '../../../test/utils.ts'
 import { entryKeyToHtmlPath } from './generate-html.ts'
 
-const generatedDir = path.resolve(import.meta.dirname, '../../../test/__generated__/server')
-
-let root: string
-
-beforeEach(async () => {
-  await fs.mkdir(generatedDir, { recursive: true })
-  root = await fs.mkdtemp(path.join(generatedDir, 'generate-html-'))
-  await fs.mkdir(path.join(root, 'pages'), { recursive: true })
-})
-
-afterEach(async () => {
-  await fs.rm(root, { recursive: true, force: true })
-})
-
 describe('entryKeyToHtmlPath', () => {
   test('index maps to index.html', () => {
     expect(entryKeyToHtmlPath('index')).toBe('index.html')
@@ -39,6 +25,20 @@ describe('entryKeyToHtmlPath', () => {
 })
 
 describe('generateHtmlPlugin', () => {
+  const generatedDir = path.resolve(import.meta.dirname, '../../../test/__generated__/server')
+
+  let root: string
+
+  beforeEach(async () => {
+    await fs.mkdir(generatedDir, { recursive: true })
+    root = await fs.mkdtemp(path.join(generatedDir, 'generate-html-'))
+    await fs.mkdir(path.join(root, 'pages'), { recursive: true })
+  })
+
+  afterEach(async () => {
+    await fs.rm(root, { recursive: true, force: true })
+  })
+
   test('outputs rendered HTML for each .vue entry', async () => {
     await fs.writeFile(path.join(root, 'pages/index.vue'), '<template><h1>Home</h1></template>')
     await fs.writeFile(path.join(root, 'pages/about.vue'), '<template><p>About</p></template>')
