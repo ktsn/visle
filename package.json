@@ -60,7 +60,7 @@
     "vite-plus": "0.1.15",
     "vitepress": "2.0.0-alpha.17",
     "vitest": "npm:@voidzero-dev/vite-plus-test@0.1.15",
-    "vue": "3.5.32"
+    "vue": "3.5.33"
   },
   "peerDependencies": {
     "vue": ">=3.0.0"
