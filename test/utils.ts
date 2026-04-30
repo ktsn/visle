@@ -4,7 +4,7 @@ import { fileURLToPath } from 'node:url'
 
 import { createBuilder, mergeConfig, type UserConfig } from 'vite'
 
-import { visle } from '../src/build/index.ts'
+import { type VisleConfig, visle } from '../src/build/index.ts'
 import { createDevLoader } from '../src/dev/index.ts'
 import { createRender } from '../src/server/render.ts'
 import { asRel } from '../src/shared/path.ts'
@@ -91,12 +91,16 @@ export function devRender(root: string) {
 /**
  * Run a production Vite build with additional config options.
  */
-export async function prodBuild(root: string, options: UserConfig = {}): Promise<void> {
+export async function prodBuild(
+  root: string,
+  options: UserConfig = {},
+  visleConfig: VisleConfig = {},
+): Promise<void> {
   const builder = await createBuilder(
     mergeConfig(
       {
         root,
-        plugins: [visle({ entryDir: 'pages', dts: 'visle-generated.d.ts' })],
+        plugins: [visle({ entryDir: 'pages', dts: 'visle-generated.d.ts', ...visleConfig })],
         resolve: {
           alias: {
             '@': root,
