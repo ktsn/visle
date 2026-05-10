@@ -47,7 +47,7 @@
     "@babel/types": "7.29.0",
     "@types/connect": "3.4.38",
     "@types/diffable-html": "5.0.2",
-    "@types/node": "25.6.0",
+    "@types/node": "25.6.1",
     "@vitest/coverage-v8": "4.1.5",
     "bumpp": "11.1.0",
     "changelogithub": "14.0.0",
