@@ -51,7 +51,7 @@ jobs:
       - name: Get Playwright version
         id: playwright-version
         shell: bash
-        run: echo "version=$(vpx playwright --version | awk '{print $2}')" >> "$GITHUB_OUTPUT"
+        run: echo "version=$(node -p "require('playwright/package.json').version")" >> "$GITHUB_OUTPUT"
 
       # Cache Playwright browser binaries to avoid downloading them on every run.
       # This significantly speeds up CI, especially on Windows where install takes several minutes.
