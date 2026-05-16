@@ -2,7 +2,7 @@ import fs from 'node:fs/promises'
 import path from 'node:path'
 import { fileURLToPath } from 'node:url'
 
-import { createBuilder, mergeConfig, type UserConfig } from 'vite'
+import { createBuilder, mergeConfig, type Plugin, type UserConfig } from 'vite'
 
 import { visle } from '../src/build/index.ts'
 import { createDevLoader } from '../src/dev/index.ts'
@@ -39,7 +39,44 @@ export const renderCases: { name: string; component: string; props?: Record<stri
   { name: 'Dynamic import shared CSS', component: 'with-dynamic-shared-css' },
   { name: 'CSS import in script', component: 'with-css-import' },
   { name: 'SVG image asset', component: 'with-svg-img' },
+  { name: 'Markdown entry component', component: 'markdown-page' },
 ]
+
+const entryExt = ['.vue', '.md']
+const vueInclude = [/\.vue$/, /\.md$/]
+
+/**
+ * Test-only plugin that converts `.md` files into Vue SFC text in the load
+ * phase, so the rest of the pipeline (visle's server transform and
+ * @vitejs/plugin-vue) can treat them as ordinary SFCs. Used to exercise the
+ * `entryExt` config with a non-`.vue` extension.
+ */
+function markdownToVuePlugin(): Plugin {
+  return {
+    name: 'test:markdown-to-vue',
+    enforce: 'pre',
+    async load(id) {
+      const [fileName, query] = id.split('?')
+      if (!fileName?.endsWith('.md')) return null
+      // Skip sub-requests emitted by the Vue plugin (e.g. ?vue&type=script)
+      if (query?.includes('vue')) return null
+
+      const md = await fs.readFile(fileName, 'utf-8')
+      const html = md
+        .split('\n')
+        .map((line) => {
+          const trimmed = line.trim()
+          if (trimmed === '') return ''
+          if (trimmed.startsWith('# ')) return `<h1>${trimmed.slice(2)}</h1>`
+          return `<p>${trimmed}</p>`
+        })
+        .filter(Boolean)
+        .join('')
+
+      return `<template><div>${html}</div></template>`
+    },
+  }
+}
 
 /**
  * Create a unique temporary directory for a test suite.
@@ -74,7 +111,15 @@ export function devRender(root: string) {
 
   const loader = createDevLoader({
     root,
-    plugins: [visle({ entryDir: 'pages', dts: 'visle-generated.d.ts' })],
+    plugins: [
+      markdownToVuePlugin(),
+      visle({
+        entryDir: 'pages',
+        entryExt,
+        dts: 'visle-generated.d.ts',
+        vue: { include: vueInclude },
+      }),
+    ],
     resolve: {
       alias: {
         '@': root,
@@ -96,7 +141,15 @@ export async function prodBuild(root: string, options: UserConfig = {}): Promise
     mergeConfig(
       {
         root,
-        plugins: [visle({ entryDir: 'pages', dts: 'visle-generated.d.ts' })],
+        plugins: [
+          markdownToVuePlugin(),
+          visle({
+            entryDir: 'pages',
+            entryExt,
+            dts: 'visle-generated.d.ts',
+            vue: { include: vueInclude },
+          }),
+        ],
         resolve: {
           alias: {
             '@': root,
