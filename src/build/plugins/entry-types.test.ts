@@ -17,9 +17,13 @@ vi.mock('node:fs/promises', () => ({
   },
 }))
 
-vi.mock('../paths.ts', () => ({
-  resolveServerComponentIds: vi.fn(() => []),
-}))
+vi.mock('../paths.ts', async (importOriginal) => {
+  const actual = await importOriginal<typeof import('../paths.ts')>()
+  return {
+    ...actual,
+    resolveServerComponentIds: vi.fn(() => []),
+  }
+})
 
 function createPlugin(dts: string | null = defaultConfig.dts) {
   const { plugin, generate } = entryTypesPlugin({
@@ -61,7 +65,7 @@ describe('entryTypesPlugin', () => {
     const hook = plugin.configureServer as (server: ViteDevServer) => Promise<void>
     await hook(createServer(watcher))
 
-    expect(resolveServerComponentIds).toHaveBeenCalledWith('/project/src/pages')
+    expect(resolveServerComponentIds).toHaveBeenCalledWith('/project/src/pages', ['.vue'])
     expect(fs.writeFile).toHaveBeenCalledWith(
       '/project/src/visle-generated.d.ts',
       expect.stringMatching('Index'),
@@ -75,7 +79,7 @@ describe('entryTypesPlugin', () => {
 
     await generate()
 
-    expect(resolveServerComponentIds).toHaveBeenCalledWith('/project/src/pages')
+    expect(resolveServerComponentIds).toHaveBeenCalledWith('/project/src/pages', ['.vue'])
     expect(fs.writeFile).toHaveBeenCalledWith(
       '/project/src/visle-generated.d.ts',
       expect.stringMatching('Index'),

@@ -559,6 +559,9 @@ exports[`Production Build SSR > Build output files 2`] = `
     "pages/with-visible-island.vue": [],
   },
   "entryDir": "pages",
+  "entryExt": [
+    ".vue",
+  ],
   "islandsBootstrap": "assets/custom-element-[hash].js",
   "jsMap": {
     "components/AliasStyledCounter.vue": "assets/AliasStyledCounter-[hash].js",

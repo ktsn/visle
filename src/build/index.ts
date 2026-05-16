@@ -29,7 +29,7 @@ export function visle(config: VisleConfig = {}): Plugin[] {
     ...config,
   }
 
-  const { plugin: serverTransform, islandPaths } = serverTransformPlugin()
+  const { plugin: serverTransform, islandPaths } = serverTransformPlugin(resolvedConfig.entryExt)
   const virtualFile = virtualFilePlugin(resolvedConfig)
   const { plugin: manifest, getManifestData } = manifestPlugin(resolvedConfig)
   const { plugin: entryTypes, generate: generateEntryTypes } = entryTypesPlugin(resolvedConfig)
@@ -50,7 +50,7 @@ export function visle(config: VisleConfig = {}): Plugin[] {
             build: {
               outDir: resolvedConfig.clientOutDir,
               rollupOptions: {
-                input: [...resolveServerComponentIds(entryDir)],
+                input: [...resolveServerComponentIds(entryDir, resolvedConfig.entryExt)],
                 preserveEntrySignatures: 'allow-extension',
               },
             },

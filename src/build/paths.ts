@@ -76,8 +76,33 @@ export function parseId(id: string): {
 }
 
 /**
+ * Check if a path has one of the configured entry extensions
+ */
+export function hasEntryExt(filePath: string, entryExt: string[]): boolean {
+  return entryExt.some((ext) => filePath.endsWith(ext))
+}
+
+/**
+ * Strip a matching entry extension from a path
+ */
+export function stripEntryExt(filePath: string, entryExt: string[]): string {
+  for (const ext of entryExt) {
+    if (filePath.endsWith(ext)) {
+      return filePath.slice(0, -ext.length)
+    }
+  }
+  return filePath
+}
+
+/**
  * Resolves paths for all server components
  */
-export function resolveServerComponentIds(entryDir: AbsolutePath): AbsolutePath[] {
-  return resolvePattern('/**/*.vue', entryDir)
+export function resolveServerComponentIds(
+  entryDir: AbsolutePath,
+  entryExt: string[],
+): AbsolutePath[] {
+  return resolvePattern(
+    entryExt.map((ext) => `/**/*${ext}`),
+    entryDir,
+  )
 }

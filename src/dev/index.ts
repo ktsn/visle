@@ -62,22 +62,28 @@ export function createDevLoader(viteConfig: InlineConfig = {}): DevRenderLoader 
 
       const visleConfig = getVisleConfig(devServer.config)
 
-      const modulePath = resolve(
-        asAbs(devServer.config.root),
-        visleConfig.entryDir,
-        `${componentPath}.vue`,
-      )
+      const root = asAbs(devServer.config.root)
+      const serverEnv = getServerEnvironment(devServer)
 
-      try {
-        const serverEnv = getServerEnvironment(devServer)
-        const module = await serverEnv.runner.import(modulePath)
-        return module.default
-      } catch (e) {
-        if (e instanceof Error) {
-          devServer.ssrFixStacktrace(e)
+      // Try each extension sequentially, returning the first successful import
+      for (const ext of visleConfig.entryExt) {
+        const modulePath = resolve(root, visleConfig.entryDir, `${componentPath}${ext}`)
+        try {
+          // oxlint-disable-next-line no-await-in-loop
+          const module = await serverEnv.runner.import(modulePath)
+          return module.default
+        } catch (e) {
+          if (e instanceof Error) {
+            devServer.ssrFixStacktrace(e)
+          }
+          // Try next extension
+          continue
         }
-        throw e
       }
+
+      throw new Error(
+        `Entry component not found: ${componentPath} (tried extensions: ${visleConfig.entryExt.join(', ')})`,
+      )
     },
 
     async getManifest() {
