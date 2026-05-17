@@ -1,7 +1,7 @@
 import { describe, expect, test } from 'vite-plus/test'
 
 import { componentWrapPrefix } from './generate.js'
-import { parseId } from './paths.js'
+import { hasEntryExt, parseId, stripEntryExt } from './paths.js'
 
 describe('parseId', () => {
   test('plain file path', () => {
@@ -50,5 +50,33 @@ describe('parseId', () => {
       query: { names: ['A', 'B'] },
       prefix: undefined,
     })
+  })
+})
+
+describe('hasEntryExt', () => {
+  test('matches single extension', () => {
+    expect(hasEntryExt('/foo/bar.vue', ['.vue'])).toBe(true)
+  })
+
+  test('matches one of multiple extensions', () => {
+    expect(hasEntryExt('/foo/bar.md', ['.vue', '.md'])).toBe(true)
+  })
+
+  test('returns false for non-matching extension', () => {
+    expect(hasEntryExt('/foo/bar.ts', ['.vue', '.md'])).toBe(false)
+  })
+})
+
+describe('stripEntryExt', () => {
+  test('strips matching extension', () => {
+    expect(stripEntryExt('foo/bar.vue', ['.vue'])).toBe('foo/bar')
+  })
+
+  test('strips first matching extension from multiple', () => {
+    expect(stripEntryExt('foo/bar.md', ['.vue', '.md'])).toBe('foo/bar')
+  })
+
+  test('returns path unchanged if no extension matches', () => {
+    expect(stripEntryExt('foo/bar.ts', ['.vue', '.md'])).toBe('foo/bar.ts')
   })
 })

@@ -5,6 +5,7 @@ import type { Options } from '@vitejs/plugin-vue'
  */
 export interface VisleConfig {
   entryDir?: string
+  entryExt?: string[]
   serverOutDir?: string
   clientOutDir?: string
   dts?: string | null
@@ -20,6 +21,7 @@ export type ResolvedVisleConfig = Required<VisleConfig>
 
 export const defaultConfig: ResolvedVisleConfig = {
   entryDir: 'src/pages',
+  entryExt: ['.vue'],
   clientOutDir: 'dist/client',
   serverOutDir: 'dist/server',
   dts: 'src/visle-generated.d.ts',

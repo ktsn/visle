@@ -1,4 +1,5 @@
 import assert from 'node:assert'
+import { existsSync } from 'node:fs'
 
 import connect from 'connect'
 import { Connect, createServer, InlineConfig, isRunnableDevEnvironment } from 'vite'
@@ -7,7 +8,7 @@ import type { RunnableDevEnvironment, ViteDevServer } from 'vite'
 import { RuntimeManifest } from '../server/manifest.js'
 import { RenderLoader } from '../server/render.js'
 import { getVisleConfig } from '../shared/config.js'
-import { asAbs, resolve } from '../shared/path.js'
+import { asAbs, AbsolutePath, resolve } from '../shared/path.js'
 import { createDevManifest } from './manifest.js'
 
 interface DevRenderLoader extends RenderLoader {
@@ -62,14 +63,29 @@ export function createDevLoader(viteConfig: InlineConfig = {}): DevRenderLoader 
 
       const visleConfig = getVisleConfig(devServer.config)
 
-      const modulePath = resolve(
-        asAbs(devServer.config.root),
-        visleConfig.entryDir,
-        `${componentPath}.vue`,
-      )
+      const root = asAbs(devServer.config.root)
+      const entryDir = resolve(root, visleConfig.entryDir)
+      const serverEnv = getServerEnvironment(devServer)
+
+      // Resolve the entry file by checking the filesystem first, so that
+      // an import error (e.g. syntax error in an existing file) is not
+      // mistaken for a missing file and silently swallowed.
+      let modulePath: AbsolutePath | undefined
+      for (const ext of visleConfig.entryExt) {
+        const candidate = resolve(entryDir, `${componentPath}${ext}`)
+        if (existsSync(candidate)) {
+          modulePath = candidate
+          break
+        }
+      }
+
+      if (!modulePath) {
+        throw new Error(
+          `Entry component not found: ${componentPath} (tried extensions: ${visleConfig.entryExt.join(', ')})`,
+        )
+      }
 
       try {
-        const serverEnv = getServerEnvironment(devServer)
         const module = await serverEnv.runner.import(modulePath)
         return module.default
       } catch (e) {

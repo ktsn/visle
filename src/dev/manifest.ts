@@ -3,6 +3,7 @@ import fs from 'node:fs/promises'
 import { type EnvironmentModuleNode, type ViteDevServer } from 'vite'
 import { parse, SFCBlock } from 'vue/compiler-sfc'
 
+import { hasEntryExt } from '../build/paths.js'
 import { type RuntimeManifest } from '../server/manifest.js'
 import { generateComponentId } from '../shared/component-id.js'
 import { getVisleConfig } from '../shared/config.js'
@@ -19,7 +20,7 @@ export function createDevManifest(devServer: ViteDevServer): RuntimeManifest {
 
   const root = asAbs(devServer.config.root)
   const { base } = devServer.config
-  const { entryDir } = getVisleConfig(devServer.config)
+  const { entryDir, entryExt } = getVisleConfig(devServer.config)
 
   // Normalize origin value
   const origin = devServer.config.server.origin?.replace(/\/$/, '') ?? ''
@@ -32,7 +33,7 @@ export function createDevManifest(devServer: ViteDevServer): RuntimeManifest {
   async function getComponentCssIds(componentRelativePath: string): Promise<string[]> {
     const absPath = resolve(root, componentRelativePath)
 
-    if (!absPath.endsWith('.vue')) {
+    if (!hasEntryExt(absPath, entryExt)) {
       return []
     }
 
@@ -85,18 +86,29 @@ export function createDevManifest(devServer: ViteDevServer): RuntimeManifest {
     },
 
     async getEntryCssIds(componentPath: string): Promise<string[]> {
-      const entryRelativePath = `${entryDir}/${componentPath}.vue`
-      const entryAbsPath = resolve(root, entryRelativePath)
-
-      const entryMod = serverEnv.moduleGraph.getModuleById(entryAbsPath)
-      if (!entryMod) {
-        // Module not yet loaded in the module graph, fall back to parsing the entry file
-        return getComponentCssIds(entryRelativePath)
+      // Find the entry module in the module graph by trying each extension
+      let entryRelativePath: string | undefined
+      let entryMod: EnvironmentModuleNode | undefined
+      for (const ext of entryExt) {
+        const candidate = `${entryDir}/${componentPath}${ext}`
+        const candidateAbs = resolve(root, candidate)
+        const mod = serverEnv.moduleGraph.getModuleById(candidateAbs)
+        if (mod) {
+          entryRelativePath = candidate
+          entryMod = mod
+          break
+        }
       }
 
-      // Walk module graph to find all transitively imported .vue and CSS files
+      if (!entryMod || !entryRelativePath) {
+        // Module not yet loaded in the module graph, fall back to parsing the first matching entry file
+        const fallbackPath = `${entryDir}/${componentPath}${entryExt[0]}`
+        return getComponentCssIds(fallbackPath)
+      }
+
+      // Walk module graph to find all transitively imported SFC and CSS files
       // preserving discovery order
-      const discovered: ({ type: 'css'; id: string } | { type: 'vue'; relativePath: string })[] = []
+      const discovered: ({ type: 'css'; id: string } | { type: 'sfc'; relativePath: string })[] = []
       const visited = new Set<string>()
 
       const walk = (mod: EnvironmentModuleNode) => {
@@ -105,9 +117,9 @@ export function createDevManifest(devServer: ViteDevServer): RuntimeManifest {
         }
         visited.add(mod.id)
 
-        if (mod.id.endsWith('.vue')) {
+        if (hasEntryExt(mod.id, entryExt)) {
           discovered.push({
-            type: 'vue',
+            type: 'sfc',
             relativePath: relative(root, asAbs(mod.id)),
           })
         } else if (!mod.id.includes('?vue') && isCSS(mod.id)) {

@@ -24,6 +24,7 @@ describe('loadManifest', () => {
   function writeManifest(data: {
     base?: string
     entryDir?: string
+    entryExt?: string[]
     cssMap?: Record<string, string[]>
     jsMap?: Record<string, string>
   }): void {
@@ -32,6 +33,7 @@ describe('loadManifest', () => {
       JSON.stringify({
         base: '/',
         entryDir: 'src/pages',
+        entryExt: ['.vue'],
         cssMap: {},
         jsMap: {},
         ...data,
@@ -98,5 +100,29 @@ describe('loadManifest', () => {
     const result = await manifest.getEntryCssIds('index')
 
     expect(result).toEqual(['/index-1234.css'])
+  })
+
+  test('getEntryCssIds resolves custom entry extension', async () => {
+    writeManifest({
+      entryExt: ['.vue', '.md'],
+      cssMap: { 'src/pages/post.md': ['post-1234.css'] },
+    })
+
+    const manifest = await loadManifest(asAbs(root))
+    const result = await manifest.getEntryCssIds('post')
+
+    expect(result).toEqual(['/post-1234.css'])
+  })
+
+  test('getEntryCssIds returns empty array when no extension matches', async () => {
+    writeManifest({
+      entryExt: ['.vue'],
+      cssMap: {},
+    })
+
+    const manifest = await loadManifest(asAbs(root))
+    const result = await manifest.getEntryCssIds('nonexistent')
+
+    expect(result).toEqual([])
   })
 })

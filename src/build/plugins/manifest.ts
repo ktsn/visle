@@ -141,6 +141,7 @@ export function manifestPlugin(visleConfig: ResolvedVisleConfig): ManifestPlugin
       return {
         base,
         entryDir: visleConfig.entryDir,
+        entryExt: visleConfig.entryExt,
         cssMap: Object.fromEntries(cssMap ?? new Map()),
         jsMap: Object.fromEntries(jsMap ?? new Map()),
         islandsBootstrap: islandsBootstrap ?? '',
