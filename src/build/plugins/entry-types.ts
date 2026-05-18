@@ -5,7 +5,7 @@ import type { Plugin } from 'vite'
 import type { ResolvedVisleConfig } from '../../shared/config.js'
 import { type AbsolutePath, asAbs, dirname, resolve } from '../../shared/path.js'
 import { generateEntryTypesCode } from '../generate.js'
-import { resolveServerComponentIds } from '../paths.js'
+import { hasEntryExt, resolveServerComponentIds } from '../paths.js'
 
 /**
  * Plugin that generates the d.ts file.
@@ -29,9 +29,9 @@ export function entryTypesPlugin(config: ResolvedVisleConfig): {
   let lastContent: string | undefined
 
   async function generateAndWrite(): Promise<void> {
-    const componentIds = resolveServerComponentIds(entryRoot)
+    const componentIds = resolveServerComponentIds(entryRoot, config.entryExt)
     const dtsDir = dirname(dtsPath)
-    const content = generateEntryTypesCode(entryRoot, dtsDir, componentIds)
+    const content = generateEntryTypesCode(entryRoot, dtsDir, componentIds, config.entryExt)
 
     if (content === lastContent) {
       return
@@ -62,7 +62,7 @@ export function entryTypesPlugin(config: ResolvedVisleConfig): {
 
     async configureServer(server) {
       const onChange = (filePath: string) => {
-        if (filePath.endsWith('.vue') && filePath.startsWith(entryRoot)) {
+        if (hasEntryExt(filePath, config.entryExt) && filePath.startsWith(entryRoot)) {
           scheduleGenerate(() => {
             this.warn(`Failed to generate a dts file to ${config.dts!}`)
           })

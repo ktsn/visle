@@ -303,6 +303,17 @@ exports[`Production Build SSR > 'Island with props' 1`] = `
 </div>
 `;
 
+exports[`Production Build SSR > 'Markdown entry component' 1`] = `
+<div>
+  <h1>
+    Hello Markdown
+  </h1>
+  <p>
+    This is a markdown entry rendered as a Vue component.
+  </p>
+</div>
+`;
+
 exports[`Production Build SSR > 'Multiple islands on the same page' 1`] = `
 <script
   type="module"
@@ -511,6 +522,7 @@ exports[`Production Build SSR > Build output files 2`] = `
   "base": "/",
   "cssMap": {
     "pages/document.vue": [],
+    "pages/markdown-page.md": [],
     "pages/named-export.vue": [],
     "pages/nested/index.vue": [],
     "pages/non-ascii-テスト.vue": [],
@@ -559,6 +571,10 @@ exports[`Production Build SSR > Build output files 2`] = `
     "pages/with-visible-island.vue": [],
   },
   "entryDir": "pages",
+  "entryExt": [
+    ".vue",
+    ".md",
+  ],
   "islandsBootstrap": "assets/custom-element-[hash].js",
   "jsMap": {
     "components/AliasStyledCounter.vue": "assets/AliasStyledCounter-[hash].js",
@@ -616,6 +632,7 @@ declare module 'visle' {
     'named-export': ComponentProps<typeof import('./pages/named-export.vue')['default']>
     'document': ComponentProps<typeof import('./pages/document.vue')['default']>
     'nested/index': ComponentProps<typeof import('./pages/nested/index.vue')['default']>
+    'markdown-page': ComponentProps<typeof import('./pages/markdown-page.md')['default']>
   }
 }
 export {}

@@ -47,29 +47,29 @@
     "@babel/types": "7.29.0",
     "@types/connect": "3.4.38",
     "@types/diffable-html": "5.0.2",
-    "@types/node": "25.5.0",
-    "@vitest/coverage-v8": "4.1.2",
-    "bumpp": "11.0.1",
+    "@types/node": "25.8.0",
+    "@vitest/coverage-v8": "4.1.6",
+    "bumpp": "11.1.0",
     "changelogithub": "14.0.0",
     "diffable-html": "6.0.1",
-    "happy-dom": "20.8.9",
-    "oxc-minify": "0.121.0",
-    "playwright": "1.58.2",
-    "typescript": "6.0.2",
-    "vite": "npm:@voidzero-dev/vite-plus-core@0.1.12",
-    "vite-plus": "0.1.12",
+    "happy-dom": "20.9.0",
+    "oxc-minify": "0.130.0",
+    "playwright": "1.60.0",
+    "typescript": "6.0.3",
+    "vite": "npm:@voidzero-dev/vite-plus-core@0.1.15",
+    "vite-plus": "0.1.15",
     "vitepress": "2.0.0-alpha.17",
-    "vitest": "npm:@voidzero-dev/vite-plus-test@0.1.12",
-    "vue": "3.5.31"
+    "vitest": "npm:@voidzero-dev/vite-plus-test@0.1.15",
+    "vue": "3.5.34"
   },
   "peerDependencies": {
     "vue": ">=3.0.0"
   },
-  "packageManager": "pnpm@10.33.0+sha512.10568bb4a6afb58c9eb3630da90cc9516417abebd3fabbe6739f0ae795728da1491e9db5a544c76ad8eb7570f5c4bb3d6c637b2cb41bfdcdb47fa823c8649319",
+  "packageManager": "pnpm@10.33.4+sha512.1c67b3b359b2d408119ba1ed289f34b8fc3c6873412bec6fd264fbdc82489e510fcbecb9ce9d22dae7f3b76269d8441046014bdca53b9979cd7a561ad631b800",
   "pnpm": {
     "overrides": {
-      "vite": "npm:@voidzero-dev/vite-plus-core@0.1.12",
-      "vitest": "npm:@voidzero-dev/vite-plus-test@0.1.12"
+      "vite": "npm:@voidzero-dev/vite-plus-core@0.1.15",
+      "vitest": "npm:@voidzero-dev/vite-plus-test@0.1.15"
     }
   }
 }

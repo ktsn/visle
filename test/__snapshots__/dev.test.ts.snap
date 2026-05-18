@@ -311,6 +311,17 @@ exports[`Dev Server SSR > 'Island with props' 1`] = `
 </div>
 `;
 
+exports[`Dev Server SSR > 'Markdown entry component' 1`] = `
+<div>
+  <h1>
+    Hello Markdown
+  </h1>
+  <p>
+    This is a markdown entry rendered as a Vue component.
+  </p>
+</div>
+`;
+
 exports[`Dev Server SSR > 'Multiple islands on the same page' 1`] = `
 <script
   type="module"
@@ -520,6 +531,7 @@ declare module 'visle' {
     'named-export': ComponentProps<typeof import('./pages/named-export.vue')['default']>
     'document': ComponentProps<typeof import('./pages/document.vue')['default']>
     'nested/index': ComponentProps<typeof import('./pages/nested/index.vue')['default']>
+    'markdown-page': ComponentProps<typeof import('./pages/markdown-page.md')['default']>
   }
 }
 export {}

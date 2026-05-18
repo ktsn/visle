@@ -32,7 +32,11 @@ export function virtualFilePlugin(config: ResolvedVisleConfig): Plugin {
 
     load(id) {
       if (id === serverVirtualEntryId) {
-        return generateServerVirtualEntryCode(entryRoot, resolveServerComponentIds(entryRoot))
+        return generateServerVirtualEntryCode(
+          entryRoot,
+          resolveServerComponentIds(entryRoot, config.entryExt),
+          config.entryExt,
+        )
       }
 
       return null

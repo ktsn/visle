@@ -3,7 +3,7 @@ import { parse } from 'vue/compiler-sfc'
 
 import { asAbs, relative } from '../../shared/path.js'
 import { generateComponentWrapperCode, componentWrapPrefix } from '../generate.js'
-import { parseId } from '../paths.js'
+import { hasEntryExt, parseId } from '../paths.js'
 import { buildImportMap, findVClientElements } from '../sfc-analysis.js'
 
 interface ServerTransformPluginResult {
@@ -17,7 +17,7 @@ interface ServerTransformPluginResult {
  * - Loads wrapper virtual modules with generated code
  * - Detects `v-client:load` directives and collects island component paths for the islands build
  */
-export function serverTransformPlugin(): ServerTransformPluginResult {
+export function serverTransformPlugin(entryExt: string[]): ServerTransformPluginResult {
   const islandPaths = new Set<string>()
 
   /**
@@ -57,8 +57,8 @@ export function serverTransformPlugin(): ServerTransformPluginResult {
 
       const { fileName, query } = parseId(id)
 
-      // Skip .vue sub-requests (e.g. ?vue&type=script)
-      if (fileName.endsWith('.vue') && query.vue) {
+      // Skip SFC sub-requests (e.g. ?vue&type=script)
+      if (hasEntryExt(fileName, entryExt) && query.vue) {
         return null
       }
 
@@ -98,11 +98,11 @@ export function serverTransformPlugin(): ServerTransformPluginResult {
     async transform(code, id) {
       const { fileName, query } = parseId(id)
 
-      if (!fileName.endsWith('.vue')) {
+      if (!hasEntryExt(fileName, entryExt)) {
         return null
       }
 
-      // Skip sub-requests (e.g., ?vue&type=style) — only process plain .vue files
+      // Skip sub-requests (e.g., ?vue&type=style) — only process plain SFC files
       if (query.vue) {
         return null
       }

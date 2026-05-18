@@ -28,9 +28,15 @@ export async function loadManifest(serverOutDir: AbsolutePath): Promise<RuntimeM
     },
 
     async getEntryCssIds(componentPath: string): Promise<string[]> {
-      const entryRelativePath = `${data.entryDir}/${componentPath}.vue`
-      const cssIds = data.cssMap[entryRelativePath] ?? []
-      return cssIds.map((cssId) => `${basePath}/${cssId}`)
+      const entryExt = data.entryExt ?? ['.vue']
+      for (const ext of entryExt) {
+        const entryRelativePath = `${data.entryDir}/${componentPath}${ext}`
+        const cssIds = data.cssMap[entryRelativePath]
+        if (cssIds) {
+          return cssIds.map((cssId) => `${basePath}/${cssId}`)
+        }
+      }
+      return []
     },
 
     async getIslandsBootstrapId(): Promise<string> {

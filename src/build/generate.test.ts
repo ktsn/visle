@@ -12,7 +12,7 @@ describe('generateEntryTypesCode', () => {
       asAbs('/project/pages/with-props.vue'),
     ]
 
-    const result = generateEntryTypesCode(entryDir, dtsDir, componentIds)
+    const result = generateEntryTypesCode(entryDir, dtsDir, componentIds, ['.vue'])
 
     expect(result).toContain(
       "'static': ComponentProps<typeof import('./pages/static.vue')['default']>",
@@ -27,7 +27,7 @@ describe('generateEntryTypesCode', () => {
     const dtsDir = asAbs('/project')
     const componentIds = [asAbs('/project/pages/nested/index.vue')]
 
-    const result = generateEntryTypesCode(entryDir, dtsDir, componentIds)
+    const result = generateEntryTypesCode(entryDir, dtsDir, componentIds, ['.vue'])
 
     expect(result).toContain(
       "'nested/index': ComponentProps<typeof import('./pages/nested/index.vue')['default']>",
@@ -35,7 +35,7 @@ describe('generateEntryTypesCode', () => {
   })
 
   test('handles empty component list', () => {
-    const result = generateEntryTypesCode(asAbs('/project/pages'), asAbs('/project'), [])
+    const result = generateEntryTypesCode(asAbs('/project/pages'), asAbs('/project'), [], ['.vue'])
 
     expect(result).toContain("declare module 'visle'")
     expect(result).toContain("import type { ComponentProps } from 'visle'")
@@ -47,7 +47,7 @@ describe('generateEntryTypesCode', () => {
     const dtsDir = asAbs('/project/types')
     const componentIds = [asAbs('/project/pages/static.vue')]
 
-    const result = generateEntryTypesCode(entryDir, dtsDir, componentIds)
+    const result = generateEntryTypesCode(entryDir, dtsDir, componentIds, ['.vue'])
 
     expect(result).toContain(
       "'static': ComponentProps<typeof import('../pages/static.vue')['default']>",
@@ -55,8 +55,19 @@ describe('generateEntryTypesCode', () => {
   })
 
   test('include empty export', () => {
-    const result = generateEntryTypesCode(asAbs('/project/pages'), asAbs('/project'), [])
+    const result = generateEntryTypesCode(asAbs('/project/pages'), asAbs('/project'), [], ['.vue'])
 
     expect(result).toContain('export {}')
+  })
+
+  test('strips multiple entry extensions', () => {
+    const entryDir = asAbs('/project/pages')
+    const dtsDir = asAbs('/project')
+    const componentIds = [asAbs('/project/pages/home.vue'), asAbs('/project/pages/post.md')]
+
+    const result = generateEntryTypesCode(entryDir, dtsDir, componentIds, ['.vue', '.md'])
+
+    expect(result).toContain("'home': ComponentProps<typeof import('./pages/home.vue')['default']>")
+    expect(result).toContain("'post': ComponentProps<typeof import('./pages/post.md')['default']>")
   })
 })

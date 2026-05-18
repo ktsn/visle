@@ -1,4 +1,5 @@
 import { type AbsolutePath, type RelativePath, relative } from '../shared/path.js'
+import { stripEntryExt } from './paths.js'
 
 export const serverVirtualEntryId = '\0@visle/server-entry'
 
@@ -7,12 +8,13 @@ export const componentWrapPrefix = '\0visle:wrap:'
 export function generateServerVirtualEntryCode(
   entryDir: AbsolutePath,
   componentIds: AbsolutePath[],
+  entryExt: string[],
 ): string {
   const imports = componentIds.map((id, i) => `import _${i} from '${id}'`).join('\n')
 
   const entries = componentIds
     .map((id, i) => {
-      const key = relative(entryDir, id).replace(/\.vue$/, '')
+      const key = stripEntryExt(relative(entryDir, id), entryExt)
       return `  '${key}': _${i}`
     })
     .join(',\n')
@@ -62,10 +64,11 @@ export function generateEntryTypesCode(
   entryDir: AbsolutePath,
   dtsDir: AbsolutePath,
   componentIds: AbsolutePath[],
+  entryExt: string[],
 ): string {
   const entries = componentIds
     .map((id) => {
-      const key = relative(entryDir, id).replace(/\.vue$/, '')
+      const key = stripEntryExt(relative(entryDir, id), entryExt)
       const importPath = relative(dtsDir, id)
       const importSpecifier = importPath.startsWith('.') ? importPath : `./${importPath}`
       return `    '${key}': ComponentProps<typeof import('${importSpecifier}')['default']>`
