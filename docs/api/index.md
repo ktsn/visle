@@ -119,6 +119,15 @@ interface VisleConfig {
   entryDir?: string
 
   /**
+   * File extensions used to detect entry components in `entryDir`.
+   * Each extension must include the leading dot. To support non-`.vue`
+   * sources (e.g. `.md`), add a Vite plugin that transforms them into
+   * Vue SFC text at the `load` phase.
+   * Default: ['.vue']
+   */
+  entryExt?: string[]
+
+  /**
    * Output directory for server build.
    * Default: 'dist/server'
    */
