@@ -38,8 +38,8 @@ importers:
         specifier: 25.9.3
         version: 25.9.3
       '@vitest/coverage-v8':
-        specifier: 4.1.8
-        version: 4.1.8(@voidzero-dev/vite-plus-test@0.1.15(@types/node@25.9.3)(@voidzero-dev/vite-plus-core@0.1.15(@types/node@25.9.3)(jiti@2.7.0)(typescript@6.0.3)(yaml@2.9.0))(happy-dom@20.10.3)(jiti@2.7.0)(typescript@6.0.3)(yaml@2.9.0))
+        specifier: 4.1.9
+        version: 4.1.9(@voidzero-dev/vite-plus-test@0.1.15(@types/node@25.9.3)(@voidzero-dev/vite-plus-core@0.1.15(@types/node@25.9.3)(jiti@2.7.0)(typescript@6.0.3)(yaml@2.9.0))(happy-dom@20.10.3)(jiti@2.7.0)(typescript@6.0.3)(yaml@2.9.0))
       bumpp:
         specifier: 11.1.0
         version: 11.1.0
@@ -958,20 +958,20 @@ packages:
       vite: ^5.0.0 || ^6.0.0 || ^7.0.0 || ^8.0.0
       vue: ^3.2.25
 
-  '@vitest/coverage-v8@4.1.8':
-    resolution: {integrity: sha512-lt3kovsyHwYe00wq4D1ti0Z974fWj4NLp6siqiyEufUpyFwK9Yhi7rBhac9JL5aA0zoMrJqc4vYPZRUnI7l7nw==}
+  '@vitest/coverage-v8@4.1.9':
+    resolution: {integrity: sha512-G9/lgqibheLVBDRuya45EbsEXTYcWoSG+TLg7i2axuzx0Eq62eXn+aWXyaVdV5vKvFSWd6ywcX8hA7la9Pvu8g==}
     peerDependencies:
-      '@vitest/browser': 4.1.8
-      vitest: 4.1.8
+      '@vitest/browser': 4.1.9
+      vitest: 4.1.9
     peerDependenciesMeta:
       '@vitest/browser':
         optional: true
 
-  '@vitest/pretty-format@4.1.8':
-    resolution: {integrity: sha512-9GasEBxpZ1VYIpqHf/0+YGg121uSNwCKOJqIrTwWP/TB7DmFCiaBpNl3aPZzoLWfWkuqhbH8vJIVobZkvdo2cA==}
+  '@vitest/pretty-format@4.1.9':
+    resolution: {integrity: sha512-s0iufns3iIFitdgm+YR7g1whCAaGtXz459VS9/PqyKDEEFgYIhsHOQmXgIgDuYCt7DeQmiZT0Qe2OA2p4ZPu5A==}
 
-  '@vitest/utils@4.1.8':
-    resolution: {integrity: sha512-uOJamYALNhfJ6iolExyQM40yIQwDqYnkKtQ5VCiSe17E33H0aQ/u+1GlRuz4LZBk6Mm3sg90G9hEbmEt37C1Zg==}
+  '@vitest/utils@4.1.9':
+    resolution: {integrity: sha512-A51o8ymO5PpqlWNnBP9ZHPXDIpuMtTLlGSjN7la4US+LJzoUMyhwjA5QXlm39JexgwHKW4Xjs8Z2d3dLCXOeuA==}
 
   '@voidzero-dev/vite-plus-core@0.1.12':
     resolution: {integrity: sha512-j8YNe7A+8JcSoddztf5whvom/yJ7OKUO3Y5a3UoLIUmOL8YEKVv5nPANrxJ7eaFfHJoMnBEwzBpq1YVZ+H3uPA==}
@@ -2870,10 +2870,10 @@ snapshots:
       vite: '@voidzero-dev/vite-plus-core@0.1.15(@types/node@25.9.3)(jiti@2.7.0)(typescript@6.0.3)(yaml@2.9.0)'
       vue: 3.5.38(typescript@6.0.3)
 
-  '@vitest/coverage-v8@4.1.8(@voidzero-dev/vite-plus-test@0.1.15(@types/node@25.9.3)(@voidzero-dev/vite-plus-core@0.1.15(@types/node@25.9.3)(jiti@2.7.0)(typescript@6.0.3)(yaml@2.9.0))(happy-dom@20.10.3)(jiti@2.7.0)(typescript@6.0.3)(yaml@2.9.0))':
+  '@vitest/coverage-v8@4.1.9(@voidzero-dev/vite-plus-test@0.1.15(@types/node@25.9.3)(@voidzero-dev/vite-plus-core@0.1.15(@types/node@25.9.3)(jiti@2.7.0)(typescript@6.0.3)(yaml@2.9.0))(happy-dom@20.10.3)(jiti@2.7.0)(typescript@6.0.3)(yaml@2.9.0))':
     dependencies:
       '@bcoe/v8-coverage': 1.0.2
-      '@vitest/utils': 4.1.8
+      '@vitest/utils': 4.1.9
       ast-v8-to-istanbul: 1.0.0
       istanbul-lib-coverage: 3.2.2
       istanbul-lib-report: 3.0.1
@@ -2884,13 +2884,13 @@ snapshots:
       tinyrainbow: 3.1.0
       vitest: '@voidzero-dev/vite-plus-test@0.1.15(@types/node@25.9.3)(@voidzero-dev/vite-plus-core@0.1.15(@types/node@25.9.3)(jiti@2.7.0)(typescript@6.0.3)(yaml@2.9.0))(happy-dom@20.10.3)(jiti@2.7.0)(typescript@6.0.3)(yaml@2.9.0)'
 
-  '@vitest/pretty-format@4.1.8':
+  '@vitest/pretty-format@4.1.9':
     dependencies:
       tinyrainbow: 3.1.0
 
-  '@vitest/utils@4.1.8':
+  '@vitest/utils@4.1.9':
     dependencies:
-      '@vitest/pretty-format': 4.1.8
+      '@vitest/pretty-format': 4.1.9
       convert-source-map: 2.0.0
       tinyrainbow: 3.1.0
 
