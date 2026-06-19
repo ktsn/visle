@@ -44,7 +44,7 @@
     "glob": "^13.0.0"
   },
   "devDependencies": {
-    "@babel/types": "7.29.7",
+    "@babel/types": "8.0.0",
     "@types/connect": "3.4.38",
     "@types/diffable-html": "5.0.2",
     "@types/node": "25.9.3",
