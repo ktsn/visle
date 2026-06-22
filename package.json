@@ -56,10 +56,10 @@
     "oxc-minify": "0.137.0",
     "playwright": "1.61.0",
     "typescript": "6.0.3",
-    "vite": "npm:@voidzero-dev/vite-plus-core@0.1.15",
-    "vite-plus": "0.1.15",
+    "vite": "npm:@voidzero-dev/vite-plus-core@0.2.1",
+    "vite-plus": "0.2.1",
     "vitepress": "2.0.0-alpha.17",
-    "vitest": "npm:@voidzero-dev/vite-plus-test@0.1.15",
+    "vitest": "npm:@voidzero-dev/vite-plus-test@0.1.24",
     "vue": "3.5.38"
   },
   "peerDependencies": {
@@ -68,8 +68,8 @@
   "packageManager": "pnpm@10.34.4+sha512.8768be55200ae3f2226b6527fcca2687e14bc4e5f12d7721a0f25da3df47915177058648db4177baf348120fa0ba2752d8d8d93f6beaf1fe64ae18da8de961af",
   "pnpm": {
     "overrides": {
-      "vite": "npm:@voidzero-dev/vite-plus-core@0.1.15",
-      "vitest": "npm:@voidzero-dev/vite-plus-test@0.1.15"
+      "vite": "npm:@voidzero-dev/vite-plus-core@0.2.1",
+      "vitest": "npm:@voidzero-dev/vite-plus-test@0.1.24"
     }
   }
 }
