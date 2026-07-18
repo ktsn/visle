@@ -10,6 +10,13 @@ export interface VisleConfig {
   clientOutDir?: string
   dts?: string | null
 
+  /**
+   * When `true`, `vite build` also outputs rendered HTML files
+   * for all render entries. The HTML file paths follow the same
+   * structure as the entry `.vue` files in entryDir.
+   */
+  generate?: boolean
+
   /** @vitejs/plugin-vue options */
   vue?: Options
 }
@@ -25,6 +32,7 @@ export const defaultConfig: ResolvedVisleConfig = {
   clientOutDir: 'dist/client',
   serverOutDir: 'dist/server',
   dts: 'src/visle-generated.d.ts',
+  generate: false,
   vue: {},
 }
 
