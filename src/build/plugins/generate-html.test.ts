@@ -1,0 +1,80 @@
+import fs from 'node:fs/promises'
+import path from 'node:path'
+
+import { afterEach, beforeEach, describe, expect, test } from 'vite-plus/test'
+
+import { prodBuild } from '../../../test/utils.ts'
+import { entryKeyToHtmlPath } from './generate-html.ts'
+
+describe('entryKeyToHtmlPath', () => {
+  test('index maps to index.html', () => {
+    expect(entryKeyToHtmlPath('index')).toBe('index.html')
+  })
+
+  test('non-index maps to name/index.html', () => {
+    expect(entryKeyToHtmlPath('profile')).toBe('profile/index.html')
+  })
+
+  test('nested index maps to nested/index.html', () => {
+    expect(entryKeyToHtmlPath('nested/index')).toBe('nested/index.html')
+  })
+
+  test('nested non-index maps to nested/name/index.html', () => {
+    expect(entryKeyToHtmlPath('nested/detail')).toBe('nested/detail/index.html')
+  })
+})
+
+describe('generateHtmlPlugin', () => {
+  const generatedDir = path.resolve(import.meta.dirname, '../../../test/__generated__/server')
+
+  let root: string
+
+  beforeEach(async () => {
+    await fs.mkdir(generatedDir, { recursive: true })
+    root = await fs.mkdtemp(path.join(generatedDir, 'generate-html-'))
+    await fs.mkdir(path.join(root, 'pages'), { recursive: true })
+  })
+
+  afterEach(async () => {
+    await fs.rm(root, { recursive: true, force: true })
+  })
+
+  test('outputs rendered HTML for each .vue entry', async () => {
+    await fs.writeFile(path.join(root, 'pages/index.vue'), '<template><h1>Home</h1></template>')
+    await fs.writeFile(path.join(root, 'pages/about.vue'), '<template><p>About</p></template>')
+
+    await prodBuild(root, {}, { generate: true })
+
+    const indexHtml = await fs.readFile(path.join(root, 'dist/client/index.html'), 'utf-8')
+    expect(indexHtml).toContain('<h1>Home</h1>')
+
+    const aboutHtml = await fs.readFile(path.join(root, 'dist/client/about/index.html'), 'utf-8')
+    expect(aboutHtml).toContain('<p>About</p>')
+  })
+
+  test('errors when entry components have props defined', async () => {
+    await fs.writeFile(
+      path.join(root, 'pages/index.vue'),
+      '<script setup lang="ts">defineProps<{ message: string }>()</script><template><div>{{ message }}</div></template>',
+    )
+    await fs.writeFile(
+      path.join(root, 'pages/about.vue'),
+      '<script setup lang="ts">defineProps<{ title: string }>()</script><template><p>{{ title }}</p></template>',
+    )
+    await fs.writeFile(
+      path.join(root, 'pages/static.vue'),
+      '<template><div>No props</div></template>',
+    )
+
+    let message = ''
+    try {
+      await prodBuild(root, {}, { generate: true })
+    } catch (e) {
+      message = String(e)
+    }
+    expect(message).toMatch('The following entries cannot have props when using generate option:')
+    expect(message).toMatch('- about')
+    expect(message).toMatch('- index')
+    expect(message).not.toMatch('- static')
+  })
+})

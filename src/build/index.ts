@@ -10,6 +10,7 @@ import { serverVirtualEntryId } from './generate.js'
 import { islandsBootstrapPath, resolveServerComponentIds } from './paths.js'
 import { devStyleSSRPlugin } from './plugins/dev-style-ssr.js'
 import { entryTypesPlugin } from './plugins/entry-types.js'
+import { generateHtmlPlugin, generateVirtualEntryId } from './plugins/generate-html.js'
 import { manifestPlugin } from './plugins/manifest.js'
 import { serverTransformPlugin } from './plugins/server-transform.js'
 import { virtualFilePlugin } from './plugins/virtual-file.js'
@@ -33,6 +34,7 @@ export function visle(config: VisleConfig = {}): Plugin[] {
   const virtualFile = virtualFilePlugin(resolvedConfig)
   const { plugin: manifest, getManifestData } = manifestPlugin(resolvedConfig)
   const { plugin: entryTypes, generate: generateEntryTypes } = entryTypesPlugin(resolvedConfig)
+  const generateHtml = generateHtmlPlugin(resolvedConfig)
   const vuePlugin = wrapVuePlugin(resolvedConfig)
 
   const orchestrationPlugin: Plugin = {
@@ -45,6 +47,15 @@ export function visle(config: VisleConfig = {}): Plugin[] {
 
       return {
         environments: {
+          server: {
+            consumer: 'server',
+            build: {
+              outDir: resolvedConfig.serverOutDir,
+              rollupOptions: {
+                input: [serverVirtualEntryId],
+              },
+            },
+          },
           style: {
             consumer: 'client',
             build: {
@@ -68,15 +79,20 @@ export function visle(config: VisleConfig = {}): Plugin[] {
               },
             },
           },
-          server: {
-            consumer: 'server',
-            build: {
-              outDir: resolvedConfig.serverOutDir,
-              rollupOptions: {
-                input: [serverVirtualEntryId],
-              },
-            },
-          },
+          ...(resolvedConfig.generate
+            ? {
+                generate: {
+                  consumer: 'client',
+                  build: {
+                    outDir: resolvedConfig.clientOutDir,
+                    emptyOutDir: false,
+                    rollupOptions: {
+                      input: [generateVirtualEntryId],
+                    },
+                  },
+                },
+              }
+            : {}),
         },
 
         builder: {
@@ -103,6 +119,11 @@ export function visle(config: VisleConfig = {}): Plugin[] {
               ),
               generateEntryTypes(),
             ])
+
+            // Generate static HTML files for all entries (when enabled)
+            if (resolvedConfig.generate) {
+              await builder.build(builder.environments.generate!)
+            }
           },
         },
       }
@@ -144,6 +165,7 @@ export function visle(config: VisleConfig = {}): Plugin[] {
     virtualFile,
     manifest,
     entryTypes,
+    generateHtml,
     vuePlugin,
     devStyleSSRPlugin(),
   ]
