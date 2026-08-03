@@ -37,11 +37,11 @@ describe('Production Build SSR', () => {
 
     const normalized = files.map(normalizeHashes).toSorted()
 
-    expect(normalized).toMatchSnapshot()
+    expect(normalized).toMatchSnapshot('client output files')
 
     const manifestPath = path.join(root, 'dist/server', manifestFileName)
     const manifestJson = await fs.readFile(manifestPath, 'utf-8')
-    expect(JSON.parse(normalizeHashes(manifestJson))).toMatchSnapshot()
+    expect(JSON.parse(normalizeHashes(manifestJson))).toMatchSnapshot('server manifest')
   })
 
   test('Type definition file is generated', async () => {

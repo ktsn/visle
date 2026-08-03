@@ -12,8 +12,8 @@ import { entryTypesPlugin } from './entry-types.ts'
 
 vi.mock('node:fs/promises', () => ({
   default: {
-    writeFile: vi.fn(() => Promise.resolve()),
-    mkdir: vi.fn(() => Promise.resolve()),
+    writeFile: vi.fn<() => Promise<void>>(() => Promise.resolve()),
+    mkdir: vi.fn<() => Promise<void>>(() => Promise.resolve()),
   },
 }))
 
@@ -21,7 +21,7 @@ vi.mock('../paths.ts', async (importOriginal) => {
   const actual = await importOriginal<typeof import('../paths.ts')>()
   return {
     ...actual,
-    resolveServerComponentIds: vi.fn(() => []),
+    resolveServerComponentIds: vi.fn<() => string[]>(() => []),
   }
 })
 

@@ -121,11 +121,11 @@ export function visle(config: VisleConfig = {}): Plugin[] {
 
     options(opts) {
       if (islandPaths.size === 0) {
-        return
+        return null
       }
 
       if (!Array.isArray(opts.input) && typeof opts.input !== 'string') {
-        return this.error(
+        this.error(
           'It is not allowed to pass an object value to the input option of the islands environment',
         )
       }

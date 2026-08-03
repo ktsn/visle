@@ -87,7 +87,7 @@ function serializeValue(value: unknown, seen: WeakSet<object>): unknown {
   }
 
   // value is an object from here
-  const obj = value as object
+  const obj = value
 
   if (seen.has(obj)) {
     throw new Error(`[visle] Cannot serialize circular reference in props`)

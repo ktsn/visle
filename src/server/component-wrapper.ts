@@ -21,7 +21,7 @@ export function createComponentWrapper(
     setup(props, { slots }) {
       const attrs = useAttrs()
 
-      if (props.__visle_strategy__) {
+      if (props['__visle_strategy__']) {
         const context: RenderContext = useSSRContext()!
         const manifest = context.manifest!
 
@@ -41,8 +41,8 @@ export function createComponentWrapper(
 
         return () => {
           const isEmptyProps = Object.keys(attrs).length === 0
-          const strategy = props.__visle_strategy__
-          const options = props.__visle_options__
+          const strategy = props['__visle_strategy__']
+          const options = props['__visle_options__']
 
           return h(
             'vue-island',
