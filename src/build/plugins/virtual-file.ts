@@ -28,6 +28,8 @@ export function virtualFilePlugin(config: ResolvedVisleConfig): Plugin {
       if (id === serverVirtualEntryId) {
         return id
       }
+
+      return null
     },
 
     load(id) {

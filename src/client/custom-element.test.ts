@@ -7,14 +7,16 @@ import { serializeProps } from '../shared/serialization.ts'
 import { VueIsland } from './custom-element.ts'
 
 vi.mock('vue', () => ({
-  createSSRApp: vi.fn(() => ({
-    mount: vi.fn(),
-    unmount: vi.fn(),
+  createSSRApp: vi.fn<() => { mount: () => void; unmount: () => void }>(() => ({
+    mount: vi.fn<() => void>(),
+    unmount: vi.fn<() => void>(),
   })),
 }))
 
 vi.mock('./load-module.ts', () => ({
-  loadModule: vi.fn(() => Promise.resolve({ default: { name: 'TestComponent' } })),
+  loadModule: vi.fn<() => Promise<{ default: { name: string } }>>(() =>
+    Promise.resolve({ default: { name: 'TestComponent' } }),
+  ),
 }))
 
 function createIsland(attrs?: Record<string, string>): VueIsland {
@@ -125,8 +127,8 @@ describe('VueIsland custom element', () => {
     let mockObserve: ReturnType<typeof vi.fn>
 
     beforeEach(() => {
-      mockDisconnect = vi.fn()
-      mockObserve = vi.fn()
+      mockDisconnect = vi.fn<() => void>()
+      mockObserve = vi.fn<(target: Element) => void>()
 
       class MockIntersectionObserver {
         constructor(callback: IntersectionObserverCallback, options?: IntersectionObserverInit) {
@@ -136,7 +138,7 @@ describe('VueIsland custom element', () => {
 
         observe = mockObserve
         disconnect = mockDisconnect
-        unobserve = vi.fn()
+        unobserve = vi.fn<(target: Element) => void>()
       }
 
       vi.stubGlobal('IntersectionObserver', MockIntersectionObserver)
@@ -213,11 +215,11 @@ describe('VueIsland custom element', () => {
     let mockCancelIdleCallback: ReturnType<typeof vi.fn>
 
     beforeEach(() => {
-      mockRequestIdleCallback = vi.fn((_cb: IdleRequestCallback) => {
+      mockRequestIdleCallback = vi.fn<(cb: IdleRequestCallback) => number>((_cb) => {
         // Store callback but don't call it immediately
         return 42
       })
-      mockCancelIdleCallback = vi.fn()
+      mockCancelIdleCallback = vi.fn<(handle: number) => void>()
 
       vi.stubGlobal('requestIdleCallback', mockRequestIdleCallback)
       vi.stubGlobal('cancelIdleCallback', mockCancelIdleCallback)
@@ -307,17 +309,20 @@ describe('VueIsland custom element', () => {
 
     function stubMatchMedia(matches: boolean) {
       changeHandler = null
-      mockRemoveEventListener = vi.fn()
+      mockRemoveEventListener =
+        vi.fn<(event: string, handler: (event: MediaQueryListEvent) => void) => void>()
 
       const mql = {
         matches,
-        addEventListener: vi.fn((_event: string, handler: (event: MediaQueryListEvent) => void) => {
+        addEventListener: vi.fn<
+          (event: string, handler: (event: MediaQueryListEvent) => void) => void
+        >((_event, handler) => {
           changeHandler = handler
         }),
         removeEventListener: mockRemoveEventListener,
       }
 
-      mockMatchMedia = vi.fn(() => mql)
+      mockMatchMedia = vi.fn<(query: string) => typeof mql>(() => mql)
       vi.stubGlobal('matchMedia', mockMatchMedia)
       return mql
     }

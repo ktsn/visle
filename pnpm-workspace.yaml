@@ -1,3 +1,20 @@
 packages:
   - .
   - examples/*
+
+overrides:
+  'vitepress>vite': 8.1.5
+  vite: 'catalog:'
+  vitest: 'catalog:'
+catalog:
+  vite: npm:@voidzero-dev/vite-plus-core@0.2.7
+  vitest: 4.1.10
+  vite-plus: 0.2.7
+  '@vitest/coverage-v8': 4.1.10
+peerDependencyRules:
+  allowAny:
+    - vite
+    - vitest
+  allowedVersions:
+    vite: '*'
+    vitest: '*'

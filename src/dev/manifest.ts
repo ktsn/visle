@@ -138,7 +138,9 @@ export function createDevManifest(devServer: ViteDevServer): RuntimeManifest {
       // Resolve CSS ids in discovery order
       const cssIdArrays = await Promise.all(
         discovered.map((entry) =>
-          entry.type === 'css' ? [entry.id] : getComponentCssIds(entry.relativePath),
+          entry.type === 'css'
+            ? Promise.resolve([entry.id])
+            : getComponentCssIds(entry.relativePath),
         ),
       )
       return [...new Set(cssIdArrays.flat())]

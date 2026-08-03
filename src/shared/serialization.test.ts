@@ -170,7 +170,7 @@ describe('serializeProps / deserializeProps', () => {
     })
 
     test('throws on invalid JSON', () => {
-      expect(() => deserializeProps('{invalid')).toThrow()
+      expect(() => deserializeProps('{invalid')).toThrow('JSON')
     })
   })
 })

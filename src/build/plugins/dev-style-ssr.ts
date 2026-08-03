@@ -27,7 +27,7 @@ export function devStyleSSRPlugin(): Plugin {
 
     transform(code, id) {
       if (!isCSS(id) || !code.includes('import.meta.hot')) {
-        return
+        return null
       }
 
       let moduleId = id

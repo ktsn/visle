@@ -48,7 +48,7 @@
     "@types/connect": "3.4.38",
     "@types/diffable-html": "5.0.2",
     "@types/node": "25.9.5",
-    "@vitest/coverage-v8": "4.1.10",
+    "@vitest/coverage-v8": "catalog:",
     "bumpp": "12.1.1",
     "changelogithub": "15.0.4",
     "diffable-html": "6.0.1",
@@ -56,20 +56,14 @@
     "oxc-minify": "0.142.0",
     "playwright": "1.62.1",
     "typescript": "7.0.2",
-    "vite": "npm:@voidzero-dev/vite-plus-core@0.1.15",
-    "vite-plus": "0.1.15",
+    "vite": "catalog:",
+    "vite-plus": "catalog:",
     "vitepress": "2.0.0-alpha.18",
-    "vitest": "npm:@voidzero-dev/vite-plus-test@0.1.15",
+    "vitest": "catalog:",
     "vue": "3.5.40"
   },
   "peerDependencies": {
     "vue": ">=3.0.0"
   },
-  "packageManager": "pnpm@11.18.0+sha512.33d83c77da82f49fba836925c6f1b841181ec3132b670639bd012f7075f5c7cf634c5f870147c19aae7478fac01df09d8892e880454896edd23ee9b33757563c",
-  "pnpm": {
-    "overrides": {
-      "vite": "npm:@voidzero-dev/vite-plus-core@0.1.15",
-      "vitest": "npm:@voidzero-dev/vite-plus-test@0.1.15"
-    }
-  }
+  "packageManager": "pnpm@11.18.0+sha512.33d83c77da82f49fba836925c6f1b841181ec3132b670639bd012f7075f5c7cf634c5f870147c19aae7478fac01df09d8892e880454896edd23ee9b33757563c"
 }

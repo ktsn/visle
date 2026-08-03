@@ -93,6 +93,8 @@ export function serverTransformPlugin(entryExt: string[]): ServerTransformPlugin
 
         return generateComponentWrapperCode(absFileName, componentRelativePath, importedNames)
       }
+
+      return null
     },
 
     async transform(code, id) {
@@ -180,6 +182,8 @@ export function serverTransformPlugin(entryExt: string[]): ServerTransformPlugin
         }
         names.add(importInfo.importedName)
       }
+
+      return null
     },
   }
 

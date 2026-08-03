@@ -485,7 +485,7 @@ exports[`Production Build SSR > 'Static component rendering' 1`] = `
 </div>
 `;
 
-exports[`Production Build SSR > Build output files 1`] = `
+exports[`Production Build SSR > Build output files > client output files 1`] = `
 [
   "assets/AliasStyledCounter-[hash].js",
   "assets/Counter-[hash].js",
@@ -517,7 +517,7 @@ exports[`Production Build SSR > Build output files 1`] = `
 ]
 `;
 
-exports[`Production Build SSR > Build output files 2`] = `
+exports[`Production Build SSR > Build output files > server manifest 1`] = `
 {
   "base": "/",
   "cssMap": {
@@ -642,7 +642,7 @@ export {}
 exports[`Production Build SSR with manual chunks > dynamic import shared CSS page includes the merged CSS 1`] = `
 <link
   rel="stylesheet"
-  href="/assets/with-visible-island-[hash].css"
+  href="/assets/style-[hash].css"
 >
 <script
   type="module"
@@ -669,7 +669,7 @@ exports[`Production Build SSR with manual chunks > dynamic import shared CSS pag
 exports[`Production Build SSR with manual chunks > shared CSS page includes the merged CSS 1`] = `
 <link
   rel="stylesheet"
-  href="/assets/with-visible-island-[hash].css"
+  href="/assets/style-[hash].css"
 >
 <script
   type="module"
