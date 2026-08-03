@@ -36,8 +36,8 @@ importers:
         version: 13.0.6
     devDependencies:
       '@babel/types':
-        specifier: 7.29.7
-        version: 7.29.7
+        specifier: 7.29.8
+        version: 7.29.8
       '@types/connect':
         specifier: 3.4.38
         version: 3.4.38
@@ -130,10 +130,6 @@ packages:
 
   '@babel/runtime@7.29.7':
     resolution: {integrity: sha512-Nq8OhGWiZIZGV6hLHoyAKLLcJihP/xFeBMGJoUrxTX2psI8dCifzLhZISFb+VWS3wFMRDmCGw5R+dOySCqPLhw==}
-    engines: {node: '>=6.9.0'}
-
-  '@babel/types@7.29.7':
-    resolution: {integrity: sha512-4zBIxpPzowiZpusoFkyGVwakdRJUyuH5PxQ/PrqghfdFWWasvnCdPfQXHrenDai+gyLARulZjZowCOj6fjT4pA==}
     engines: {node: '>=6.9.0'}
 
   '@babel/types@7.29.8':
@@ -2366,11 +2362,6 @@ snapshots:
 
   '@babel/runtime@7.29.7': {}
 
-  '@babel/types@7.29.7':
-    dependencies:
-      '@babel/helper-string-parser': 7.29.7
-      '@babel/helper-validator-identifier': 7.29.7
-
   '@babel/types@7.29.8':
     dependencies:
       '@babel/helper-string-parser': 7.29.7
@@ -3648,7 +3639,7 @@ snapshots:
   magicast@0.5.4:
     dependencies:
       '@babel/parser': 7.29.8
-      '@babel/types': 7.29.7
+      '@babel/types': 7.29.8
       source-map-js: 1.2.1
 
   make-dir@4.0.0:
