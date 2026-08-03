@@ -50,7 +50,7 @@
     "@types/node": "25.9.5",
     "@vitest/coverage-v8": "4.1.10",
     "bumpp": "12.1.1",
-    "changelogithub": "14.0.0",
+    "changelogithub": "15.0.4",
     "diffable-html": "6.0.1",
     "happy-dom": "20.11.1",
     "oxc-minify": "0.142.0",
