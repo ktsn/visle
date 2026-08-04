@@ -1,7 +1,4 @@
-import fs from 'node:fs/promises'
-
-import { manifestFileName, type ManifestData } from '../shared/manifest.js'
-import { type AbsolutePath, join } from '../shared/path.js'
+import type { ManifestData } from '../shared/manifest.js'
 
 export interface RuntimeManifest {
   getClientImportId(componentRelativePath: string): Promise<string>
@@ -10,12 +7,9 @@ export interface RuntimeManifest {
 }
 
 /**
- * Loads the manifest file from serverOutDir for production SSR.
+ * Creates the platform-neutral runtime view of build manifest data.
  */
-export async function loadManifest(serverOutDir: AbsolutePath): Promise<RuntimeManifest> {
-  const manifestPath = join(serverOutDir, manifestFileName)
-
-  const data: ManifestData = JSON.parse(await fs.readFile(manifestPath, 'utf-8'))
+export function createRuntimeManifest(data: ManifestData): RuntimeManifest {
   const basePath = data.base.replace(/\/$/, '')
 
   return {

@@ -1,196 +1,88 @@
-import fs from 'node:fs/promises'
-import path from 'node:path'
-import { fileURLToPath } from 'node:url'
+import { describe, expect, test } from 'vite-plus/test'
+import { defineComponent, h, type Component } from 'vue'
 
-import { afterEach, describe, test, expect, beforeEach } from 'vite-plus/test'
+import type { ManifestData } from '../shared/manifest.ts'
+import { createRender, type RenderLoader } from './render.ts'
+import { createStaticLoader } from './static-loader.ts'
 
-import { visle } from '../build/index.ts'
-import { createDevLoader } from '../dev/index.ts'
-import { createRender } from './render.ts'
+const emptyManifest: ManifestData = {
+  base: '/',
+  entryDir: 'src/pages',
+  entryExt: ['.vue'],
+  cssMap: {},
+  jsMap: {},
+  islandsBootstrap: 'assets/islands.js',
+}
 
-const generatedDir = path.resolve(import.meta.dirname, '../../test/__generated__/server')
-
-/**
- * Save JavaScript code provided as the argument.
- *
- * @param root
- *   The root directory to save the codes.
- * @param codes
- *   JavaScript codes that will be saved.
- *   Keys are relative paths to be saved. Values are code strings.
- */
-async function saveCodes(root: string, codes: Record<string, string>): Promise<void> {
-  // Save each component code to a file
-  const promises = Object.entries(codes).map(async ([filePath, code]) => {
-    const fullPath = path.join(root, filePath)
-    const dirPath = path.dirname(fullPath)
-    await fs.mkdir(dirPath, { recursive: true })
-    await fs.writeFile(fullPath, code, 'utf8')
-  })
-
-  await Promise.all(promises)
+function loaderFor(component: Component): RenderLoader {
+  return createStaticLoader({ entries: { Comp: component }, manifest: emptyManifest })
 }
 
 describe('createRender', () => {
-  let root: string
+  test('throws a targeted error before a loader is configured', async () => {
+    const render = createRender()
 
-  beforeEach(async () => {
-    await fs.mkdir(generatedDir, { recursive: true })
-    root = await fs.mkdtemp(path.join(generatedDir, 'render-'))
+    await expect(render('Comp')).rejects.toThrow(
+      '[visle] Render loader is not configured. Call render.setLoader(loader) before rendering.',
+    )
   })
 
-  afterEach(async () => {
-    await fs.rm(root, { recursive: true, force: true })
+  test('uses a loader passed during initialization', async () => {
+    const component = defineComponent({
+      props: { msg: { type: String, required: true } },
+      render() {
+        return h('div', this.msg)
+      },
+    })
+    const render = createRender({ loader: loaderFor(component) })
+
+    await expect(render('Comp', { msg: 'Hello' })).resolves.toBe('<div>Hello</div>')
   })
 
-  describe('isDev = false', () => {
-    const emptyManifest = JSON.stringify({
-      base: '/',
-      entryDir: 'src/pages',
-      cssMap: {},
-      jsMap: {},
-    })
+  test('setLoader enables rendering after shared initialization', async () => {
+    const render = createRender()
+    render.setLoader(
+      loaderFor(
+        defineComponent({
+          render: () => h('div', 'Hello'),
+        }),
+      ),
+    )
 
-    test('renders vue component with props', async () => {
-      const render = createRender({
-        serverOutDir: path.join(root, 'dist/server'),
-      })
-
-      await saveCodes(root, {
-        'dist/server/visle-manifest.json': emptyManifest,
-        'dist/server/server-entry.js': `
-          import { defineComponent, h } from 'vue'
-          export default { Comp: defineComponent({
-            props: {
-              msg: {
-                type: String,
-                required: true,
-              },
-            },
-            render() {
-              return h('div', {}, [this.msg])
-            },
-          }) }`,
-      })
-
-      const result = await render('Comp', { msg: 'Hello' })
-
-      expect(result).toBe('<div>Hello</div>')
-    })
-
-    test('renders vue component without props', async () => {
-      const render = createRender({
-        serverOutDir: path.join(root, 'dist/server'),
-      })
-
-      await saveCodes(root, {
-        'dist/server/visle-manifest.json': emptyManifest,
-        'dist/server/server-entry.js': `
-          import { defineComponent, h } from 'vue'
-          export default { Comp: defineComponent({
-            render() {
-              return h('div', {}, ['Hello'])
-            },
-          }) }`,
-      })
-
-      const result = await render('Comp')
-
-      expect(result).toBe('<div>Hello</div>')
-    })
-
-    test('renders vue component from .mjs file', async () => {
-      const render = createRender({
-        serverOutDir: path.join(root, 'dist/server'),
-      })
-
-      await saveCodes(root, {
-        'dist/server/visle-manifest.json': emptyManifest,
-        'dist/server/server-entry.mjs': `
-          import { defineComponent, h } from 'vue'
-          export default { Comp: defineComponent({
-            render() {
-              return h('div', {}, ['Hello'])
-            },
-          }) }`,
-      })
-
-      const result = await render('Comp')
-
-      expect(result).toBe('<div>Hello</div>')
-    })
-
-    test('renders head related tags', async () => {
-      const render = createRender({
-        serverOutDir: path.join(root, 'dist/server'),
-      })
-
-      await saveCodes(root, {
-        'dist/server/visle-manifest.json': emptyManifest,
-        'dist/server/server-entry.js': `
-          import { defineComponent, h } from 'vue'
-          export default { Comp: defineComponent({
-            render() {
-              return h('html', {}, [
-                h('head', {}, [
-                  h('title', {}, ['Hello']),
-                  h('meta', { charset: 'utf-8' }),
-                  h('link', { rel: 'stylesheet', href: 'style.css' }),
-                  h('style', {}, ['body { color: red; }']),
-                  h('script', { src: 'script.js' }),
-                  h('script', {}, ["console.log('Hello')"]),
-                ]),
-              ])
-            },
-          }) }`,
-      })
-
-      const result = await render('Comp')
-
-      expect(result).toBe(
-        '<html><head><title>Hello</title><meta charset="utf-8"><link rel="stylesheet" href="style.css"><style>body { color: red; }</style><script src="script.js"></script><script>console.log(&#39;Hello&#39;)</script></head></html>',
-      )
-    })
+    await expect(render('Comp')).resolves.toBe('<div>Hello</div>')
   })
 
-  describe('isDev = true', () => {
-    let loader: ReturnType<typeof createDevLoader> | undefined
-
-    afterEach(async () => {
-      await loader?.close()
-      loader = undefined
+  test('replaces the configured loader', async () => {
+    const render = createRender({
+      loader: loaderFor(defineComponent({ render: () => h('div', 'first') })),
     })
+    render.setLoader(loaderFor(defineComponent({ render: () => h('div', 'second') })))
 
-    test('renders vue component from component directory', async () => {
-      const render = createRender({
-        serverOutDir: path.join(root, 'dist/server'),
-      })
+    await expect(render('Comp')).resolves.toBe('<div>second</div>')
+  })
 
-      loader = createDevLoader({
-        root,
-        plugins: [visle()],
-        resolve: {
-          alias: {
-            'visle/internal': path.resolve(
-              path.dirname(fileURLToPath(import.meta.url)),
-              'internal.ts',
-            ),
+  test('renders head-related tags', async () => {
+    const render = createRender({
+      loader: loaderFor(
+        defineComponent({
+          render() {
+            return h('html', {}, [
+              h('head', {}, [
+                h('title', {}, ['Hello']),
+                h('meta', { charset: 'utf-8' }),
+                h('link', { rel: 'stylesheet', href: 'style.css' }),
+                h('style', {}, ['body { color: red; }']),
+                h('script', { src: 'script.js' }),
+                h('script', {}, ["console.log('Hello')"]),
+              ]),
+            ])
           },
-        },
-      })
-
-      render.setLoader(loader)
-
-      await saveCodes(root, {
-        'src/pages/Comp.vue': `
-          <template>
-            <div>Hello</div>
-          </template>`,
-      })
-
-      const result = await render('Comp')
-
-      expect(result).toBe('<div>Hello</div>')
+        }),
+      ),
     })
+
+    await expect(render('Comp')).resolves.toBe(
+      '<html><head><title>Hello</title><meta charset="utf-8"><link rel="stylesheet" href="style.css"><style>body { color: red; }</style><script src="script.js"></script><script>console.log(&#39;Hello&#39;)</script></head></html>',
+    )
   })
 })

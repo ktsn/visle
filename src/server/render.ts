@@ -1,20 +1,11 @@
-import path from 'node:path'
-
-import { Component, createApp } from 'vue'
+import { type Component, createApp } from 'vue'
 import { renderToString } from 'vue/server-renderer'
 
-import { defaultConfig } from '../shared/config.js'
-import { resolveServerDistPath } from '../shared/entry.js'
-import { asAbs } from '../shared/path.js'
-import { RuntimeManifest, loadManifest } from './manifest.js'
+import type { RuntimeManifest } from './manifest.js'
 import { transformWithRenderContext } from './transform.js'
 
 export interface RenderOptions {
-  /**
-   * Directory path for server build output.
-   * Pass the same value of Visle Vite plugin's serverOutDir.
-   */
-  serverOutDir?: string
+  loader?: RenderLoader
 }
 
 export interface RenderLoader {
@@ -27,9 +18,9 @@ export interface RenderContext {
   hasIsland?: boolean
 }
 
-type RenderArgs<P> = {} extends P ? [props?: P] : [props: P]
+export type RenderArgs<P> = {} extends P ? [props?: P] : [props: P]
 
-export interface RenderFunction<T extends Record<string, any> = Record<string, any>> {
+export interface RenderFunction<T extends Record<keyof T, unknown> = Record<string, unknown>> {
   <K extends string & keyof T>(componentPath: K, ...args: RenderArgs<T[K]>): Promise<string>
   setLoader(loader: RenderLoader): void
 }
@@ -37,37 +28,25 @@ export interface RenderFunction<T extends Record<string, any> = Record<string, a
 /**
  * Return a function that renders a Vue component to a HTML string.
  * The returned render function receives a path to a Vue component.
- * You need to specify Vite output directory of server build as same value as
- * defined in Vite config.
+ * A loader can be provided initially or installed later with `setLoader()`.
  */
-export function createRender<T extends Record<string, any> = Record<string, any>>(
+export function createRender<T extends Record<keyof T, unknown> = Record<string, unknown>>(
   options: RenderOptions = {},
 ): RenderFunction<T> {
-  let cachedManifest: RuntimeManifest | undefined
-
-  let loader: RenderLoader = {
-    loadEntry(componentPath) {
-      const serverOutDir = asAbs(path.resolve(options.serverOutDir ?? defaultConfig.serverOutDir))
-
-      return import(/* @vite-ignore */ resolveServerDistPath(serverOutDir)).then(
-        (m) => m.default[componentPath],
-      )
-    },
-
-    async getManifest() {
-      if (!cachedManifest) {
-        const serverOutDir = asAbs(path.resolve(options.serverOutDir ?? defaultConfig.serverOutDir))
-        cachedManifest = await loadManifest(serverOutDir)
-      }
-      return cachedManifest
-    },
-  }
+  let loader = options.loader
 
   async function render(componentPath: string, props?: any): Promise<string> {
-    const component = await loader.loadEntry(componentPath)
+    const activeLoader = loader
+    if (!activeLoader) {
+      throw new Error(
+        '[visle] Render loader is not configured. Call render.setLoader(loader) before rendering.',
+      )
+    }
+
+    const component = await activeLoader.loadEntry(componentPath)
 
     const context: RenderContext = {
-      manifest: await loader.getManifest(),
+      manifest: await activeLoader.getManifest(),
     }
 
     const app = createApp(component, props)

@@ -1,7 +1,12 @@
+import { manifestFileName } from '../shared/manifest.js'
 import { type AbsolutePath, type RelativePath, relative } from '../shared/path.js'
 import { stripEntryExt } from './paths.js'
 
 export const serverVirtualEntryId = '\0@visle/server-entry'
+
+export const serverEntryFileName = 'server-entry.js'
+export const runtimeFileName = 'visle-runtime.js'
+export const runtimeDeclarationFileName = 'visle-runtime.d.ts'
 
 export const componentWrapPrefix = '\0visle:wrap:'
 
@@ -20,6 +25,33 @@ export function generateServerVirtualEntryCode(
     .join(',\n')
 
   return `${imports}\nexport default {\n${entries}\n}`
+}
+
+/**
+ * Generate the production runtime module. The relative import is deliberately
+ * static so deployment bundlers can discover every server entry.
+ */
+export function generateStaticRuntimeCode(): string {
+  const importPath = `./${serverEntryFileName}`
+  const manifestImportPath = `./${manifestFileName}`
+
+  return `import entries from ${JSON.stringify(importPath)}
+import manifest from ${JSON.stringify(manifestImportPath)} with { type: "json" }
+
+export default {
+  entries,
+  manifest,
+}
+`
+}
+
+export function generateStaticRuntimeDeclarationCode(): string {
+  return `import type { StaticRuntime } from 'visle'
+
+declare const runtime: StaticRuntime
+
+export default runtime
+`
 }
 
 export function generateComponentWrapperCode(

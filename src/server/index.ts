@@ -1,6 +1,17 @@
 import type { AllowedComponentProps, ComponentCustomProps, VNodeProps } from 'vue'
 
 export { createRender } from './render.js'
+export { createStaticLoader } from './static-loader.js'
+export type { ManifestData } from '../shared/manifest.js'
+export type { RuntimeManifest } from './manifest.js'
+export type {
+  RenderArgs,
+  RenderContext,
+  RenderFunction,
+  RenderLoader,
+  RenderOptions,
+} from './render.js'
+export type { StaticRuntime } from './static-loader.js'
 
 export type ComponentProps<T> = T extends new (...args: any) => { $props: infer P }
   ? // ComponentCustomProps can have extra fields with declaration merging.

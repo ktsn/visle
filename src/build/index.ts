@@ -6,7 +6,14 @@ import type { Plugin } from 'vite'
 import { type VisleConfig, defaultConfig, setVisleConfig } from '../shared/config.js'
 import { manifestFileName } from '../shared/manifest.js'
 import { asAbs, join, resolve } from '../shared/path.js'
-import { serverVirtualEntryId } from './generate.js'
+import {
+  generateStaticRuntimeCode,
+  generateStaticRuntimeDeclarationCode,
+  runtimeDeclarationFileName,
+  runtimeFileName,
+  serverEntryFileName,
+  serverVirtualEntryId,
+} from './generate.js'
 import { islandsBootstrapPath, resolveServerComponentIds } from './paths.js'
 import { devStyleSSRPlugin } from './plugins/dev-style-ssr.js'
 import { entryTypesPlugin } from './plugins/entry-types.js'
@@ -74,6 +81,9 @@ export function visle(config: VisleConfig = {}): Plugin[] {
               outDir: resolvedConfig.serverOutDir,
               rollupOptions: {
                 input: [serverVirtualEntryId],
+                output: {
+                  entryFileNames: serverEntryFileName,
+                },
               },
             },
           },
@@ -100,6 +110,11 @@ export function visle(config: VisleConfig = {}): Plugin[] {
               fs.writeFile(
                 join(serverOutDir, manifestFileName),
                 JSON.stringify(getManifestData(), null, 2),
+              ),
+              fs.writeFile(join(serverOutDir, runtimeFileName), generateStaticRuntimeCode()),
+              fs.writeFile(
+                join(serverOutDir, runtimeDeclarationFileName),
+                generateStaticRuntimeDeclarationCode(),
               ),
               generateEntryTypes(),
             ])

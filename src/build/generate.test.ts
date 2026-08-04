@@ -1,7 +1,27 @@
 import { describe, test, expect } from 'vite-plus/test'
 
 import { asAbs } from '../shared/path.ts'
-import { generateEntryTypesCode } from './generate.ts'
+import {
+  generateEntryTypesCode,
+  generateStaticRuntimeCode,
+  generateStaticRuntimeDeclarationCode,
+} from './generate.ts'
+
+describe('generateStaticRuntimeCode', () => {
+  test('statically imports the emitted server entry and manifest', () => {
+    const result = generateStaticRuntimeCode()
+
+    expect(result).toContain('import entries from "./server-entry.js"')
+    expect(result).toContain('import manifest from "./visle-manifest.json" with { type: "json" }')
+    expect(result).toContain('export default {\n  entries,\n  manifest,\n}')
+  })
+
+  test('generates a declaration for TypeScript consumers', () => {
+    expect(generateStaticRuntimeDeclarationCode()).toContain(
+      "import type { StaticRuntime } from 'visle'",
+    )
+  })
+})
 
 describe('generateEntryTypesCode', () => {
   test('generates module augmentation with component entries', () => {
