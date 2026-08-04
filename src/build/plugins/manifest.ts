@@ -93,12 +93,12 @@ export function manifestPlugin(visleConfig: ResolvedVisleConfig): ManifestPlugin
         return
       }
 
-      if (envName === 'islands') {
+      if (envName === 'client') {
         const envJsMap = new Map<string, string>()
 
         for (const [key, chunk] of Object.entries(bundle)) {
           // Since we generate all style files in style environment,
-          // delete all css assets in islands environment
+          // delete all css assets in client environment
           if (
             chunk.type === 'asset' &&
             typeof chunk.fileName === 'string' &&

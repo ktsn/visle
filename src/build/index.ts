@@ -17,6 +17,7 @@ import {
 import { islandsBootstrapPath, resolveServerComponentIds } from './paths.js'
 import { devStyleSSRPlugin } from './plugins/dev-style-ssr.js'
 import { entryTypesPlugin } from './plugins/entry-types.js'
+import { islandComponentsPlugin } from './plugins/island-components.js'
 import { manifestPlugin } from './plugins/manifest.js'
 import { serverTransformPlugin } from './plugins/server-transform.js'
 import { virtualFilePlugin } from './plugins/virtual-file.js'
@@ -26,7 +27,7 @@ export type { VisleConfig }
 
 /**
  * Visle plugin for Vite.
- * Configures style, islands, and server build environments,
+ * Configures style, client, and server build environments,
  * orchestrates the build order, and sets up Vue SFC compilation
  * with island component support.
  */
@@ -36,7 +37,8 @@ export function visle(config: VisleConfig = {}): Plugin[] {
     ...config,
   }
 
-  const { plugin: serverTransform, islandPaths } = serverTransformPlugin(resolvedConfig.entryExt)
+  const { plugin: islandComponents, islandPaths } = islandComponentsPlugin(resolvedConfig.entryExt)
+  const serverTransform = serverTransformPlugin(resolvedConfig.entryExt)
   const virtualFile = virtualFilePlugin(resolvedConfig)
   const { plugin: manifest, getManifestData } = manifestPlugin(resolvedConfig)
   const { plugin: entryTypes, generate: generateEntryTypes } = entryTypesPlugin(resolvedConfig)
@@ -62,14 +64,14 @@ export function visle(config: VisleConfig = {}): Plugin[] {
               },
             },
           },
-          islands: {
+          client: {
             consumer: 'client',
             build: {
               outDir: resolvedConfig.clientOutDir,
               emptyOutDir: false,
               rollupOptions: {
                 // Start with islands bootstrap;
-                // v-client island paths are added after server build
+                // v-client island paths are added after the style build
                 input: [islandsBootstrapPath],
                 preserveEntrySignatures: 'allow-extension',
               },
@@ -91,16 +93,11 @@ export function visle(config: VisleConfig = {}): Plugin[] {
 
         builder: {
           buildApp: async (builder) => {
-            // Build style and server in parallel
-            // - Style build produces cssMap (component -> CSS file mappings)
-            // - Server build discovers island component paths via server-transform rewriting
-            await Promise.all([
-              builder.build(builder.environments.style!),
-              builder.build(builder.environments.server!),
-            ])
-
-            // Build islands using entry paths collected during server build
-            await builder.build(builder.environments.islands!)
+            // The style traversal discovers every island component before the
+            // client environment consumes those paths as build inputs.
+            await builder.build(builder.environments.style!)
+            await builder.build(builder.environments.client!)
+            await builder.build(builder.environments.server!)
 
             // Write manifest and type definition files after all builds
             const serverOutDir = resolve(root, resolvedConfig.serverOutDir)
@@ -128,11 +125,11 @@ export function visle(config: VisleConfig = {}): Plugin[] {
     },
   }
 
-  const islandsInputPlugin: Plugin = {
-    name: 'visle:islands-input',
+  const clientInputPlugin: Plugin = {
+    name: 'visle:client-input',
     sharedDuringBuild: true,
 
-    applyToEnvironment: (env) => env.name === 'islands',
+    applyToEnvironment: (env) => env.name === 'client',
 
     options(opts) {
       if (islandPaths.size === 0) {
@@ -141,11 +138,11 @@ export function visle(config: VisleConfig = {}): Plugin[] {
 
       if (!Array.isArray(opts.input) && typeof opts.input !== 'string') {
         this.error(
-          'It is not allowed to pass an object value to the input option of the islands environment',
+          'It is not allowed to pass an object value to the input option of the client environment',
         )
       }
 
-      // Update islands environment input with paths discovered during server build
+      // Update client environment input with paths discovered during style build
       const existing = Array.isArray(opts.input) ? opts.input : [opts.input]
 
       return { ...opts, input: [...existing, ...islandPaths] }
@@ -154,7 +151,8 @@ export function visle(config: VisleConfig = {}): Plugin[] {
 
   return [
     orchestrationPlugin,
-    islandsInputPlugin,
+    clientInputPlugin,
+    islandComponents,
     serverTransform,
     virtualFile,
     manifest,
