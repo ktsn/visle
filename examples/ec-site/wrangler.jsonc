@@ -1,0 +1,17 @@
+{
+  "$schema": "./node_modules/wrangler/config-schema.json",
+  "name": "visle-ec-site-example",
+  "main": "src/prod.ts",
+  "compatibility_date": "2026-08-04",
+  "build": {
+    "command": "vp build",
+    "watch_dir": ["src/app", "src/components", "src/pages"],
+  },
+  "assets": {
+    "directory": "./dist/client",
+  },
+  "observability": {
+    "enabled": true,
+    "head_sampling_rate": 1,
+  },
+}

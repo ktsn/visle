@@ -4,48 +4,42 @@ Visle provides a dev loader that integrates with Vite's dev server for hot modul
 
 ## Setting Up the Dev Loader
 
-Use `createDevLoader()` from `visle/dev` to create a development loader and connect it to your render function with `setLoader()`:
+Application and route definitions can own one shared renderer without importing development-only dependencies:
 
 ```ts
-import { createRender } from 'visle'
-import { createDevLoader } from 'visle/dev'
-
-const render = createRender()
-
-// Create and set the dev loader
-const loader = createDevLoader()
-render.setLoader(loader)
-```
-
-The loader also provides a Connect-compatible middleware for serving Vite's development assets. Add `loader.middleware` to your server:
-
-```ts
+// src/app.ts
 import express from 'express'
 import { createRender } from 'visle'
-import { createDevLoader } from 'visle/dev'
 
 const app = express()
-
 const render = createRender()
-
-if (process.env.NODE_ENV === 'production') {
-  // Serve client assets built with Vite in production
-  app.use('/assets', express.static('dist/client/assets'))
-} else {
-  // Set dev loader and serve Vite dev assets in development
-  const loader = createDevLoader()
-  render.setLoader(loader)
-
-  app.use(loader.middleware)
-}
 
 app.get('/', async (req, res) => {
   const html = await render('index')
   res.send(html)
 })
 
+export { app, render }
+```
+
+The development-only entry imports `createDevLoader()` from `visle/dev` and installs it before serving requests. The loader also provides Connect-compatible middleware for serving Vite's development assets:
+
+```ts
+// src/dev.ts
+import { createDevLoader } from 'visle/dev'
+
+import { app, render } from './app.ts'
+
+// Set dev loader and serve Vite dev assets in development
+const loader = createDevLoader()
+
+render.setLoader(loader)
+app.use(loader.middleware)
+
 app.listen(3000)
 ```
+
+Only `src/dev.ts` imports `visle/dev` and therefore Vite. The production entry can import the same renderer and install the static production loader described in the [production guide](./production.md).
 
 ## Custom Vite Config
 

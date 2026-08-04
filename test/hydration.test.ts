@@ -72,7 +72,7 @@ describe('Client-side Hydration', () => {
     await copyFixtures(root)
     await prodBuild(root)
 
-    const render = prodRender(root)
+    const render = await prodRender(root)
     const clientDir = path.join(root, 'dist/client')
 
     // Render each page and write as HTML files for the browser

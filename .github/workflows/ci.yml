@@ -18,6 +18,7 @@ jobs:
           run-install: true
 
       - run: vp run -r build
+      - run: vp run ec-site-example#check:worker
       - run: vp check
 
   publish-dry-run:

@@ -7,9 +7,10 @@
 Creates a render function that renders Vue components to HTML strings.
 
 ```ts
-import { createRender } from 'visle'
+import { createRender, createStaticLoader } from 'visle'
+import runtime from './dist/server/visle-runtime.js'
 
-const render = createRender()
+const render = createRender({ loader: createStaticLoader(runtime) })
 const html = await render('index', { title: 'Hello' })
 ```
 
@@ -17,12 +18,7 @@ const html = await render('index', { title: 'Hello' })
 
 ```ts
 interface RenderOptions {
-  /**
-   * Directory path for server build output.
-   * Pass the same value as the Visle plugin's `serverOutDir`.
-   * Default: 'dist/server'
-   */
-  serverOutDir?: string
+  loader?: RenderLoader
 }
 ```
 
@@ -33,10 +29,29 @@ interface RenderFunction<T> {
   // Render a component to an HTML string
   <K extends keyof T>(componentPath: K, ...args: RenderArgs<T[K]>): Promise<string>
 
-  // Set a custom loader (used in development)
+  // Install or replace the environment-specific loader
   setLoader(loader: RenderLoader): void
 }
 ```
+
+When creating a renderer without a loader, its environment entry point must call `setLoader()` before handling a request. Rendering earlier throws:
+
+```text
+[visle] Render loader is not configured. Call render.setLoader(loader) before rendering.
+```
+
+### `createStaticLoader(runtime)`
+
+Creates a platform-neutral production loader from the generated static runtime module.
+
+```ts
+import { createStaticLoader } from 'visle'
+import runtime from './dist/server/visle-runtime.js'
+
+render.setLoader(createStaticLoader(runtime))
+```
+
+The Vite build writes `visle-runtime.js` beside the server entry. It statically imports both the emitted server entry and `visle-manifest.json` so deployment bundlers can discover the complete runtime artifact graph.
 
 ### `VisleEntries`
 

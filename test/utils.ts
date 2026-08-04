@@ -1,12 +1,13 @@
 import fs from 'node:fs/promises'
 import path from 'node:path'
-import { fileURLToPath } from 'node:url'
+import { fileURLToPath, pathToFileURL } from 'node:url'
 
 import { createBuilder, mergeConfig, type Plugin, type UserConfig } from 'vite'
 
-import { visle } from '../src/build/index.ts'
+import { visle, type VisleConfig } from '../src/build/index.ts'
 import { createDevLoader } from '../src/dev/index.ts'
 import { createRender } from '../src/server/render.ts'
+import { createStaticLoader, type StaticRuntime } from '../src/server/static-loader.ts'
 import { asRel } from '../src/shared/path.ts'
 
 const tmpDir = path.resolve('test/__generated__/integration')
@@ -136,7 +137,11 @@ export function devRender(root: string) {
 /**
  * Run a production Vite build with additional config options.
  */
-export async function prodBuild(root: string, options: UserConfig = {}): Promise<void> {
+export async function prodBuild(
+  root: string,
+  options: UserConfig = {},
+  visleConfig: VisleConfig = {},
+): Promise<void> {
   const builder = await createBuilder(
     mergeConfig(
       {
@@ -148,6 +153,7 @@ export async function prodBuild(root: string, options: UserConfig = {}): Promise
             entryExt,
             dts: 'visle-generated.d.ts',
             vue: { include: vueInclude },
+            ...visleConfig,
           }),
         ],
         resolve: {
@@ -168,10 +174,13 @@ export async function prodBuild(root: string, options: UserConfig = {}): Promise
 /**
  * Create a prod mode render function (after prodBuild).
  */
-export function prodRender(root: string) {
-  return createRender({
-    serverOutDir: path.join(root, 'dist/server'),
-  })
+export async function prodRender(root: string) {
+  const runtimePath = path.join(root, 'dist/server/visle-runtime.js')
+  const runtimeModule: {
+    default: StaticRuntime
+  } = await import(pathToFileURL(runtimePath).href)
+
+  return createRender({ loader: createStaticLoader(runtimeModule.default) })
 }
 
 /**
