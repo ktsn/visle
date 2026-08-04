@@ -1,11 +1,96 @@
 import { describe, test, expect } from 'vite-plus/test'
 import { parse } from 'vue/compiler-sfc'
 
-import { buildImportMap, findVClientElements } from './sfc-analysis.ts'
+import { buildImportMap, extractIslandComponents, findVClientElements } from './sfc-analysis.ts'
 
 function parseSfc(code: string) {
   return parse(code).descriptor
 }
+
+describe('extractIslandComponents', () => {
+  test('returns no islands when the component has no template', async () => {
+    const islands = await extractIslandComponents(
+      '/src/component.vue',
+      '<script setup>const message = "hello"</script>',
+      async () => '/unused.vue',
+    )
+
+    expect(islands).toEqual([])
+  })
+
+  test('returns no islands when the template has no v-client components', async () => {
+    const islands = await extractIslandComponents(
+      '/src/component.vue',
+      '<template><main>Static</main></template>',
+      async () => '/unused.vue',
+    )
+
+    expect(islands).toEqual([])
+  })
+
+  test('integrates component analysis with import resolution', async () => {
+    const id = '/src/pages/index.vue'
+    const resolveCalls: [source: string, importer: string][] = []
+    const code = `
+      <script setup>
+      import Counter from '../components/Counter.vue'
+      </script>
+      <template>
+        <main><Counter v-client:visible /></main>
+      </template>
+    `
+
+    const islands = await extractIslandComponents(id, code, async (source, importer) => {
+      resolveCalls.push([source, importer])
+      return '/src/components/Counter.vue?names=default'
+    })
+
+    expect(resolveCalls).toEqual([['../components/Counter.vue', id]])
+    expect(islands).toEqual([
+      {
+        tag: 'Counter',
+        importInfo: {
+          source: '../components/Counter.vue',
+          importedName: 'default',
+        },
+        resolvedPath: '/src/components/Counter.vue',
+      },
+    ])
+  })
+
+  test('preserves island metadata when imports are missing or unresolved', async () => {
+    const id = '/src/page.vue'
+    const resolveCalls: [source: string, importer: string][] = []
+    const code = `
+      <script setup>
+      import Counter from './Counter.vue'
+      </script>
+      <template>
+        <Counter v-client:load />
+        <Unregistered v-client:idle />
+      </template>
+    `
+
+    const islands = await extractIslandComponents(id, code, async (source, importer) => {
+      resolveCalls.push([source, importer])
+      return null
+    })
+
+    expect(resolveCalls).toEqual([['./Counter.vue', id]])
+    expect(islands).toEqual([
+      {
+        tag: 'Counter',
+        importInfo: { source: './Counter.vue', importedName: 'default' },
+        resolvedPath: undefined,
+      },
+      {
+        tag: 'Unregistered',
+        importInfo: undefined,
+        resolvedPath: undefined,
+      },
+    ])
+  })
+})
 
 describe('buildImportMap', () => {
   describe('script setup', () => {
