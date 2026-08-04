@@ -1,25 +1,17 @@
 import type { Plugin, ResolvedConfig } from 'vite'
-import { parse } from 'vue/compiler-sfc'
 
 import { asAbs, relative } from '../../shared/path.js'
 import { generateComponentWrapperCode, componentWrapPrefix } from '../generate.js'
 import { hasEntryExt, parseId } from '../paths.js'
-import { buildImportMap, findVClientElements } from '../sfc-analysis.js'
-
-interface ServerTransformPluginResult {
-  plugin: Plugin
-  islandPaths: Set<string>
-}
+import { extractIslandComponents } from '../sfc-analysis.js'
 
 /**
  * Vite plugin that transforms Vue SFC imports on the server environment.
  * - Redirects island component imports to component wrapper virtual modules
  * - Loads wrapper virtual modules with generated code
- * - Detects `v-client:load` directives and collects island component paths for the islands build
+ * - Detects `v-client:*` directives and records imports that need wrapping
  */
-export function serverTransformPlugin(entryExt: string[]): ServerTransformPluginResult {
-  const islandPaths = new Set<string>()
-
+export function serverTransformPlugin(entryExt: string[]): Plugin {
   /**
    * Map from importer file path → Map<resolvedSourcePath, Set<importedName>>
    * Tracks which imports need wrapping.
@@ -29,13 +21,13 @@ export function serverTransformPlugin(entryExt: string[]): ServerTransformPlugin
 
   let viteConfig: ResolvedConfig
 
-  const plugin: Plugin = {
+  return {
     name: 'visle:server-transform',
     enforce: 'pre',
     sharedDuringBuild: true,
 
     applyToEnvironment(environment) {
-      return environment.name === 'server'
+      return environment.config.consumer === 'server'
     },
 
     configResolved(resolvedConfig) {
@@ -43,7 +35,6 @@ export function serverTransformPlugin(entryExt: string[]): ServerTransformPlugin
     },
 
     buildStart() {
-      islandPaths.clear()
       componentNameMap.clear()
     },
 
@@ -109,49 +100,14 @@ export function serverTransformPlugin(entryExt: string[]): ServerTransformPlugin
         return null
       }
 
-      const { descriptor } = parse(code)
+      const islands = extractIslandComponents(id, code, async (source, importer) => {
+        // Note: skipSelf only works when this.resolve is called from resolveId.
+        // From transform, our resolveId still runs and wraps the result with a
+        // virtual module prefix, so we need to unwrap it.
+        return (await this.resolve(source, importer))?.id ?? null
+      })
 
-      if (!descriptor.template?.ast) {
-        return null
-      }
-
-      // Build tag-name-to-import-source map from <script> block
-      const importMap = buildImportMap(descriptor, id)
-
-      // Find elements with v-client:load
-      const matches = findVClientElements(descriptor.template.ast.children)
-
-      if (matches.length === 0) {
-        return null
-      }
-
-      // Resolve alias import sources in parallel
-      const resolveResults = await Promise.all(
-        matches.map(async (node) => {
-          const importInfo = importMap.get(node.tag)
-          if (!importInfo) {
-            return {
-              tag: node.tag,
-              importInfo: undefined,
-              resolvedPath: undefined,
-            }
-          }
-
-          // Note: skipSelf only works when this.resolve is called from resolveId.
-          // From transform, our resolveId still runs and wraps the result with a
-          // virtual module prefix, so we need to unwrap it.
-          const resolved = await this.resolve(importInfo.source, id)
-          const resolvedPath = resolved ? parseId(resolved.id).fileName : undefined
-
-          return {
-            tag: node.tag,
-            importInfo,
-            resolvedPath,
-          }
-        }),
-      )
-
-      for (const { tag, importInfo, resolvedPath } of resolveResults) {
+      for (const { tag, importInfo, resolvedPath } of await islands) {
         if (!importInfo) {
           this.warn(
             `v-client:load on "${tag}" is not supported. ` +
@@ -166,8 +122,6 @@ export function serverTransformPlugin(entryExt: string[]): ServerTransformPlugin
           )
           continue
         }
-
-        islandPaths.add(resolvedPath)
 
         // Record import name so resolveId can include it in the names query
         let nameMap = componentNameMap.get(fileName)
@@ -186,6 +140,4 @@ export function serverTransformPlugin(entryExt: string[]): ServerTransformPlugin
       return null
     },
   }
-
-  return { plugin, islandPaths }
 }

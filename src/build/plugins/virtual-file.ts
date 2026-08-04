@@ -8,7 +8,7 @@ import { islandsBootstrapPath, resolveServerComponentIds } from '../paths.js'
 
 /**
  * Vite plugin that resolves and loads virtual entry modules
- * per environment (style, islands, server, dev client).
+ * per environment (style, client, server).
  */
 export function virtualFilePlugin(config: ResolvedVisleConfig): Plugin {
   let entryRoot: AbsolutePath

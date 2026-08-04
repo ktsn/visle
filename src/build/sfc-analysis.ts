@@ -1,7 +1,68 @@
 import type { ObjectExpression } from '@babel/types'
 import type { ElementNode, TemplateChildNode } from '@vue/compiler-core'
 import { NodeTypes } from '@vue/compiler-core'
-import { compileScript, type SFCDescriptor } from 'vue/compiler-sfc'
+import { parse, compileScript, type SFCDescriptor } from 'vue/compiler-sfc'
+
+import { parseId } from './paths.js'
+
+export interface IslandComponentInfo {
+  tag: string
+  importInfo?: ImportInfo
+  resolvedPath?: string
+}
+
+/**
+ * Extract all island components in the specified component code.
+ *
+ * @param id Extraction target component ID
+ * @param code Extraction target component code
+ * @param resolveId ID resolver function receiving resolving import source and importer ID
+ * @returns An array of resolved island components info
+ */
+export async function extractIslandComponents(
+  id: string,
+  code: string,
+  resolveId: (source: string, importer: string) => Promise<string | null>,
+): Promise<IslandComponentInfo[]> {
+  const { descriptor } = parse(code)
+
+  if (!descriptor.template?.ast) {
+    return []
+  }
+
+  // Build tag-name-to-import-source map from <script> block
+  const importMap = buildImportMap(descriptor, id)
+
+  // Find elements with v-client:load
+  const matches = findVClientElements(descriptor.template.ast.children)
+
+  if (matches.length === 0) {
+    return []
+  }
+
+  // Resolve alias import sources in parallel
+  return await Promise.all(
+    matches.map(async (node) => {
+      const importInfo = importMap.get(node.tag)
+      if (!importInfo) {
+        return {
+          tag: node.tag,
+          importInfo: undefined,
+          resolvedPath: undefined,
+        }
+      }
+
+      const resolvedId = await resolveId(importInfo.source, id)
+      const resolvedPath = resolvedId ? parseId(resolvedId).fileName : undefined
+
+      return {
+        tag: node.tag,
+        importInfo,
+        resolvedPath,
+      }
+    }),
+  )
+}
 
 export interface ImportInfo {
   source: string
