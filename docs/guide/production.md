@@ -1,15 +1,15 @@
 # Production
 
-In production, Visle serves pre-built assets from the Vite build output.
+In production, Visle renders from a statically imported build artifact.
 
 ## Build Output
 
 Running `vite build` produces two directories:
 
 - **`dist/client`** (default) — Client-side assets (CSS, island JavaScript)
-- **`dist/server`** (default) — Server-side components for HTML rendering and the asset manifest
+- **`dist/server`** (default) — Server-side components, `visle-manifest.json`, and `visle-runtime.js`
 
-You can customize these paths in the Visle plugin config:
+You can customize the output paths in the Visle plugin config:
 
 ```ts
 import { visle } from 'visle/build'
@@ -25,36 +25,42 @@ export default defineConfig({
 })
 ```
 
-## Serving Static Assets
+## Configure the Production Loader
 
-Serve the `dist/client` directory as static files so that CSS and island JavaScript are available to the browser:
+Application and route definitions can own one shared renderer without knowing their environment:
 
 ```ts
+// src/app.ts
 import express from 'express'
 import { createRender } from 'visle'
 
 const app = express()
 const render = createRender()
 
-// Serve the built assets
-app.use('/assets', express.static('dist/client/assets'))
-
 app.get('/', async (req, res) => {
   const html = await render('index')
   res.send(html)
 })
 
+export { app, render }
+```
+
+The production entry imports the generated runtime and installs its loader before serving requests:
+
+```ts
+// src/prod.ts
+import express from 'express'
+import { createStaticLoader } from 'visle'
+import runtime from '../dist/server/visle-runtime.js'
+
+import { app, render } from './app.ts'
+
+render.setLoader(createStaticLoader(runtime))
+
+// Serve the built assets
+app.use('/assets', express.static('dist/client/assets'))
+
 app.listen(3000)
 ```
 
-## Custom `serverOutDir`
-
-If you customize `serverOutDir` in the Visle plugin, pass the same value to `createRender()`:
-
-```ts
-const render = createRender({
-  serverOutDir: 'custom/server',
-})
-```
-
-This tells the render function where to find the pre-built server components and manifest.
+If `serverOutDir` is customized, update the static runtime import path.
