@@ -1,10 +1,8 @@
-import { serve } from '@hono/node-server'
-import { serveStatic } from '@hono/node-server/serve-static'
+import { createStaticLoader } from 'visle'
 
-import { app } from './app/server.ts'
+import runtime from '../dist/server/visle-runtime.js'
+import { app, render } from './app/server.ts'
 
-app.use('/assets/*', serveStatic({ root: 'dist/client' }))
+render.setLoader(createStaticLoader(runtime))
 
-serve({ fetch: app.fetch, port: 3000 }, () => {
-  console.log('Server running at http://localhost:3000')
-})
+export default app

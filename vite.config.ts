@@ -27,7 +27,6 @@ export default defineConfig({
       suspicious: 'error',
       perf: 'error',
     },
-    ignorePatterns: ['dist/', 'node_modules/'],
     options: {
       typeAware: true,
       typeCheck: true,
