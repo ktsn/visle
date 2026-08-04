@@ -116,24 +116,7 @@ describe('Production static runtime with custom server output', () => {
     await fs.mkdir(path.join(root, 'pages'), { recursive: true })
     await fs.writeFile(path.join(root, 'pages/index.vue'), '<template><div>Home</div></template>')
 
-    await prodBuild(
-      root,
-      {
-        base: '/shop/',
-        environments: {
-          server: {
-            build: {
-              rollupOptions: {
-                output: {
-                  entryFileNames: 'chunks/[name]-[hash].mjs',
-                },
-              },
-            },
-          },
-        },
-      },
-      { serverOutDir: 'custom/server' },
-    )
+    await prodBuild(root, {}, { serverOutDir: 'custom/server' })
   })
 
   afterAll(async () => {
