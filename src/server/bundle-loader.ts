@@ -17,10 +17,10 @@ export function createBundleLoader(source: LoaderSource): RenderLoader {
 
   return {
     async loadEntry(componentPath) {
-      const load = source.entries[componentPath]
-      if (!load) {
+      if (!Object.hasOwn(source.entries, componentPath)) {
         throw new Error(`[visle] Unknown entry component: ${componentPath}`)
       }
+      const load = source.entries[componentPath]!
       return load()
     },
 

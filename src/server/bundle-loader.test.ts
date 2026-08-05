@@ -32,11 +32,14 @@ describe('createBundleLoader', () => {
     await expect(loader.loadEntry('index')).resolves.toBe(component)
   })
 
-  test('rejects unknown entries with a descriptive error', async () => {
-    const loader = createBundleLoader({ entries: {}, manifest })
+  test.each(['missing', 'constructor', 'toString', 'valueOf'])(
+    'rejects unknown entry %s with a descriptive error',
+    async (componentPath) => {
+      const loader = createBundleLoader({ entries: {}, manifest })
 
-    await expect(loader.loadEntry('missing')).rejects.toThrow(
-      '[visle] Unknown entry component: missing',
-    )
-  })
+      await expect(loader.loadEntry(componentPath)).rejects.toThrow(
+        `[visle] Unknown entry component: ${componentPath}`,
+      )
+    },
+  )
 })
