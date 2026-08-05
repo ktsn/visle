@@ -2,7 +2,16 @@
   "extends": "./tsconfig.base.json",
   "compilerOptions": {
     "noEmit": true,
-    "allowImportingTsExtensions": true
+    "allowImportingTsExtensions": true,
+    "paths": {
+      "visle": ["./src/server/index.ts"],
+      "visle/vite": ["./src/server/vite.ts"]
+    }
   },
-  "include": ["src/**/*.test.ts", "**/__tests__/**/*.ts", "test/**/*"]
+  "include": [
+    "src/**/*.test.ts",
+    "src/server/vite-virtual.d.ts",
+    "**/__tests__/**/*.ts",
+    "test/**/*"
+  ]
 }
