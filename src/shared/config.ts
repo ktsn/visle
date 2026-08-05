@@ -10,6 +10,14 @@ export interface VisleConfig {
   clientOutDir?: string
   dts?: string | null
 
+  /**
+   * Controls whether Visle supplies the `ssr` environment entry and output
+   * options or receives them from another Vite plugin.
+   *
+   * @default 'components'
+   */
+  serverBuild?: 'components' | 'integrated'
+
   /** @vitejs/plugin-vue options */
   vue?: Options
 }
@@ -25,6 +33,7 @@ export const defaultConfig: ResolvedVisleConfig = {
   clientOutDir: 'dist/client',
   serverOutDir: 'dist/server',
   dts: 'src/visle-generated.d.ts',
+  serverBuild: 'components',
   vue: {},
 }
 

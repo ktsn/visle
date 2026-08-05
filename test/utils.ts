@@ -6,8 +6,8 @@ import { createBuilder, mergeConfig, type Plugin, type UserConfig } from 'vite'
 
 import { visle, type VisleConfig } from '../src/build/index.ts'
 import { createDevLoader } from '../src/dev/index.ts'
+import { createBundleLoader, type LoaderSource } from '../src/server/bundle-loader.ts'
 import { createRender } from '../src/server/render.ts'
-import { createStaticLoader, type StaticRuntime } from '../src/server/static-loader.ts'
 import { asRel } from '../src/shared/path.ts'
 
 const tmpDir = path.resolve('test/__generated__/integration')
@@ -175,12 +175,12 @@ export async function prodBuild(
  * Create a prod mode render function (after prodBuild).
  */
 export async function prodRender(root: string) {
-  const runtimePath = path.join(root, 'dist/server/visle-runtime.js')
-  const runtimeModule: {
-    default: StaticRuntime
-  } = await import(pathToFileURL(runtimePath).href)
+  const bundlePath = path.join(root, 'dist/server/visle-bundle.js')
+  const bundleModule: {
+    default: LoaderSource
+  } = await import(pathToFileURL(bundlePath).href)
 
-  return createRender({ loader: createStaticLoader(runtimeModule.default) })
+  return createRender({ loader: createBundleLoader(bundleModule.default) })
 }
 
 /**

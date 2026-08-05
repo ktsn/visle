@@ -1,0 +1,55 @@
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
+
+exports[`Integrated development server > renders a component with its resolved development assets 1`] = `
+<link
+  rel="stylesheet"
+  href="/base/pages/with-css.vue?vue&type=style&index=0&lang.css"
+>
+<link
+  rel="stylesheet"
+  href="/base/components/StyledCounter.vue?vue&type=style&index=0&scoped=[scoped]&lang.css"
+>
+<script
+  type="module"
+  src="/base/@visle/bootstrap"
+  async
+>
+</script>
+<div>
+  <h1>
+    Styled Page
+  </h1>
+  <vue-island entry="/base/components/StyledCounter.vue">
+    <button data-v-[scoped]>
+      Styled Count: 0
+    </button>
+  </vue-island>
+</div>
+`;
+
+exports[`Integrated server build > renders a component with its resolved CSS and JavaScript assets 1`] = `
+<link
+  rel="stylesheet"
+  href="/base/assets/StyledCounter-[hash].css"
+>
+<link
+  rel="stylesheet"
+  href="/base/assets/with-css-[hash].css"
+>
+<script
+  type="module"
+  src="/base/assets/custom-element-[hash].js"
+  async
+>
+</script>
+<div>
+  <h1>
+    Styled Page
+  </h1>
+  <vue-island entry="/base/assets/StyledCounter-[hash].js">
+    <button data-v-[scoped]>
+      Styled Count: 0
+    </button>
+  </vue-island>
+</div>
+`;

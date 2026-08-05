@@ -1,12 +1,21 @@
+import { virtualIslandsBootstrapPath } from '../shared/entry.js'
 import { manifestFileName } from '../shared/manifest.js'
+import type { BuildManifest } from '../shared/manifest.js'
 import { type AbsolutePath, type RelativePath, relative } from '../shared/path.js'
 import { stripEntryExt } from './paths.js'
 
-export const serverVirtualEntryId = '\0@visle/server-entry'
+export const viteEntriesId = 'virtual:visle/vite-entries'
+export const resolvedViteEntriesId = `\0${viteEntriesId}`
+export const viteManifestId = 'virtual:visle/vite-manifest'
+export const resolvedViteManifestId = `\0${viteManifestId}`
+export const viteEntryCssPrefix = 'virtual:visle/vite-entry-css/'
+export const resolvedViteEntryCssPrefix = `\0${viteEntryCssPrefix}`
+export const serverEntriesId = 'virtual:visle/server-entries'
+export const resolvedServerEntriesId = `\0${serverEntriesId}`
 
 export const serverEntryFileName = 'server-entry.js'
-export const runtimeFileName = 'visle-runtime.js'
-export const runtimeDeclarationFileName = 'visle-runtime.d.ts'
+export const bundleFileName = 'visle-bundle.js'
+export const bundleDeclarationFileName = 'visle-bundle.d.ts'
 
 export const componentWrapPrefix = '\0visle:wrap:'
 
@@ -14,13 +23,20 @@ export function generateServerVirtualEntryCode(
   entryDir: AbsolutePath,
   componentIds: AbsolutePath[],
   entryExt: string[],
+  dynamic: boolean,
 ): string {
-  const imports = componentIds.map((id, i) => `import _${i} from '${id}'`).join('\n')
+  const imports = componentIds
+    .map((id, i) => {
+      return dynamic
+        ? `const _${i} = () => import(${JSON.stringify(id)}).then(({ default: component }) => component)`
+        : `import _value_${i} from ${JSON.stringify(id)}\nconst _${i} = () => _value_${i}`
+    })
+    .join('\n')
 
   const entries = componentIds
     .map((id, i) => {
       const key = stripEntryExt(relative(entryDir, id), entryExt)
-      return `  '${key}': _${i}`
+      return `  ${JSON.stringify(key)}: _${i}`
     })
     .join(',\n')
 
@@ -28,10 +44,10 @@ export function generateServerVirtualEntryCode(
 }
 
 /**
- * Generate the production runtime module. The relative import is deliberately
+ * Generate the production bundle module. The relative import is deliberately
  * static so deployment bundlers can discover every server entry.
  */
-export function generateStaticRuntimeCode(): string {
+export function generateBundleCode(): string {
   const importPath = `./${serverEntryFileName}`
   const manifestImportPath = `./${manifestFileName}`
 
@@ -45,12 +61,50 @@ export default {
 `
 }
 
-export function generateStaticRuntimeDeclarationCode(): string {
-  return `import type { StaticRuntime } from 'visle'
+export function generateBundleDeclarationCode(): string {
+  return `import type { LoaderSource } from 'visle'
 
-declare const runtime: StaticRuntime
+declare const bundle: LoaderSource
 
-export default runtime
+export default bundle
+`
+}
+
+/** Generate production manifest data for the Vite-backed server loader. */
+export function generateIntegratedManifestCode(manifest: BuildManifest): string {
+  return `export default ${JSON.stringify(manifest)}\n`
+}
+
+/** Generate a development manifest with lazy per-entry CSS resolution. */
+export function generateIntegratedDevManifestCode(
+  base: string,
+  entryDir: string,
+  entryExt: string[],
+  entries: Record<string, string>,
+): string {
+  const cssMap = Object.entries(entries)
+    .map(([entryRelativePath, componentPath]) => {
+      const cssModuleId = viteEntryCssPrefix + encodeURIComponent(componentPath)
+      return `    ${JSON.stringify(entryRelativePath)}: () => import(${JSON.stringify(cssModuleId)}).then(({ default: cssIds }) => cssIds)`
+    })
+    .join(',\n')
+
+  return `const jsMap = new Proxy(Object.create(null), {
+  get(_target, relativePath) {
+    return typeof relativePath === 'string' ? relativePath : undefined
+  },
+})
+
+export default {
+  base: ${JSON.stringify(base)},
+  entryDir: ${JSON.stringify(entryDir)},
+  entryExt: ${JSON.stringify(entryExt)},
+  cssMap: {
+${cssMap}
+  },
+  jsMap,
+  islandsBootstrap: ${JSON.stringify(virtualIslandsBootstrapPath)},
+}
 `
 }
 

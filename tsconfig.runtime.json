@@ -4,5 +4,10 @@
     "noEmit": true,
     "types": []
   },
-  "include": ["src/server/index.ts", "src/server/internal.ts"]
+  "include": [
+    "src/server/index.ts",
+    "src/server/internal.ts",
+    "src/server/vite.ts",
+    "src/server/vite-virtual.d.ts"
+  ]
 }

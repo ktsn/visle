@@ -16,7 +16,11 @@ describe('virtualFilePlugin', () => {
   test('islands bootstrap is transformable in client environment', async () => {
     server = await createServer({
       configFile: false,
-      plugins: [virtualFilePlugin(defaultConfig)],
+      plugins: [
+        virtualFilePlugin(defaultConfig, () => {
+          throw new Error('manifest should not be requested')
+        }),
+      ],
       appType: 'custom',
       server: { middlewareMode: true },
       optimizeDeps: { noDiscovery: true },

@@ -1,13 +1,13 @@
 import type { Plugin } from 'vite'
 
 import type { ResolvedVisleConfig } from '../../shared/config.js'
-import type { ManifestData } from '../../shared/manifest.js'
+import type { BuildManifest } from '../../shared/manifest.js'
 import { asAbs, relative } from '../../shared/path.js'
 import { islandsBootstrapPath } from '../paths.js'
 
 interface ManifestPluginResult {
   plugin: Plugin
-  getManifestData: () => ManifestData
+  getBuildManifest: () => BuildManifest
 }
 
 /**
@@ -137,15 +137,25 @@ export function manifestPlugin(visleConfig: ResolvedVisleConfig): ManifestPlugin
   return {
     plugin,
 
-    getManifestData: (): ManifestData => {
+    getBuildManifest: (): BuildManifest => {
+      assertBundle('style manifest', cssMap)
+      assertBundle('client manifest', jsMap)
+      assertBundle('islands bootstrap', islandsBootstrap)
+
       return {
         base,
         entryDir: visleConfig.entryDir,
         entryExt: visleConfig.entryExt,
-        cssMap: Object.fromEntries(cssMap ?? new Map()),
-        jsMap: Object.fromEntries(jsMap ?? new Map()),
-        islandsBootstrap: islandsBootstrap ?? '',
+        cssMap: Object.fromEntries(cssMap),
+        jsMap: Object.fromEntries(jsMap),
+        islandsBootstrap,
       }
     },
+  }
+}
+
+function assertBundle<T>(name: string, bundle: T | undefined): asserts bundle is T {
+  if (bundle === undefined) {
+    throw new Error(`[visle] Missing ${name}`)
   }
 }

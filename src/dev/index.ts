@@ -113,10 +113,10 @@ export function createDevLoader(viteConfig: InlineConfig = {}): DevRenderLoader 
 }
 
 export function getServerEnvironment(devServer: ViteDevServer): RunnableDevEnvironment {
-  const serverEnv = devServer.environments.server
+  const serverEnv = devServer.environments.ssr
   assert(
     serverEnv && isRunnableDevEnvironment(serverEnv),
-    "[visle] Vite's server environment is not available. Make sure to add visle() plugin to your Vite config file.",
+    "[visle] Vite's ssr environment is not available. Make sure to add visle() plugin to your Vite config file.",
   )
   return serverEnv
 }
