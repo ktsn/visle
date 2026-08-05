@@ -77,13 +77,13 @@ Create a server file (e.g. `server.ts`) that uses `createRender()` to render pag
 ```ts
 // server.ts
 import express from 'express'
-import { createRender, createStaticLoader } from 'visle'
-import runtime from './dist/server/visle-runtime.js'
+import { createBundleLoader, createRender } from 'visle'
+import bundle from './dist/server/visle-bundle.js'
 
 const app = express()
 
 // Visle's render function
-const render = createRender({ loader: createStaticLoader(runtime) })
+const render = createRender({ loader: createBundleLoader(bundle) })
 
 // Serve client assets built with Vite
 app.use('/assets', express.static('dist/client/assets'))

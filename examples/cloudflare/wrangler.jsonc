@@ -1,0 +1,10 @@
+{
+  "$schema": "./node_modules/wrangler/config-schema.json",
+  "name": "visle-cloudflare-example",
+  "main": "src/app/server.ts",
+  "compatibility_date": "2026-08-05",
+  "observability": {
+    "enabled": true,
+    "head_sampling_rate": 1,
+  },
+}

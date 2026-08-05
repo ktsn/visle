@@ -1,10 +1,13 @@
 import { Hono } from 'hono'
 import { createRender, type VisleEntries } from 'visle'
+import { createViteLoader } from 'visle/vite'
 
 import { getAllProducts, getProduct } from './db.ts'
 
 const app = new Hono()
-const render = createRender<VisleEntries>()
+const render = createRender<VisleEntries>({
+  loader: createViteLoader(),
+})
 
 app.get('/', async (c) => {
   const products = getAllProducts()
@@ -21,4 +24,4 @@ app.get('/products/:id', async (c) => {
   return c.html(html)
 })
 
-export { app, render }
+export default app
