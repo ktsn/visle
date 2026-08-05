@@ -58,7 +58,7 @@
     "typescript": "7.0.2",
     "vite": "catalog:",
     "vite-plus": "catalog:",
-    "vitepress": "2.0.0-alpha.18",
+    "vitepress": "2.0.0-alpha.19",
     "vitest": "catalog:",
     "vue": "3.5.40"
   },
