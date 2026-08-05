@@ -7,10 +7,10 @@
 Creates a render function that renders Vue components to HTML strings.
 
 ```ts
-import { createRender, createStaticLoader } from 'visle'
-import runtime from './dist/server/visle-runtime.js'
+import { createBundleLoader, createRender } from 'visle'
+import bundle from './dist/server/visle-bundle.js'
 
-const render = createRender({ loader: createStaticLoader(runtime) })
+const render = createRender({ loader: createBundleLoader(bundle) })
 const html = await render('index', { title: 'Hello' })
 ```
 
@@ -40,18 +40,18 @@ When creating a renderer without a loader, its environment entry point must call
 [visle] Render loader is not configured. Call render.setLoader(loader) before rendering.
 ```
 
-### `createStaticLoader(runtime)`
+### `createBundleLoader(source)`
 
-Creates a platform-neutral production loader from the generated static runtime module.
+Creates a platform-neutral loader from a generated entry bundle and manifest source.
 
 ```ts
-import { createStaticLoader } from 'visle'
-import runtime from './dist/server/visle-runtime.js'
+import { createBundleLoader } from 'visle'
+import bundle from './dist/server/visle-bundle.js'
 
-render.setLoader(createStaticLoader(runtime))
+render.setLoader(createBundleLoader(bundle))
 ```
 
-The Vite build writes `visle-runtime.js` beside the server entry. It statically imports both the emitted server entry and `visle-manifest.json` so deployment bundlers can discover the complete runtime artifact graph.
+The Vite build writes `visle-bundle.js` beside the server entry. It statically imports both the emitted server entry and `visle-manifest.json` so deployment bundlers can discover the complete bundle artifact graph.
 
 ### `VisleEntries`
 
@@ -64,6 +64,24 @@ const render = createRender<VisleEntries>()
 ```
 
 See the [TypeScript guide](../guide/typescript) for details.
+
+## `visle/vite` Module
+
+### `createViteLoader()`
+
+Creates a loader for a server application built by Vite in [integrated mode](../guide/integrated-mode.md).
+
+```ts
+import { createViteLoader } from 'visle/vite'
+
+render.setLoader(createViteLoader())
+```
+
+The loader dynamically imports page entries through the Vite `ssr` environment. The Visle
+Vite plugin supplies its virtual entry map and asset manifest, including lazy development CSS
+resolution and the final production asset paths. This module must be processed by
+`visle({ serverBuild: 'integrated' })`. The `visle/vite` subpath itself resolves through the package
+exports; the plugin only resolves the virtual data modules that it imports.
 
 ## `visle/dev` Module
 
@@ -143,10 +161,17 @@ interface VisleConfig {
   entryExt?: string[]
 
   /**
-   * Output directory for server build.
+   * Output directory for the `ssr` environment.
    * Default: 'dist/server'
    */
   serverOutDir?: string
+
+  /**
+   * Build Visle's server components, or contribute the runtime to
+   * the shared `ssr` environment configured by another Vite plugin.
+   * Default: 'components'
+   */
+  serverBuild?: 'components' | 'integrated'
 
   /**
    * Output directory for client build (CSS, island JS).
