@@ -73,9 +73,7 @@ export default defineConfig({
       },
       {
         text: 'Recipes',
-        items: [
-          { text: 'Cloudflare Workers', link: '/recipes/cloudflare-workers' },
-        ],
+        items: [{ text: 'Cloudflare Workers', link: '/recipes/cloudflare-workers' }],
       },
       {
         text: 'API Reference',

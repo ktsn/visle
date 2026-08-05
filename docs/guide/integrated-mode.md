@@ -3,10 +3,10 @@
 Integrated mode lets a Vite runtime provider build the application server and Visle pages together.
 Use it when a platform plugin owns the server entry, development runtime, and deployment output.
 
-| Mode | Server build owner | Loader |
-| --- | --- | --- |
-| `components` (default) | Your separate application build | `createBundleLoader()` |
-| `integrated` | Vite and a runtime provider plugin | `createViteLoader()` |
+| Mode                   | Server build owner                 | Loader                 |
+| ---------------------- | ---------------------------------- | ---------------------- |
+| `components` (default) | Your separate application build    | `createBundleLoader()` |
+| `integrated`           | Vite and a runtime provider plugin | `createViteLoader()`   |
 
 For a conventional Node.js server built separately from Visle, use the default mode described in
 the [production guide](./production.md).
@@ -23,10 +23,7 @@ import { visle } from 'visle/build'
 import { defineConfig } from 'vite'
 
 export default defineConfig({
-  plugins: [
-    visle({ serverBuild: 'integrated' }),
-    cloudflare({ viteEnvironment: { name: 'ssr' } }),
-  ],
+  plugins: [visle({ serverBuild: 'integrated' }), cloudflare({ viteEnvironment: { name: 'ssr' } })],
 })
 ```
 
