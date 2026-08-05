@@ -21,20 +21,6 @@ jobs:
       - run: vp run ec-site-example#check:worker
       - run: vp check
 
-  publish-dry-run:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
-
-      - uses: voidzero-dev/setup-vp@250f29ce396baf5e8f24498e17c0dfdebabc26eb # v1
-        with:
-          node-version: '24'
-          cache: true
-          run-install: true
-
-      - name: Publish dry run
-        run: vpx jsr publish --dry-run
-
   test:
     runs-on: ${{ matrix.os }}
     strategy:
