@@ -1,11 +1,11 @@
 import { describe, expect, test } from 'vite-plus/test'
 import { defineComponent, h, type Component } from 'vue'
 
-import type { ManifestData } from '../shared/manifest.ts'
+import type { ManifestSource } from '../shared/manifest.ts'
+import { createBundleLoader } from './bundle-loader.ts'
 import { createRender, type RenderLoader } from './render.ts'
-import { createStaticLoader } from './static-loader.ts'
 
-const emptyManifest: ManifestData = {
+const emptyManifest: ManifestSource = {
   base: '/',
   entryDir: 'src/pages',
   entryExt: ['.vue'],
@@ -15,7 +15,7 @@ const emptyManifest: ManifestData = {
 }
 
 function loaderFor(component: Component): RenderLoader {
-  return createStaticLoader({ entries: { Comp: component }, manifest: emptyManifest })
+  return createBundleLoader({ entries: { Comp: () => component }, manifest: emptyManifest })
 }
 
 describe('createRender', () => {

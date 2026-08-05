@@ -41,6 +41,9 @@ app.listen(3000)
 
 Only `src/dev.ts` imports `visle/dev` and therefore Vite. The production entry can import the same renderer and install the static production loader described in the [production guide](./production.md).
 
+If a runtime provider already owns the Vite development server and application entry, use
+[integrated mode](./integrated-mode.md) and `createViteLoader()` instead of `createDevLoader()`.
+
 ## Custom Vite Config
 
 You can pass Vite configuration to `createDevLoader()`. The dev loader automatically loads your Vite config file, so in most cases you only need to write your settings in the Vite config without passing inline config:

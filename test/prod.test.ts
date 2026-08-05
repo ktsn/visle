@@ -4,7 +4,7 @@ import { pathToFileURL } from 'node:url'
 
 import { describe, test, expect, beforeAll, afterAll } from 'vite-plus/test'
 
-import { runtimeFileName, serverEntryFileName } from '../src/build/generate.ts'
+import { bundleFileName, serverEntryFileName } from '../src/build/generate.ts'
 import { RenderFunction } from '../src/server/render.ts'
 import { manifestFileName } from '../src/shared/manifest.ts'
 import {
@@ -108,11 +108,11 @@ describe('Production Build SSR with manual chunks', () => {
   })
 })
 
-describe('Production static runtime with custom server output', () => {
+describe('Production bundle with custom server output', () => {
   let root: string
 
   beforeAll(async () => {
-    root = await createTmpDir('prod-static-runtime')
+    root = await createTmpDir('prod-bundle')
     await fs.mkdir(path.join(root, 'pages'), { recursive: true })
     await fs.writeFile(path.join(root, 'pages/index.vue'), '<template><div>Home</div></template>')
 
@@ -120,23 +120,23 @@ describe('Production static runtime with custom server output', () => {
   })
 
   afterAll(async () => {
-    await removeTmpDir('prod-static-runtime')
+    await removeTmpDir('prod-bundle')
   })
 
   test('imports the configured server entry and final manifest', async () => {
     const serverDir = path.join(root, 'custom/server')
-    const runtimePath = path.join(serverDir, runtimeFileName)
-    const runtimeCode = await fs.readFile(runtimePath, 'utf-8')
+    const bundlePath = path.join(serverDir, bundleFileName)
+    const bundleCode = await fs.readFile(bundlePath, 'utf-8')
     const manifest = JSON.parse(await fs.readFile(path.join(serverDir, manifestFileName), 'utf-8'))
 
     await expect(fs.access(path.join(serverDir, serverEntryFileName))).resolves.toBeUndefined()
-    expect(runtimeCode).toContain(`import entries from "./${serverEntryFileName}"`)
-    expect(runtimeCode).toContain(
+    expect(bundleCode).toContain(`import entries from "./${serverEntryFileName}"`)
+    expect(bundleCode).toContain(
       `import manifest from "./${manifestFileName}" with { type: "json" }`,
     )
 
-    const runtime = (await import(pathToFileURL(runtimePath).href)).default
-    expect(runtime.manifest).toEqual(manifest)
-    expect(Object.keys(runtime.entries)).toEqual(['index'])
+    const bundle = (await import(pathToFileURL(bundlePath).href)).default
+    expect(bundle.manifest).toEqual(manifest)
+    expect(Object.keys(bundle.entries)).toEqual(['index'])
   })
 })

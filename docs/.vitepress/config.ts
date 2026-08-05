@@ -66,9 +66,14 @@ export default defineConfig({
           { text: 'Islands Architecture', link: '/guide/islands' },
           { text: 'Development', link: '/guide/development' },
           { text: 'Production', link: '/guide/production' },
+          { text: 'Integrated Mode', link: '/guide/integrated-mode' },
           { text: 'CSS Handling', link: '/guide/css' },
           { text: 'TypeScript', link: '/guide/typescript' },
         ],
+      },
+      {
+        text: 'Recipes',
+        items: [{ text: 'Cloudflare Workers', link: '/recipes/cloudflare-workers' }],
       },
       {
         text: 'API Reference',

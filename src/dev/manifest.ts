@@ -1,79 +1,20 @@
-import fs from 'node:fs/promises'
+import type { ViteDevServer } from 'vite'
 
-import { type EnvironmentModuleNode, type ViteDevServer } from 'vite'
-import { parse, SFCBlock } from 'vue/compiler-sfc'
-
-import { hasEntryExt } from '../build/paths.js'
-import { type RuntimeManifest } from '../server/manifest.js'
-import { generateComponentId } from '../shared/component-id.js'
-import { getVisleConfig } from '../shared/config.js'
+import type { RuntimeManifest } from '../server/manifest.js'
 import { virtualIslandsBootstrapPath } from '../shared/entry.js'
-import { isCSS } from '../shared/module-id.js'
-import { asAbs, asRel, dirname, join, relative, resolve } from '../shared/path.js'
 import { getServerEnvironment } from './index.js'
+import { collectDevEntryCssIds } from './style.js'
 
 /**
- * Creates a dev-mode RuntimeManifest that resolves paths using Vite's dev server.
+ * Creates a dev-mode RuntimeManifest that resolves source and virtual asset URLs.
  */
 export function createDevManifest(devServer: ViteDevServer): RuntimeManifest {
-  const serverEnv = getServerEnvironment(devServer)
-
-  const root = asAbs(devServer.config.root)
   const { base } = devServer.config
-  const { entryDir, entryExt } = getVisleConfig(devServer.config)
-
-  // Normalize origin value
   const origin = devServer.config.server.origin?.replace(/\/$/, '') ?? ''
   const basePath = basePathForDev(base)
 
   function applyServeBase(filePath: string): string {
     return `${origin}${basePath}${filePath}`
-  }
-
-  async function getComponentCssIds(componentRelativePath: string): Promise<string[]> {
-    const absPath = resolve(root, componentRelativePath)
-
-    if (!hasEntryExt(absPath, entryExt)) {
-      return []
-    }
-
-    const code = await fs.readFile(absPath, 'utf-8')
-    const descriptor = parse(code).descriptor
-    const componentId = generateComponentId(componentRelativePath, code, false)
-
-    return Promise.all(
-      descriptor.styles.map(async (style, i) => {
-        const attrsQuery = attrsToQuery(style.attrs, 'css')
-        const srcQuery = style.src ? (style.scoped ? `&src=${componentId}` : '&src=true') : ''
-        const scopedQuery = style.scoped ? `&scoped=${componentId}` : ''
-        const query = `?vue&type=style&index=${i}${srcQuery}${scopedQuery}`
-
-        let stylePath: string
-        if (!style.src) {
-          stylePath = `/${componentRelativePath}`
-        } else if (style.src.startsWith('.')) {
-          const componentDir = dirname(asRel(componentRelativePath))
-          stylePath = '/' + join(componentDir, style.src)
-        } else {
-          const result = await serverEnv.pluginContainer.resolveId(style.src, absPath)
-          const resolved = result?.id
-          if (resolved) {
-            stylePath = '/' + relative(root, asAbs(resolved))
-          } else {
-            stylePath = '/' + style.src
-          }
-        }
-
-        let styleId = `${stylePath}${query}${attrsQuery}`
-
-        if (style.module) {
-          // inject `.module` before extension so vite handles it as css module
-          styleId = styleId.replace(/\.(\w+)$/, '.module.$1')
-        }
-
-        return applyServeBase(styleId)
-      }),
-    )
   }
 
   return {
@@ -86,64 +27,12 @@ export function createDevManifest(devServer: ViteDevServer): RuntimeManifest {
     },
 
     async getEntryCssIds(componentPath: string): Promise<string[]> {
-      // Find the entry module in the module graph by trying each extension
-      let entryRelativePath: string | undefined
-      let entryMod: EnvironmentModuleNode | undefined
-      for (const ext of entryExt) {
-        const candidate = `${entryDir}/${componentPath}${ext}`
-        const candidateAbs = resolve(root, candidate)
-        const mod = serverEnv.moduleGraph.getModuleById(candidateAbs)
-        if (mod) {
-          entryRelativePath = candidate
-          entryMod = mod
-          break
-        }
-      }
-
-      if (!entryMod || !entryRelativePath) {
-        // Module not yet loaded in the module graph, fall back to parsing the first matching entry file
-        const fallbackPath = `${entryDir}/${componentPath}${entryExt[0]}`
-        return getComponentCssIds(fallbackPath)
-      }
-
-      // Walk module graph to find all transitively imported SFC and CSS files
-      // preserving discovery order
-      const discovered: ({ type: 'css'; id: string } | { type: 'sfc'; relativePath: string })[] = []
-      const visited = new Set<string>()
-
-      const walk = (mod: EnvironmentModuleNode) => {
-        if (!mod.id || visited.has(mod.id)) {
-          return
-        }
-        visited.add(mod.id)
-
-        if (hasEntryExt(mod.id, entryExt)) {
-          discovered.push({
-            type: 'sfc',
-            relativePath: relative(root, asAbs(mod.id)),
-          })
-        } else if (!mod.id.includes('?vue') && isCSS(mod.id)) {
-          discovered.push({
-            type: 'css',
-            id: applyServeBase('/' + relative(root, asAbs(mod.id))),
-          })
-        }
-
-        for (const imported of mod.importedModules) {
-          walk(imported)
-        }
-      }
-      walk(entryMod)
-
-      // Resolve CSS ids in discovery order
-      const cssIdArrays = await Promise.all(
-        discovered.map((entry) =>
-          entry.type === 'css'
-            ? Promise.resolve([entry.id])
-            : getComponentCssIds(entry.relativePath),
-        ),
+      const cssIds = await collectDevEntryCssIds(
+        devServer,
+        getServerEnvironment(devServer),
+        componentPath,
       )
-      return [...new Set(cssIdArrays.flat())]
+      return cssIds.map(applyServeBase)
     },
   }
 }
@@ -151,37 +40,4 @@ export function createDevManifest(devServer: ViteDevServer): RuntimeManifest {
 function basePathForDev(base: string): string {
   const baseUrl = new URL(base, 'https://example.com')
   return baseUrl.pathname.replace(/\/$/, '')
-}
-
-// these are built-in query parameters so should be ignored
-// if the user happen to add them as attrs
-const ignoreList = new Set(['id', 'index', 'src', 'type', 'lang', 'module', 'scoped', 'generic'])
-
-/**
- * Borrowed from @vitejs/plugin-vue
- */
-function attrsToQuery(
-  attrs: SFCBlock['attrs'],
-  langFallback?: string,
-  forceLangFallback = false,
-): string {
-  let query = ''
-
-  for (const name in attrs) {
-    const value = attrs[name]
-    if (!ignoreList.has(name)) {
-      query += `&${encodeURIComponent(name)}${value ? `=${encodeURIComponent(value)}` : ''}`
-    }
-  }
-
-  if (langFallback || attrs.lang) {
-    query +=
-      'lang' in attrs
-        ? forceLangFallback
-          ? `&lang.${langFallback}`
-          : `&lang.${attrs.lang}`
-        : `&lang.${langFallback}`
-  }
-
-  return query
 }

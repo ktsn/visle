@@ -2,12 +2,16 @@
 
 In production, Visle renders from a statically imported build artifact.
 
+The default `serverBuild: 'components'` mode builds the page components for consumption by an
+external application server build. If another Vite plugin owns the complete application server
+build, use [integrated mode](./integrated-mode.md) instead.
+
 ## Build Output
 
 Running `vite build` produces two directories:
 
 - **`dist/client`** (default) — Client-side assets (CSS, island JavaScript)
-- **`dist/server`** (default) — Server-side components, `visle-manifest.json`, and `visle-runtime.js`
+- **`dist/server`** (default) — Server-side components, `visle-manifest.json`, and `visle-bundle.js`
 
 You can customize the output paths in the Visle plugin config:
 
@@ -45,17 +49,17 @@ app.get('/', async (req, res) => {
 export { app, render }
 ```
 
-The production entry imports the generated runtime and installs its loader before serving requests:
+The production entry imports the generated bundle and installs its loader before serving requests:
 
 ```ts
 // src/prod.ts
 import express from 'express'
-import { createStaticLoader } from 'visle'
-import runtime from '../dist/server/visle-runtime.js'
+import { createBundleLoader } from 'visle'
+import bundle from '../dist/server/visle-bundle.js'
 
 import { app, render } from './app.ts'
 
-render.setLoader(createStaticLoader(runtime))
+render.setLoader(createBundleLoader(bundle))
 
 // Serve the built assets
 app.use('/assets', express.static('dist/client/assets'))
@@ -63,4 +67,4 @@ app.use('/assets', express.static('dist/client/assets'))
 app.listen(3000)
 ```
 
-If `serverOutDir` is customized, update the static runtime import path.
+If `serverOutDir` is customized, update the bundle import path.

@@ -1,13 +1,13 @@
 {
-  "name": "ec-site-example",
+  "name": "cloudflare-example",
   "private": true,
   "type": "module",
   "scripts": {
-    "dev": "node src/dev.ts",
     "build": "vp build",
-    "start": "wrangler dev",
-    "check:worker": "wrangler deploy --dry-run",
-    "deploy:worker": "wrangler deploy"
+    "check:worker": "vp build && wrangler deploy --dry-run",
+    "deploy:worker": "vp build && wrangler deploy",
+    "dev": "vp dev",
+    "preview": "vp preview"
   },
   "dependencies": {
     "hono": "^4.11.9",
@@ -15,7 +15,7 @@
     "vue": "^3.5.28"
   },
   "devDependencies": {
-    "@hono/node-server": "^1.19.9",
+    "@cloudflare/vite-plugin": "^1.50.0",
     "vite": "catalog:",
     "vite-plus": "catalog:",
     "wrangler": "^4.118.0"

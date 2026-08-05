@@ -1,9 +1,9 @@
 import { describe, expect, test } from 'vite-plus/test'
 
-import type { ManifestData } from '../shared/manifest.ts'
+import type { ManifestSource } from '../shared/manifest.ts'
 import { createRuntimeManifest } from './manifest.ts'
 
-function createManifestData(data: Partial<ManifestData> = {}): ManifestData {
+function createManifestSource(data: Partial<ManifestSource> = {}): ManifestSource {
   return {
     base: '/',
     entryDir: 'src/pages',
@@ -18,14 +18,24 @@ function createManifestData(data: Partial<ManifestData> = {}): ManifestData {
 describe('createRuntimeManifest', () => {
   test('gets a file path derived from the JS map', async () => {
     const manifest = createRuntimeManifest(
-      createManifestData({ jsMap: { 'src/foo.vue': 'foo-1234.js' } }),
+      createManifestSource({ jsMap: { 'src/foo.vue': 'foo-1234.js' } }),
+    )
+
+    await expect(manifest.getClientImportId('src/foo.vue')).resolves.toBe('/foo-1234.js')
+  })
+
+  test('resolves a lazy JS map value', async () => {
+    const manifest = createRuntimeManifest(
+      createManifestSource({
+        jsMap: { 'src/foo.vue': async () => 'foo-1234.js' },
+      }),
     )
 
     await expect(manifest.getClientImportId('src/foo.vue')).resolves.toBe('/foo-1234.js')
   })
 
   test('throws if the JS map does not include the file path', async () => {
-    const manifest = createRuntimeManifest(createManifestData())
+    const manifest = createRuntimeManifest(createManifestSource())
 
     await expect(manifest.getClientImportId('src/foo.vue')).rejects.toThrow(
       'src/foo.vue not found in manifest JS map',
@@ -37,7 +47,7 @@ describe('createRuntimeManifest', () => {
     ['/prefix', '/prefix/foo-1234.js'],
   ] as const)('prepends base to file path: %s', async ([base, expected]) => {
     const manifest = createRuntimeManifest(
-      createManifestData({
+      createManifestSource({
         base,
         jsMap: { 'src/foo.vue': 'foo-1234.js' },
       }),
@@ -48,7 +58,7 @@ describe('createRuntimeManifest', () => {
 
   test('uses the configured entry directory', async () => {
     const manifest = createRuntimeManifest(
-      createManifestData({
+      createManifestSource({
         entryDir: 'views',
         cssMap: { 'views/index.vue': ['index-1234.css'] },
       }),
@@ -57,9 +67,19 @@ describe('createRuntimeManifest', () => {
     await expect(manifest.getEntryCssIds('index')).resolves.toEqual(['/index-1234.css'])
   })
 
+  test('resolves a lazy CSS map value', async () => {
+    const manifest = createRuntimeManifest(
+      createManifestSource({
+        cssMap: { 'src/pages/index.vue': async () => ['index-1234.css'] },
+      }),
+    )
+
+    await expect(manifest.getEntryCssIds('index')).resolves.toEqual(['/index-1234.css'])
+  })
+
   test('resolves custom entry extensions', async () => {
     const manifest = createRuntimeManifest(
-      createManifestData({
+      createManifestSource({
         entryExt: ['.vue', '.md'],
         cssMap: { 'src/pages/post.md': ['post-1234.css'] },
       }),
@@ -69,14 +89,14 @@ describe('createRuntimeManifest', () => {
   })
 
   test('returns an empty CSS list when no extension matches', async () => {
-    const manifest = createRuntimeManifest(createManifestData())
+    const manifest = createRuntimeManifest(createManifestSource())
 
     await expect(manifest.getEntryCssIds('nonexistent')).resolves.toEqual([])
   })
 
   test('gets the islands bootstrap path', async () => {
     const manifest = createRuntimeManifest(
-      createManifestData({ base: '/shop/', islandsBootstrap: 'assets/islands-1234.js' }),
+      createManifestSource({ base: '/shop/', islandsBootstrap: 'assets/islands-1234.js' }),
     )
 
     await expect(manifest.getIslandsBootstrapId()).resolves.toBe('/shop/assets/islands-1234.js')
