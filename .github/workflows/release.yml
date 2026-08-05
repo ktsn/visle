@@ -30,29 +30,8 @@ jobs:
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
 
-  publish-jsr:
-    runs-on: ubuntu-latest
-
-    permissions:
-      contents: read
-      id-token: write
-
-    steps:
-      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
-
-      - uses: voidzero-dev/setup-vp@250f29ce396baf5e8f24498e17c0dfdebabc26eb # v1
-        with:
-          node-version: '24'
-          cache: true
-          run-install: true
-
-      - name: Publish to JSR
-        run: vpx jsr publish
-
   github-release:
-    needs:
-      - publish-npm
-      - publish-jsr
+    needs: publish-npm
 
     runs-on: ubuntu-latest
 
