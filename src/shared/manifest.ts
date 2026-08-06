@@ -9,6 +9,7 @@ interface ManifestShape<CssValue, JsValue> {
   cssMap: Record<string, CssValue>
   jsMap: Record<string, JsValue>
   islandsBootstrap: string
+  devClient?: string
 }
 
 export type BuildManifest = ManifestShape<string[], string>

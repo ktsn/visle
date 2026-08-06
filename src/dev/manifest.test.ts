@@ -5,7 +5,7 @@ import { createServer, type ViteDevServer } from 'vite'
 import { afterEach, beforeEach, describe, expect, test } from 'vite-plus/test'
 
 import { visle } from '../build/index.ts'
-import { virtualIslandsBootstrapPath } from '../shared/entry.ts'
+import { virtualIslandsBootstrapPath, viteDevClientPath } from '../shared/entry.ts'
 import { createDevManifest } from './manifest.ts'
 
 const generatedDir = path.resolve(import.meta.dirname, '../../test/__generated__/dev')
@@ -53,10 +53,19 @@ describe('createDevManifest', () => {
     fs.writeFileSync(filePath, '<template><div /></template>\n<style>.page { color: red }</style>')
   }
 
-  test('returns the virtual islands bootstrap path', async () => {
+  test('returns the Vite development client without the islands bootstrap', async () => {
     const manifest = createDevManifest(await createTestServer())
 
-    await expect(manifest.getIslandsBootstrapId()).resolves.toBe(virtualIslandsBootstrapPath)
+    await expect(manifest.getBootstrapJsIds(false)).resolves.toEqual([viteDevClientPath])
+  })
+
+  test('returns the Vite development client and islands bootstrap for an island page', async () => {
+    const manifest = createDevManifest(await createTestServer())
+
+    await expect(manifest.getBootstrapJsIds(true)).resolves.toEqual([
+      viteDevClientPath,
+      virtualIslandsBootstrapPath,
+    ])
   })
 
   test('returns source paths for client imports', async () => {
@@ -95,6 +104,19 @@ describe('createDevManifest', () => {
 
     await expect(manifest.getEntryCssIds('foo')).resolves.toEqual([
       'http://localhost:3000/src/pages/foo.vue?vue&type=style&index=0&lang.css',
+    ])
+  })
+
+  test('applies the configured base and origin to the Vite development client', async () => {
+    const manifest = createDevManifest(
+      await createTestServer({
+        base: '/prefix/',
+        serverOrigin: 'http://localhost:3000',
+      }),
+    )
+
+    await expect(manifest.getBootstrapJsIds(false)).resolves.toEqual([
+      'http://localhost:3000/prefix/@vite/client',
     ])
   })
 })

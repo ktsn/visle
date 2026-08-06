@@ -11,6 +11,12 @@ exports[`Integrated development server > renders a component with its resolved d
 >
 <script
   type="module"
+  src="/base/@vite/client"
+  async
+>
+</script>
+<script
+  type="module"
   src="/base/@visle/bootstrap"
   async
 >

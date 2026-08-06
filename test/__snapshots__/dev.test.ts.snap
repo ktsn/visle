@@ -5,6 +5,12 @@ exports[`Dev Server SSR > 'CSS import in script' 1`] = `
   rel="stylesheet"
   href="/styles/imported.css"
 >
+<script
+  type="module"
+  src="/@vite/client"
+  async
+>
+</script>
 <div>
   <h2>
     CSS Import Page
@@ -17,6 +23,12 @@ exports[`Dev Server SSR > 'CSS modules' 1`] = `
   rel="stylesheet"
   href="/pages/with-css-module.vue?vue&type=style&index=0&lang.module.css"
 >
+<script
+  type="module"
+  src="/@vite/client"
+  async
+>
+</script>
 <div class="_container_[css-module-hash]">
   CSS Module
 </div>
@@ -31,6 +43,12 @@ exports[`Dev Server SSR > 'CSS with style src alias' 1`] = `
   rel="stylesheet"
   href="/styles/alias-counter.css?vue&type=style&index=0&src=[src]&scoped=[scoped]&lang.css"
 >
+<script
+  type="module"
+  src="/@vite/client"
+  async
+>
+</script>
 <script
   type="module"
   src="/@visle/bootstrap"
@@ -60,6 +78,12 @@ exports[`Dev Server SSR > 'CSS with style src' 1`] = `
 >
 <script
   type="module"
+  src="/@vite/client"
+  async
+>
+</script>
+<script
+  type="module"
   src="/@visle/bootstrap"
   async
 >
@@ -77,6 +101,12 @@ exports[`Dev Server SSR > 'CSS with style src' 1`] = `
 `;
 
 exports[`Dev Server SSR > 'Component in subdirectory' 1`] = `
+<script
+  type="module"
+  src="/@vite/client"
+  async
+>
+</script>
 <div>
   Subdirectory Page
 </div>
@@ -91,6 +121,12 @@ exports[`Dev Server SSR > 'Component with CSS' 1`] = `
   rel="stylesheet"
   href="/components/StyledCounter.vue?vue&type=style&index=0&scoped=[scoped]&lang.css"
 >
+<script
+  type="module"
+  src="/@vite/client"
+  async
+>
+</script>
 <script
   type="module"
   src="/@visle/bootstrap"
@@ -112,6 +148,12 @@ exports[`Dev Server SSR > 'Component with CSS' 1`] = `
 exports[`Dev Server SSR > 'Component with island' 1`] = `
 <script
   type="module"
+  src="/@vite/client"
+  async
+>
+</script>
+<script
+  type="module"
   src="/@visle/bootstrap"
   async
 >
@@ -129,6 +171,12 @@ exports[`Dev Server SSR > 'Component with island' 1`] = `
 `;
 
 exports[`Dev Server SSR > 'Component with props' 1`] = `
+<script
+  type="module"
+  src="/@vite/client"
+  async
+>
+</script>
 <div>
   Hello Props
 </div>
@@ -143,6 +191,12 @@ exports[`Dev Server SSR > 'Dynamic import shared CSS' 1`] = `
   rel="stylesheet"
   href="/components/StyledCounter.vue?vue&type=style&index=0&scoped=[scoped]&lang.css"
 >
+<script
+  type="module"
+  src="/@vite/client"
+  async
+>
+</script>
 <script
   type="module"
   src="/@visle/bootstrap"
@@ -173,6 +227,12 @@ exports[`Dev Server SSR > 'Full HTML document with head/body' 1`] = `
     </title>
     <script
       type="module"
+      src="/@vite/client"
+      async
+    >
+    </script>
+    <script
+      type="module"
       src="/@visle/bootstrap"
       async
     >
@@ -194,6 +254,12 @@ exports[`Dev Server SSR > 'Full HTML document with head/body' 1`] = `
 exports[`Dev Server SSR > 'Island with alias import' 1`] = `
 <script
   type="module"
+  src="/@vite/client"
+  async
+>
+</script>
+<script
+  type="module"
   src="/@visle/bootstrap"
   async
 >
@@ -211,6 +277,12 @@ exports[`Dev Server SSR > 'Island with alias import' 1`] = `
 `;
 
 exports[`Dev Server SSR > 'Island with barrel import' 1`] = `
+<script
+  type="module"
+  src="/@vite/client"
+  async
+>
+</script>
 <script
   type="module"
   src="/@visle/bootstrap"
@@ -235,6 +307,12 @@ exports[`Dev Server SSR > 'Island with barrel import' 1`] = `
 exports[`Dev Server SSR > 'Island with named import' 1`] = `
 <script
   type="module"
+  src="/@vite/client"
+  async
+>
+</script>
+<script
+  type="module"
   src="/@visle/bootstrap"
   async
 >
@@ -257,6 +335,12 @@ exports[`Dev Server SSR > 'Island with named import' 1`] = `
 exports[`Dev Server SSR > 'Island with options API renamed compo…' 1`] = `
 <script
   type="module"
+  src="/@vite/client"
+  async
+>
+</script>
+<script
+  type="module"
   src="/@visle/bootstrap"
   async
 >
@@ -274,6 +358,12 @@ exports[`Dev Server SSR > 'Island with options API renamed compo…' 1`] = `
 `;
 
 exports[`Dev Server SSR > 'Island with options API' 1`] = `
+<script
+  type="module"
+  src="/@vite/client"
+  async
+>
+</script>
 <script
   type="module"
   src="/@visle/bootstrap"
@@ -295,6 +385,12 @@ exports[`Dev Server SSR > 'Island with options API' 1`] = `
 exports[`Dev Server SSR > 'Island with props' 1`] = `
 <script
   type="module"
+  src="/@vite/client"
+  async
+>
+</script>
+<script
+  type="module"
   src="/@visle/bootstrap"
   async
 >
@@ -312,6 +408,12 @@ exports[`Dev Server SSR > 'Island with props' 1`] = `
 `;
 
 exports[`Dev Server SSR > 'Markdown entry component' 1`] = `
+<script
+  type="module"
+  src="/@vite/client"
+  async
+>
+</script>
 <div>
   <h1>
     Hello Markdown
@@ -323,6 +425,12 @@ exports[`Dev Server SSR > 'Markdown entry component' 1`] = `
 `;
 
 exports[`Dev Server SSR > 'Multiple islands on the same page' 1`] = `
+<script
+  type="module"
+  src="/@vite/client"
+  async
+>
+</script>
 <script
   type="module"
   src="/@visle/bootstrap"
@@ -344,6 +452,12 @@ exports[`Dev Server SSR > 'Multiple islands on the same page' 1`] = `
 `;
 
 exports[`Dev Server SSR > 'Named export' 1`] = `
+<script
+  type="module"
+  src="/@vite/client"
+  async
+>
+</script>
 <script
   type="module"
   src="/@visle/bootstrap"
@@ -370,6 +484,12 @@ exports[`Dev Server SSR > 'Named export' 1`] = `
 exports[`Dev Server SSR > 'Nested island' 1`] = `
 <script
   type="module"
+  src="/@vite/client"
+  async
+>
+</script>
+<script
+  type="module"
   src="/@visle/bootstrap"
   async
 >
@@ -389,6 +509,12 @@ exports[`Dev Server SSR > 'Nested island' 1`] = `
 `;
 
 exports[`Dev Server SSR > 'Non-ascii file name' 1`] = `
+<script
+  type="module"
+  src="/@vite/client"
+  async
+>
+</script>
 <p>
   Non-ascii file name
 </p>
@@ -399,6 +525,12 @@ exports[`Dev Server SSR > 'SVG image asset' 1`] = `
   rel="stylesheet"
   href="/pages/with-svg-img.vue?vue&type=style&index=0&lang.css"
 >
+<script
+  type="module"
+  src="/@vite/client"
+  async
+>
+</script>
 <script
   type="module"
   src="/@visle/bootstrap"
@@ -424,6 +556,12 @@ exports[`Dev Server SSR > 'SVG image asset' 1`] = `
 exports[`Dev Server SSR > 'Same component as island and server' 1`] = `
 <script
   type="module"
+  src="/@vite/client"
+  async
+>
+</script>
+<script
+  type="module"
   src="/@visle/bootstrap"
   async
 >
@@ -444,6 +582,12 @@ exports[`Dev Server SSR > 'Same component as island and server' 1`] = `
 `;
 
 exports[`Dev Server SSR > 'Server component with slot' 1`] = `
+<script
+  type="module"
+  src="/@vite/client"
+  async
+>
+</script>
 <div class="layout">
   <header>
     Header
@@ -471,6 +615,12 @@ exports[`Dev Server SSR > 'Shared CSS common chunk' 1`] = `
 >
 <script
   type="module"
+  src="/@vite/client"
+  async
+>
+</script>
+<script
+  type="module"
   src="/@visle/bootstrap"
   async
 >
@@ -488,6 +638,12 @@ exports[`Dev Server SSR > 'Shared CSS common chunk' 1`] = `
 `;
 
 exports[`Dev Server SSR > 'Static component rendering' 1`] = `
+<script
+  type="module"
+  src="/@vite/client"
+  async
+>
+</script>
 <div>
   Hello World
 </div>

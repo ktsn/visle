@@ -61,6 +61,19 @@ describe('createRender', () => {
     await expect(render('Comp')).resolves.toBe('<div>second</div>')
   })
 
+  test('injects a configured development client without an island', async () => {
+    const render = createRender({
+      loader: createBundleLoader({
+        entries: { Comp: () => defineComponent({ render: () => h('div', 'Hello') }) },
+        manifest: { ...emptyManifest, devClient: '/@vite/client' },
+      }),
+    })
+
+    await expect(render('Comp')).resolves.toBe(
+      '<script type="module" src="/@vite/client" async></script><div>Hello</div>',
+    )
+  })
+
   test('renders head-related tags', async () => {
     const render = createRender({
       loader: loaderFor(
