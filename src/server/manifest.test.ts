@@ -94,11 +94,31 @@ describe('createRuntimeManifest', () => {
     await expect(manifest.getEntryCssIds('nonexistent')).resolves.toEqual([])
   })
 
-  test('gets the islands bootstrap path', async () => {
+  test('gets no bootstrap JavaScript for a production page without islands', async () => {
+    const manifest = createRuntimeManifest(createManifestSource())
+
+    await expect(manifest.getBootstrapJsIds(false)).resolves.toEqual([])
+  })
+
+  test('gets the islands bootstrap path for a production page with islands', async () => {
     const manifest = createRuntimeManifest(
       createManifestSource({ base: '/shop/', islandsBootstrap: 'assets/islands-1234.js' }),
     )
 
-    await expect(manifest.getIslandsBootstrapId()).resolves.toBe('/shop/assets/islands-1234.js')
+    await expect(manifest.getBootstrapJsIds(true)).resolves.toEqual([
+      '/shop/assets/islands-1234.js',
+    ])
+  })
+
+  test('gets development and island bootstrap paths when configured', async () => {
+    const manifest = createRuntimeManifest(
+      createManifestSource({ base: '/shop/', devClient: '/@vite/client' }),
+    )
+
+    await expect(manifest.getBootstrapJsIds(false)).resolves.toEqual(['/shop/@vite/client'])
+    await expect(manifest.getBootstrapJsIds(true)).resolves.toEqual([
+      '/shop/@vite/client',
+      '/shop/assets/islands.js',
+    ])
   })
 })

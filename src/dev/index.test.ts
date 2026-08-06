@@ -44,6 +44,8 @@ describe('createDevLoader', () => {
       '<template><div>Hello</div></template>',
     )
 
-    await expect(render('Comp')).resolves.toBe('<div>Hello</div>')
+    await expect(render('Comp')).resolves.toBe(
+      '<script type="module" src="/@vite/client" async></script><div>Hello</div>',
+    )
   })
 })

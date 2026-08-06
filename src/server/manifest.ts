@@ -3,7 +3,7 @@ import type { ManifestSource, SourceValue } from '../shared/manifest.js'
 export interface RuntimeManifest {
   getClientImportId(componentRelativePath: string): Promise<string>
   getEntryCssIds(componentPath: string): Promise<string[]>
-  getIslandsBootstrapId(): Promise<string>
+  getBootstrapJsIds(hasIsland: boolean): Promise<string[]>
 }
 
 function resolveSourceValue(source: SourceValue<string>): Promise<string>
@@ -46,8 +46,12 @@ export function createRuntimeManifest(source: ManifestSource): RuntimeManifest {
       return cssIds.map(resolveAssetId)
     },
 
-    async getIslandsBootstrapId(): Promise<string> {
-      return resolveAssetId(source.islandsBootstrap)
+    async getBootstrapJsIds(hasIsland: boolean): Promise<string[]> {
+      const ids = source.devClient ? [resolveAssetId(source.devClient)] : []
+      if (hasIsland) {
+        ids.push(resolveAssetId(source.islandsBootstrap))
+      }
+      return ids
     },
   }
 }

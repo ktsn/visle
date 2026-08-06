@@ -1,4 +1,4 @@
-import { virtualIslandsBootstrapPath } from '../shared/entry.js'
+import { virtualIslandsBootstrapPath, viteDevClientPath } from '../shared/entry.js'
 import { manifestFileName } from '../shared/manifest.js'
 import type { BuildManifest } from '../shared/manifest.js'
 import { type AbsolutePath, type RelativePath, relative } from '../shared/path.js'
@@ -104,6 +104,7 @@ ${cssMap}
   },
   jsMap,
   islandsBootstrap: ${JSON.stringify(virtualIslandsBootstrapPath)},
+  devClient: ${JSON.stringify(viteDevClientPath)},
 }
 `
 }
