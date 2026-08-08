@@ -44,6 +44,33 @@ export function visle(config: VisleConfig = {}): Plugin[] {
   const virtualFile = virtualFilePlugin(resolvedConfig, getBuildManifest)
   const vuePlugin = wrapVuePlugin(resolvedConfig)
 
+  /**
+   * Setting island component paths to the client environment input.
+   */
+  const clientInputPlugin: Plugin = {
+    name: 'visle:client-input',
+    sharedDuringBuild: true,
+
+    applyToEnvironment: (env) => env.name === 'client',
+
+    options(opts) {
+      if (islandPaths.size === 0) {
+        return null
+      }
+
+      if (!Array.isArray(opts.input) && typeof opts.input !== 'string') {
+        this.error(
+          'It is not allowed to pass an object value to the input option of the client environment',
+        )
+      }
+
+      // Update client environment input with paths discovered during style build
+      const existing = Array.isArray(opts.input) ? opts.input : [opts.input]
+
+      return { ...opts, input: [...existing, ...islandPaths] }
+    },
+  }
+
   const orchestrationPlugin: Plugin = {
     name: 'visle:orchestration',
 
@@ -63,6 +90,7 @@ export function visle(config: VisleConfig = {}): Plugin[] {
             },
           },
         },
+
         client: {
           consumer: 'client',
           build: {
@@ -76,6 +104,7 @@ export function visle(config: VisleConfig = {}): Plugin[] {
             },
           },
         },
+
         ssr: {
           consumer: 'server',
           resolve: {
@@ -149,30 +178,6 @@ export function visle(config: VisleConfig = {}): Plugin[] {
 
     configResolved(viteConfig) {
       setVisleConfig(viteConfig, resolvedConfig)
-    },
-  }
-
-  const clientInputPlugin: Plugin = {
-    name: 'visle:client-input',
-    sharedDuringBuild: true,
-
-    applyToEnvironment: (env) => env.name === 'client',
-
-    options(opts) {
-      if (islandPaths.size === 0) {
-        return null
-      }
-
-      if (!Array.isArray(opts.input) && typeof opts.input !== 'string') {
-        this.error(
-          'It is not allowed to pass an object value to the input option of the client environment',
-        )
-      }
-
-      // Update client environment input with paths discovered during style build
-      const existing = Array.isArray(opts.input) ? opts.input : [opts.input]
-
-      return { ...opts, input: [...existing, ...islandPaths] }
     },
   }
 
