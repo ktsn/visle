@@ -21,7 +21,7 @@ import { islandComponentsPlugin } from './plugins/island-components.js'
 import { manifestPlugin } from './plugins/manifest.js'
 import { serverTransformPlugin } from './plugins/server-transform.js'
 import { virtualFilePlugin } from './plugins/virtual-file.js'
-import { wrapVuePlugin } from './vue.js'
+import { wrapVuePlugin } from './plugins/vue.js'
 
 export type { VisleConfig }
 
