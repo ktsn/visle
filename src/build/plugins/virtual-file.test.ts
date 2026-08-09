@@ -2,8 +2,8 @@ import { createServer, type ViteDevServer } from 'vite'
 import { describe, test, expect, afterEach } from 'vite-plus/test'
 
 import { defaultConfig } from '../../shared/config.ts'
-import { virtualIslandsBootstrapPath } from '../../shared/entry.ts'
-import { virtualFilePlugin } from './virtual-file.ts'
+import { islandsBootstrapPath } from '../../shared/entry.ts'
+import { virtualFilePlugins } from './virtual-file.ts'
 
 describe('virtualFilePlugin', () => {
   let server: ViteDevServer | undefined
@@ -17,7 +17,7 @@ describe('virtualFilePlugin', () => {
     server = await createServer({
       configFile: false,
       plugins: [
-        virtualFilePlugin(defaultConfig, () => {
+        virtualFilePlugins(defaultConfig, () => {
           throw new Error('manifest should not be requested')
         }),
       ],
@@ -27,7 +27,7 @@ describe('virtualFilePlugin', () => {
       logLevel: 'silent',
     })
 
-    const result = await server.environments.client.transformRequest(virtualIslandsBootstrapPath)
+    const result = await server.environments.client.transformRequest(islandsBootstrapPath)
 
     expect(result).not.toBeNull()
     expect(result!.code).toContain('vue-island')

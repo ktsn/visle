@@ -3,7 +3,7 @@ import type { Plugin } from 'vite'
 import type { ResolvedVisleConfig } from '../../shared/config.js'
 import type { BuildManifest } from '../../shared/manifest.js'
 import { asAbs, relative } from '../../shared/path.js'
-import { islandsBootstrapPath } from '../paths.js'
+import { realIslandsBootstrapPath } from '../paths.js'
 
 interface ManifestPluginResult {
   plugin: Plugin
@@ -113,7 +113,7 @@ export function manifestPlugin(visleConfig: ResolvedVisleConfig): ManifestPlugin
           }
 
           // The chunk is islands bootstrap that is Visle-provided
-          if (chunk.facadeModuleId === islandsBootstrapPath) {
+          if (chunk.facadeModuleId === realIslandsBootstrapPath) {
             islandsBootstrap = chunk.fileName
             continue
           }

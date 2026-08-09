@@ -8,7 +8,7 @@ import { componentWrapPrefix } from './generate.js'
 // -----------------------------
 // Custom Element Paths
 // -----------------------------
-export const islandsBootstrapPath = resolve(
+export const realIslandsBootstrapPath = resolve(
   // In Deno, import.meta.dirname can be undefined (in https module).
   // Just casting it to string for now.
   // oxlint-disable-next-line typescript/no-unnecessary-type-assertion

@@ -1,17 +1,13 @@
-import { virtualIslandsBootstrapPath, viteDevClientPath } from '../shared/entry.js'
+import { islandsBootstrapPath, viteDevClientPath } from '../shared/entry.js'
 import { manifestFileName } from '../shared/manifest.js'
 import type { BuildManifest } from '../shared/manifest.js'
-import { type AbsolutePath, type RelativePath, relative } from '../shared/path.js'
+import { type AbsolutePath, type RelativePath, relative, resolve } from '../shared/path.js'
 import { stripEntryExt } from './paths.js'
 
 export const viteEntriesId = 'virtual:visle/vite-entries'
-export const resolvedViteEntriesId = `\0${viteEntriesId}`
 export const viteManifestId = 'virtual:visle/vite-manifest'
-export const resolvedViteManifestId = `\0${viteManifestId}`
 export const viteEntryCssPrefix = 'virtual:visle/vite-entry-css/'
-export const resolvedViteEntryCssPrefix = `\0${viteEntryCssPrefix}`
 export const serverEntriesId = 'virtual:visle/server-entries'
-export const resolvedServerEntriesId = `\0${serverEntriesId}`
 
 export const serverEntryFileName = 'server-entry.js'
 export const bundleFileName = 'visle-bundle.js'
@@ -71,19 +67,27 @@ export default bundle
 }
 
 /** Generate production manifest data for the Vite-backed server loader. */
-export function generateIntegratedManifestCode(manifest: BuildManifest): string {
+export function generateVirtualManifestCode(manifest: BuildManifest): string {
   return `export default ${JSON.stringify(manifest)}\n`
 }
 
 /** Generate a development manifest with lazy per-entry CSS resolution. */
-export function generateIntegratedDevManifestCode(
-  base: string,
-  entryDir: string,
-  entryExt: string[],
-  entries: Record<string, string>,
+export function generateVirtualDevManifestCode(
+  config: {
+    root: AbsolutePath
+    base: string
+    entryDir: string
+    entryExt: string[]
+  },
+  entryComponentIds: AbsolutePath[],
 ): string {
-  const cssMap = Object.entries(entries)
-    .map(([entryRelativePath, componentPath]) => {
+  const cssMap = entryComponentIds
+    .map((componentId) => {
+      const entryRelativePath = relative(config.root, componentId)
+      const componentPath = stripEntryExt(
+        relative(resolve(config.root, config.entryDir), componentId),
+        config.entryExt,
+      )
       const cssModuleId = viteEntryCssPrefix + encodeURIComponent(componentPath)
       return `    ${JSON.stringify(entryRelativePath)}: () => import(${JSON.stringify(cssModuleId)}).then(({ default: cssIds }) => cssIds)`
     })
@@ -96,14 +100,12 @@ export function generateIntegratedDevManifestCode(
 })
 
 export default {
-  base: ${JSON.stringify(base)},
-  entryDir: ${JSON.stringify(entryDir)},
-  entryExt: ${JSON.stringify(entryExt)},
-  cssMap: {
-${cssMap}
-  },
+  base: ${JSON.stringify(config.base)},
+  entryDir: ${JSON.stringify(config.entryDir)},
+  entryExt: ${JSON.stringify(config.entryExt)},
+  cssMap: {\n${cssMap}},
   jsMap,
-  islandsBootstrap: ${JSON.stringify(virtualIslandsBootstrapPath)},
+  islandsBootstrap: ${JSON.stringify(islandsBootstrapPath)},
   devClient: ${JSON.stringify(viteDevClientPath)},
 }
 `
