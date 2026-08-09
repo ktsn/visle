@@ -5,10 +5,10 @@ import { createObjectProperty, createSimpleExpression } from '@vue/compiler-core
 import { createServer, type ViteDevServer } from 'vite'
 import { afterEach, beforeEach, describe, expect, test } from 'vite-plus/test'
 
-import { defaultConfig, type ResolvedVisleConfig } from '../shared/config.ts'
+import { defaultConfig, type ResolvedVisleConfig } from '../../shared/config.ts'
 import { wrapVuePlugin } from './vue.ts'
 
-const root = path.resolve(__dirname, '..', '..')
+const root = path.resolve(__dirname, '../../..')
 const tempDir = path.resolve(root, 'test/__generated__/server/vue-plugin')
 
 describe('wrapVuePlugin', () => {

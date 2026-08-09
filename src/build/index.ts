@@ -14,14 +14,14 @@ import {
   serverEntriesId,
   serverEntryFileName,
 } from './generate.js'
-import { islandsBootstrapPath, resolveServerComponentIds } from './paths.js'
+import { realIslandsBootstrapPath, resolveServerComponentIds } from './paths.js'
 import { devStyleSSRPlugin } from './plugins/dev-style-ssr.js'
 import { entryTypesPlugin } from './plugins/entry-types.js'
 import { islandComponentsPlugin } from './plugins/island-components.js'
 import { manifestPlugin } from './plugins/manifest.js'
 import { serverTransformPlugin } from './plugins/server-transform.js'
-import { virtualFilePlugin } from './plugins/virtual-file.js'
-import { wrapVuePlugin } from './vue.js'
+import { virtualFilePlugins } from './plugins/virtual-file.js'
+import { wrapVuePlugin } from './plugins/vue.js'
 
 export type { VisleConfig }
 
@@ -41,8 +41,35 @@ export function visle(config: VisleConfig = {}): Plugin[] {
   const { plugin: manifest, getBuildManifest } = manifestPlugin(resolvedConfig)
   const { plugin: entryTypes, generate: generateEntryTypes } = entryTypesPlugin(resolvedConfig)
   const serverTransform = serverTransformPlugin(resolvedConfig.entryExt)
-  const virtualFile = virtualFilePlugin(resolvedConfig, getBuildManifest)
+  const virtualFile = virtualFilePlugins(resolvedConfig, getBuildManifest)
   const vuePlugin = wrapVuePlugin(resolvedConfig)
+
+  /**
+   * Setting island component paths to the client environment input.
+   */
+  const clientInputPlugin: Plugin = {
+    name: 'visle:client-input',
+    sharedDuringBuild: true,
+
+    applyToEnvironment: (env) => env.name === 'client',
+
+    options(opts) {
+      if (islandPaths.size === 0) {
+        return null
+      }
+
+      if (!Array.isArray(opts.input) && typeof opts.input !== 'string') {
+        this.error(
+          'It is not allowed to pass an object value to the input option of the client environment',
+        )
+      }
+
+      // Update client environment input with paths discovered during style build
+      const existing = Array.isArray(opts.input) ? opts.input : [opts.input]
+
+      return { ...opts, input: [...existing, ...islandPaths] }
+    },
+  }
 
   const orchestrationPlugin: Plugin = {
     name: 'visle:orchestration',
@@ -63,6 +90,7 @@ export function visle(config: VisleConfig = {}): Plugin[] {
             },
           },
         },
+
         client: {
           consumer: 'client',
           build: {
@@ -71,11 +99,12 @@ export function visle(config: VisleConfig = {}): Plugin[] {
             rollupOptions: {
               // Start with islands bootstrap;
               // v-client island paths are added after the style build
-              input: [islandsBootstrapPath],
+              input: [realIslandsBootstrapPath],
               preserveEntrySignatures: 'allow-extension',
             },
           },
         },
+
         ssr: {
           consumer: 'server',
           resolve: {
@@ -152,36 +181,12 @@ export function visle(config: VisleConfig = {}): Plugin[] {
     },
   }
 
-  const clientInputPlugin: Plugin = {
-    name: 'visle:client-input',
-    sharedDuringBuild: true,
-
-    applyToEnvironment: (env) => env.name === 'client',
-
-    options(opts) {
-      if (islandPaths.size === 0) {
-        return null
-      }
-
-      if (!Array.isArray(opts.input) && typeof opts.input !== 'string') {
-        this.error(
-          'It is not allowed to pass an object value to the input option of the client environment',
-        )
-      }
-
-      // Update client environment input with paths discovered during style build
-      const existing = Array.isArray(opts.input) ? opts.input : [opts.input]
-
-      return { ...opts, input: [...existing, ...islandPaths] }
-    },
-  }
-
   return [
     orchestrationPlugin,
     clientInputPlugin,
     islandComponents,
     serverTransform,
-    virtualFile,
+    ...virtualFile,
     manifest,
     entryTypes,
     vuePlugin,

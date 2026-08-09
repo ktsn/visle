@@ -1,7 +1,7 @@
 import type { ViteDevServer } from 'vite'
 
 import type { RuntimeManifest } from '../server/manifest.js'
-import { virtualIslandsBootstrapPath, viteDevClientPath } from '../shared/entry.js'
+import { islandsBootstrapPath, viteDevClientPath } from '../shared/entry.js'
 import { getServerEnvironment } from './index.js'
 import { collectDevEntryCssIds } from './style.js'
 
@@ -25,7 +25,7 @@ export function createDevManifest(devServer: ViteDevServer): RuntimeManifest {
     async getBootstrapJsIds(hasIsland: boolean): Promise<string[]> {
       const ids = [applyServeBase(viteDevClientPath)]
       if (hasIsland) {
-        ids.push(applyServeBase(virtualIslandsBootstrapPath))
+        ids.push(applyServeBase(islandsBootstrapPath))
       }
       return ids
     },

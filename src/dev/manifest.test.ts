@@ -5,7 +5,7 @@ import { createServer, type ViteDevServer } from 'vite'
 import { afterEach, beforeEach, describe, expect, test } from 'vite-plus/test'
 
 import { visle } from '../build/index.ts'
-import { virtualIslandsBootstrapPath, viteDevClientPath } from '../shared/entry.ts'
+import { islandsBootstrapPath, viteDevClientPath } from '../shared/entry.ts'
 import { createDevManifest } from './manifest.ts'
 
 const generatedDir = path.resolve(import.meta.dirname, '../../test/__generated__/dev')
@@ -64,7 +64,7 @@ describe('createDevManifest', () => {
 
     await expect(manifest.getBootstrapJsIds(true)).resolves.toEqual([
       viteDevClientPath,
-      virtualIslandsBootstrapPath,
+      islandsBootstrapPath,
     ])
   })
 

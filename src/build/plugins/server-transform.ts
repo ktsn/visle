@@ -19,6 +19,30 @@ export function serverTransformPlugin(entryExt: string[]): Plugin {
    */
   const componentNameMap = new Map<string, Map<string, Set<string>>>()
 
+  function registerComponentName({
+    importerPath,
+    sourcePath,
+    importedName,
+  }: {
+    importerPath: string
+    sourcePath: string
+    importedName: string
+  }): void {
+    let nameMap = componentNameMap.get(importerPath)
+    if (!nameMap) {
+      nameMap = new Map()
+      componentNameMap.set(importerPath, nameMap)
+    }
+
+    let names = nameMap.get(sourcePath)
+    if (!names) {
+      names = new Set()
+      nameMap.set(sourcePath, names)
+    }
+
+    names.add(importedName)
+  }
+
   let viteConfig: ResolvedConfig
 
   return {
@@ -124,17 +148,11 @@ export function serverTransformPlugin(entryExt: string[]): Plugin {
         }
 
         // Record import name so resolveId can include it in the names query
-        let nameMap = componentNameMap.get(fileName)
-        if (!nameMap) {
-          nameMap = new Map()
-          componentNameMap.set(fileName, nameMap)
-        }
-        let names = nameMap.get(resolvedPath)
-        if (!names) {
-          names = new Set()
-          nameMap.set(resolvedPath, names)
-        }
-        names.add(importInfo.importedName)
+        registerComponentName({
+          importerPath: fileName,
+          sourcePath: resolvedPath,
+          importedName: importInfo.importedName,
+        })
       }
 
       return null
