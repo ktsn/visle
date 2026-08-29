@@ -50,7 +50,7 @@
     "@types/diffable-html": "5.0.2",
     "@types/node": "25.9.5",
     "@vitest/coverage-v8": "catalog:",
-    "bumpp": "12.2.1",
+    "bumpp": "12.2.2",
     "changelogithub": "15.0.4",
     "diffable-html": "6.0.1",
     "happy-dom": "20.11.6",
