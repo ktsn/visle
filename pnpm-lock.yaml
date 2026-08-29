@@ -51,8 +51,8 @@ importers:
         specifier: 'catalog:'
         version: 4.1.10(@vitest/browser@4.1.10)(vitest@4.1.10)
       bumpp:
-        specifier: 12.2.1
-        version: 12.2.1
+        specifier: 12.2.2
+        version: 12.2.2
       changelogithub:
         specifier: 15.0.4
         version: 15.0.4
@@ -1799,8 +1799,8 @@ packages:
     resolution: {integrity: sha512-nEh+kZOPY1w+gcCMobZ6ETUp9WfibndnosbpwB1iJk/8Gt5ZF2bhS6+B6bPYz424KtwsR6Rflc3tCz1/ghX2dQ==}
     engines: {node: '>=4.0'}
 
-  bumpp@12.2.1:
-    resolution: {integrity: sha512-8inGPx8PC/BaEOWhzfxrNHGj/x5Srt0EeJatAcTJ9N7AZpQG/HlH4kGp5JWbEL8zffYXI5iBkMjG8SHnJ9e/6g==}
+  bumpp@12.2.2:
+    resolution: {integrity: sha512-tS7KZs+e1mRpN+N9mQU2greqHbqMLZrjBA0iQ4qVS/UB8yFPUgcvQHps4dVvRe37AEMNSOyNlnGuhnoklKlacg==}
     engines: {node: ^22.18.0 || ^24.11.0 || >=26.0.0}
     hasBin: true
 
@@ -4203,7 +4203,7 @@ snapshots:
     dependencies:
       '@types/node': 25.9.5
 
-  bumpp@12.2.1:
+  bumpp@12.2.2:
     dependencies:
       args-tokenizer: 0.3.0
       cac: 7.0.0
