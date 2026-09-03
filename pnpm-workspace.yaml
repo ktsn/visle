@@ -3,7 +3,7 @@ packages:
   - examples/*
 
 overrides:
-  'vitepress>vite': 8.2.1
+  'vitepress>vite': 8.2.2
   vite: 'catalog:'
   vitest: 'catalog:'
 catalog:
