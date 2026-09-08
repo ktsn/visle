@@ -55,7 +55,7 @@
     "diffable-html": "6.0.1",
     "happy-dom": "20.14.0",
     "oxc-minify": "0.148.0",
-    "playwright": "1.62.1",
+    "playwright": "1.63.0",
     "typescript": "7.0.2",
     "vite": "catalog:",
     "vite-plus": "catalog:",
