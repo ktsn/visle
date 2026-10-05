@@ -8,9 +8,9 @@ overrides:
   vitest: 'catalog:'
 catalog:
   vite: npm:@voidzero-dev/vite-plus-core@0.2.8
-  vitest: 4.1.10
+  vitest: 4.1.11
   vite-plus: 0.2.8
-  '@vitest/coverage-v8': 4.1.10
+  '@vitest/coverage-v8': 4.1.11
 peerDependencyRules:
   allowAny:
     - vite
