@@ -42,7 +42,7 @@
     "@vitejs/plugin-vue": "^6.0.3",
     "@vue/compiler-core": "^3.5.28",
     "connect": "^3.7.0",
-    "glob": "^13.0.0"
+    "glob": "^14.0.0"
   },
   "devDependencies": {
     "@babel/types": "8.0.8",
